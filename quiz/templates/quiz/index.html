@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="container">
+        <form method="post">
+            {% csrf_token %}
+            
+           <div class="form-group">
+                   <label for="name">Имя</label>
+                   <input class="form-control my-2" type="text" id="name" name="name" placeholder="Ваше имя">
+                   <label for="name">Номер телефона</label>
+                   <input class="form-control my-2" type="text" id="phone" name="phone" placeholder="89251234567">
+           </div>
+
+            <div class="form-group">
+                <label for="type_of_cake">Какой десерт хотите?</label>
+                <select class="form-control my-2" id="type_of_cake" name="type_of_cake">
+                    <option>Торт</option>
+                    <option>Капкейки</option>
+                    <option>Макаронс</option>
+                    <option>Другое</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Ваши пожелания</label>
+                <textarea class="form-control my-2" id="message" name="message" rows="3"></textarea>
+            </div>
+            <input class="btn btn-primary btn-block" type="submit">
+        </form>
+    </div>
+    
+</body>
+</html>
