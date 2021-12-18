@@ -8,7 +8,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', quiz_views.quiz, name="quiz"),
     path('orders', quiz_views.orders, name="orders"),
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
