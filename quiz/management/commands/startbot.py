@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 import logging
 
+import telegram
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
 import os
@@ -42,10 +43,12 @@ class Command(BaseCommand):
         # Create the Updater and pass it your bot's token.
         # updater = Updater("5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA")
 
-        TOKEN = "5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA"
+        token = "5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA"
         PORT = int(os.environ.get('PORT', '5000'))
-        updater = Updater(TOKEN)
+        bot = telegram.Bot(token=token)
+        bot.setWebhook("https://caketeam.herokuapp.com/" + token)
 
+        updater = Updater(token)
         dispatcher = updater.dispatcher
 
         # on different commands - answer in Telegram
@@ -58,6 +61,6 @@ class Command(BaseCommand):
         updater.start_webhook(listen="0.0.0.0",
                               port=PORT,
                               url_path=TOKEN,
-                              webhook_url="https://caketeam.herokuapp.com/" + TOKEN)
+                              webhook_url="https://caketeam.herokuapp.com/" + token)
         updater.idle()
 
