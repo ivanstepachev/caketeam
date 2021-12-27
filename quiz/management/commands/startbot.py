@@ -60,7 +60,7 @@ class Command(BaseCommand):
 
         updater.start_webhook(listen="0.0.0.0",
                               port=PORT,
-                              url_path=TOKEN,
+                              url_path=token,
                               webhook_url="https://caketeam.herokuapp.com/" + token)
         updater.idle()
 
