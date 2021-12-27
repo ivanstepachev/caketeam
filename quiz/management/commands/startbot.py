@@ -3,6 +3,7 @@ import logging
 
 from telegram import Update, ForceReply
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters, CallbackContext
+import os
 
 # Enable logging
 # logging.basicConfig(
@@ -39,9 +40,12 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         """Start the bot."""
         # Create the Updater and pass it your bot's token.
-        updater = Updater("5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA")
+        # updater = Updater("5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA")
 
-        # Get the dispatcher to register handlers
+        TOKEN = "5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA"
+        PORT = int(os.environ.get('PORT', '8443'))
+        updater = Updater(TOKEN)
+
         dispatcher = updater.dispatcher
 
         # on different commands - answer in Telegram
@@ -51,10 +55,9 @@ class Command(BaseCommand):
         # on non command i.e message - echo the message on Telegram
         dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
 
-        # Start the Bot
-        updater.start_polling()
-
-        # Run the bot until you press Ctrl-C or the process receives SIGINT,
-        # SIGTERM or SIGABRT. This should be used most of the time, since
-        # start_polling() is non-blocking and will stop the bot gracefully.
+        updater.start_webhook(listen="0.0.0.0",
+                              port=PORT,
+                              url_path=TOKEN,
+                              webhook_url="https://caketeam.herokuapp.com/" + TOKEN)
         updater.idle()
+
