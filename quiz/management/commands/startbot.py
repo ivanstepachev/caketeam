@@ -43,7 +43,7 @@ class Command(BaseCommand):
         # updater = Updater("5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA")
 
         TOKEN = "5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA"
-        PORT = int(os.environ.get('PORT', '8443'))
+        PORT = int(os.environ.get('PORT', '5000'))
         updater = Updater(TOKEN)
 
         dispatcher = updater.dispatcher
