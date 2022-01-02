@@ -34,5 +34,5 @@ def bot(request):
         data = json.loads(request.body)
         print(data)
         chat_id = data["message"]["chat"]["id"]
-        bot.sendMessage(chat_id=chat_id, 'blablabla')
+        bot.sendMessage(chat_id=chat_id, text='blablabla')
     return HttpResponse('ok', content_type='text/plain', status=200)
