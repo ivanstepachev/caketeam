@@ -5,10 +5,8 @@ from django.http import HttpResponse
 
 import json
 
-import telegram
 import requests
 
-bot = telegram.Bot('5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA')
 
 def quiz(request):
     if request.method == 'POST':
@@ -28,6 +26,7 @@ def orders(request):
     orders = Order.objects.all()
     return render(request, 'quiz/orders.html', {'orders': orders})
 
+
 def send_message(chat_id, text):
     method = "sendMessage"
     token = "5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA"
@@ -42,5 +41,6 @@ def bot(request):
         data = json.loads(request.body)
         print(data)
         chat_id = data["message"]["chat"]["id"]
-        send_message(chat_id=chat_id, text='blablabla')
+        text = data["message"]["date"]["text"]
+        send_message(chat_id=chat_id, text=text)
     return HttpResponse('ok', content_type='text/plain', status=200)
