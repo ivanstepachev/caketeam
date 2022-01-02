@@ -16,7 +16,7 @@ def quiz(request):
         message = request.POST.get('message')
         order = Order(name=name, phone=phone, type_of_cake=type_of_cake, message=message)
         order.save()
-
+        send_message(chat_id=896205315, text=order.name)
         return redirect('quiz')
     else:
         return render(request, 'quiz/index.html')
