@@ -3,6 +3,8 @@ from quiz.models import Order
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
+import json
+
 def quiz(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -24,4 +26,7 @@ def orders(request):
 
 @csrf_exempt
 def bot(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        print(data)
     return HttpResponse('ok', content_type='text/plain', status=200)
