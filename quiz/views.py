@@ -6,6 +6,7 @@ from django.http import HttpResponse
 import json
 
 import telegram
+import requests
 
 bot = telegram.Bot('5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA')
 
@@ -27,6 +28,13 @@ def orders(request):
     orders = Order.objects.all()
     return render(request, 'quiz/orders.html', {'orders': orders})
 
+def send_message(chat_id, text):
+    method = "sendMessage"
+    token = "5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA"
+    url = f"https://api.telegram.org/bot{token}/{method}"
+    data = {"chat_id": chat_id, "text": text}
+    requests.post(url, data=data)
+
 
 @csrf_exempt
 def bot(request):
@@ -34,5 +42,5 @@ def bot(request):
         data = json.loads(request.body)
         print(data)
         chat_id = data["message"]["chat"]["id"]
-        bot.send_message(chat_id=chat_id, text='blablabla')
+        send_message(chat_id=chat_id, text='blablabla')
     return HttpResponse('ok', content_type='text/plain', status=200)
