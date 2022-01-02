@@ -5,6 +5,10 @@ from django.http import HttpResponse
 
 import json
 
+import telegram
+
+bot = telegram.Bot('5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA')
+
 def quiz(request):
     if request.method == 'POST':
         name = request.POST.get('name')
@@ -29,4 +33,6 @@ def bot(request):
     if request.method == "POST":
         data = json.loads(request.body)
         print(data)
+        chat_id = data["message"]["chat"]["id"]
+        bot.sendMessage(chat_id=chat_id, 'blablabla')
     return HttpResponse('ok', content_type='text/plain', status=200)

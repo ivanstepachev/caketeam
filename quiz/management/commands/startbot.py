@@ -48,6 +48,8 @@ class Command(BaseCommand):
         bot = telegram.Bot(token=token)
         bot.setWebhook("https://caketeam.herokuapp.com/" + token)
 
+        bot.sendMessage()
+
         updater = Updater(token)
         dispatcher = updater.dispatcher
 
