@@ -41,6 +41,12 @@ def bot(request):
         data = json.loads(request.body)
         print(data)
         chat_id = data["message"]["chat"]["id"]
-        text = data["message"]["date"]["text"]
+        text = data["message"]["text"]
         send_message(chat_id=chat_id, text=text)
     return HttpResponse('ok', content_type='text/plain', status=200)
+
+# {'update_id': 541049445, 'message':
+#     {'message_id': 60, 'from':
+#         {'id': 896205315, 'is_bot': False, 'first_name': 'Ivan', 'username': 'ivan40', 'language_code': 'ru'},
+#      'chat': {'id': 896205315, 'first_name': 'Ivan', 'username': 'ivan40', 'type': 'private'},
+#      'date': 1641148166, 'text': 'Hdbcnf'}}
