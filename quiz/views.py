@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from quiz.models import Order
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
@@ -7,6 +7,7 @@ import json
 
 import requests
 
+admin_id = 896205315
 
 def quiz(request):
     if request.method == 'POST':
@@ -16,12 +17,12 @@ def quiz(request):
         message = request.POST.get('message')
         order = Order(name=name, phone=phone, type_of_cake=type_of_cake, message=message)
         order.save()
-        order_text = f'''
-        Имя: {order.name}
+        order_text = f'''Имя: {order.name}
         Телефон: {order.phone}
         Десерт: {order.type_of_cake}
-        Примечание: {order.message}'''
-        send_message(chat_id=896205315, text=order_text)
+        Примечание: {order.message}
+        https://caketeam.herokuapp.com/orders/{order.id}'''
+        send_message(chat_id=admin_id, text=order_text)
         return redirect('quiz')
     else:
         return render(request, 'quiz/index.html')
@@ -30,6 +31,19 @@ def quiz(request):
 def orders(request):
     orders = Order.objects.all()
     return render(request, 'quiz/orders.html', {'orders': orders})
+
+
+def order_detail(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':
+        note = request.POST.get('note')
+        order.note = note
+        order.save()
+        order_text = f'''Десерт: {order.type_of_cake}
+                Примечание: {order.message}
+                Примечание2: {order.note}'''
+        send_message(chat_id=admin_id, text=order_text)
+    return render(request, 'quiz/order_detail.html', {'order': order})
 
 
 def send_message(chat_id, text):
