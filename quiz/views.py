@@ -43,7 +43,7 @@ def order_detail(request, order_id):
         comments = ''
         notes = Note.objects.filter(order=order)
         for note in notes:
-            comments += '\n' + note.date + note.text
+            comments += '\n' + str(note.date) + note.text
         order_text = f'''Десерт: {order.type_of_cake}
                 Примечание: {order.message}
                 Комментарии: {comments}'''
