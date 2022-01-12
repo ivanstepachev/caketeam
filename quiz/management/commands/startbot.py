@@ -13,8 +13,6 @@ class Command(BaseCommand):
         PORT = int(os.environ.get('PORT', '5000'))
         bot = telegram.Bot(token=token)
         bot.setWebhook("https://caketeam.herokuapp.com/" + token)
-        bot.sendMessage()
-
         updater = Updater(token)
         updater.start_webhook(listen="0.0.0.0",
                               port=PORT,
