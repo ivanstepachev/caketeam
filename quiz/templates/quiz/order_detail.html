@@ -16,7 +16,7 @@
         <p>Десерт: {{ order.type_of_cake }}</p>
         <p>Примечание: {{ order.message }}</p>
         <p>Комментарии:</p>
-        {% for note in order.notes %}
+        {% for note in order.note %}
         <p>{{ note.text }}</p>
         {% endfor %}
         <form method="post">
