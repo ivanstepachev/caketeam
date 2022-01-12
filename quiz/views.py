@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from quiz.models import Order, Token
+from quiz.models import Order, Token, Note
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
@@ -37,7 +37,9 @@ def orders(request):
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
-        note = request.POST.get('note')
+        text = request.POST.get('note')
+        note = Note(text=text)
+        note.save()
         order.note = note
         order.save()
         order_text = f'''Десерт: {order.type_of_cake}

@@ -2,12 +2,17 @@ from django.db import models
 from django.conf import settings
 
 
+class Note(models.Model):
+    text = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+
+
 class Order(models.Model):
     name = models.CharField(max_length=200, default='')
     phone = models.CharField(max_length=15, default='')
     type_of_cake = models.CharField(max_length=10, default='')
     message = models.TextField(default='')
-    note = models.TextField(default='', blank=True)
+    note = models.ForeignKey(Note, null=True, default='', on_delete=models.CASCADE, related_name='notes')
 
     def __str__(self):
         return self.name.capitalize()
