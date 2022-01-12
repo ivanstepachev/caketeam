@@ -67,6 +67,34 @@ def bot(request):
     return HttpResponse('ok', content_type='text/plain', status=200)
 
 
+def setwebhook(request):
+    if request.method == "POST":
+        token = request.POST.get('token')
+        link = request.POST.get('link')
+        token_exist = Token.objects.filter(id=1)
+        if token_exist:
+            new_token = token_exist[0]
+            new_token.token = token
+            new_token.save()
+        else:
+            new_token = Token(id=1, token=token)
+            new_token.save()
+        requests.get(f'https://api.telegram.org/bot{token}/setWebhook?url=https://{link}/bot')
+        return redirect('setwebhook')
+    else:
+        return render(request, 'quiz/setwebhook.html')
+
+
+def deletewebhook(request):
+    if request.method == "POST":
+        token = request.POST.get('token')
+        requests.get(f'https://api.telegram.org/bot{token}/deleteWebhook')
+        return redirect('deletewebhook')
+    else:
+        token = Token.objects.filter(id=1)
+        return render(request, 'quiz/deletewebhook.html', {'token': token})
+
+
 # {'update_id': 541049445, 'message':
 #     {'message_id': 60, 'from':
 #         {'id': 896205315, 'is_bot': False, 'first_name': 'Ivan', 'username': 'ivan40', 'language_code': 'ru'},
