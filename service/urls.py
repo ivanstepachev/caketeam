@@ -10,6 +10,6 @@ urlpatterns = [
     path('', quiz_views.quiz, name="quiz"),
     path('orders', quiz_views.orders, name="orders"),
     path('orders/<int:order_id>', quiz_views.order_detail, name="order_detail"),
-    path('bot/', quiz_views.bot, name="bot")
+    path('bot', quiz_views.bot, name="bot")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
