@@ -43,14 +43,13 @@ def order_detail(request, order_id):
         order.note = note
         order.save()
         # Сохраним комментарии администратора
-        comments = ''
+
         notes = order.note
-        for note in notes:
-            comments += note.text
+
 
         order_text = f'''Десерт: {order.type_of_cake}
                 Примечание: {order.message}
-                Комментарии: {comments}'''
+                Комментарии: {notes}'''
         send_message(chat_id=admin_id, text=order_text)
         return redirect('quiz')
     return render(request, 'quiz/order_detail.html', {'order': order})
