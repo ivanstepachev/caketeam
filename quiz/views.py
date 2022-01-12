@@ -61,6 +61,7 @@ def send_message(chat_id, text):
     requests.post(url, data=data)
 
 
+
 @csrf_exempt
 def bot(request):
     if request.method == "POST":
