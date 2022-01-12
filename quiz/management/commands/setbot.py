@@ -11,7 +11,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         token = options["token"]
-        requests.get(f'https://api.telegram.org/bot{token}/setWebhook?url=https://caketeam.herokuapp.com/{token}')
+        requests.get(f'https://api.telegram.org/bot{token}/setWebhook?url=https://caketeam.herokuapp.com/bot')
         file_name = 'bot_token.py'
         with open(file_name, 'w') as f:
             f.write('token = \'{}\''.format(token))
