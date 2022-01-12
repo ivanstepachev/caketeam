@@ -43,8 +43,8 @@ def order_detail(request, order_id):
         order.note = note
         order.save()
         # Сохраним комментарии администратора
+        notes = Note.objects.filter(notes__order__id=order.id)
 
-        notes = order.note
 
 
         order_text = f'''Десерт: {order.type_of_cake}
