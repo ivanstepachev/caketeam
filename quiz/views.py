@@ -43,7 +43,7 @@ def order_detail(request, order_id):
         order.note = note
         order.save()
         comments = ''
-        notes = Note.objects.filter(notes__id = order.id)
+        notes = Note.objects.filter(notes__id=order.id)
         for note in notes:
             comments += note.text
         order_text = f'''Десерт: {order.type_of_cake}
