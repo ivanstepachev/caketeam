@@ -42,8 +42,9 @@ def order_detail(request, order_id):
         note.save()
         order.note = note
         order.save()
+        # Сохраним комментарии администратора
         comments = ''
-        notes = Order.objects.filter(id=order.id)
+        notes = order.note
         for note in notes:
             comments += note.text
 
