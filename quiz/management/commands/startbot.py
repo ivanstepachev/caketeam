@@ -3,14 +3,13 @@ import telegram
 from telegram.ext import Updater
 import os
 
-from bot_token import token as t
+from bot_token import token
 
 class Command(BaseCommand):
     help = 'Bot Starting'
 
     def handle(self, *args, **options):
         """Start the bot."""
-        token = t
         PORT = int(os.environ.get('PORT', '5000'))
         bot = telegram.Bot(token=token)
         bot.setWebhook("https://caketeam.herokuapp.com/" + token)
