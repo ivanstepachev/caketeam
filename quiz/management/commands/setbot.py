@@ -13,7 +13,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         token = options["token"]
-        requests.get(f'https://api.telegram.org/bot{token}/setWebhook?url=https://caketeam.herokuapp.com/bot')
         token_exist = Token.objects.filter(id=1)
         if token_exist:
             new_token = token_exist[0]
@@ -22,3 +21,4 @@ class Command(BaseCommand):
         else:
             new_token = Token(id=1, token=token)
             new_token.save()
+        requests.get(f'https://api.telegram.org/bot{token}/setWebhook?url=https://caketeam.herokuapp.com/bot')
