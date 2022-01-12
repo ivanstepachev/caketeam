@@ -82,7 +82,8 @@ def setwebhook(request):
         requests.get(f'https://api.telegram.org/bot{token}/setWebhook?url=https://{link}/bot')
         return redirect('setwebhook')
     else:
-        return render(request, 'quiz/setwebhook.html')
+        url = request.build_absolute_uri().split('/')[2]
+        return render(request, 'quiz/setwebhook.html', {'url': url})
 
 
 def deletewebhook(request):
