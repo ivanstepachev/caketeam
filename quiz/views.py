@@ -40,10 +40,13 @@ def order_detail(request, order_id):
         text = request.POST.get('note')
         note = Note(text=text, order=order)
         note.save()
-
+        comments = ''
+        notes = Note.objects.filter(order=order)
+        for note in notes:
+            comments += note.text
         order_text = f'''Десерт: {order.type_of_cake}
                 Примечание: {order.message}
-                Комментарии: {note.text}'''
+                Комментарии: {comments}'''
         send_message(chat_id=admin_id, text=order_text)
         return redirect('quiz')
     return render(request, 'quiz/order_detail.html', {'order': order})
