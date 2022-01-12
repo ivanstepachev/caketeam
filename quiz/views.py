@@ -38,18 +38,12 @@ def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
         text = request.POST.get('note')
-        note = Note(text=text)
+        note = Note(text=text, order=order.id)
         note.save()
-        order.note = note
-        order.save()
-        # Сохраним комментарии администратора
-        notes = Note.objects.filter(notes__order__id=order.id)
-
-
 
         order_text = f'''Десерт: {order.type_of_cake}
                 Примечание: {order.message}
-                Комментарии: {notes}'''
+                Комментарии: {note.text}'''
         send_message(chat_id=admin_id, text=order_text)
         return redirect('quiz')
     return render(request, 'quiz/order_detail.html', {'order': order})
