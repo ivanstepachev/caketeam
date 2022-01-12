@@ -23,3 +23,10 @@ class Staff(models.Model):
 
     def __str__(self):
         return self.telegram_id
+
+
+class Token(models.Model):
+    token = models.CharField(max_length=30)
+
+    def __str__(self):
+        return 'token'

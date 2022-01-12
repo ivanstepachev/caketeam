@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from quiz.models import Order
+from quiz.models import Order, Token
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
@@ -8,6 +8,7 @@ import json
 import requests
 
 admin_id = 896205315
+
 
 def quiz(request):
     if request.method == 'POST':
@@ -49,7 +50,7 @@ def order_detail(request, order_id):
 
 def send_message(chat_id, text):
     method = "sendMessage"
-    token = "5043578506:AAGe4gsEVX9Rhy0ZkdKyb3qRReSgPm6neuA"
+    token = Token.objects.get(id=1).token
     url = f"https://api.telegram.org/bot{token}/{method}"
     data = {"chat_id": chat_id, "text": text}
     requests.post(url, data=data)
