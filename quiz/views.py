@@ -41,8 +41,9 @@ def order_detail(request, order_id):
         order.save()
         order_text = f'''Десерт: {order.type_of_cake}
                 Примечание: {order.message}
-                Примечание2: {order.note}'''
+                Примечание 2: {order.note}'''
         send_message(chat_id=admin_id, text=order_text)
+        return redirect('quiz')
     return render(request, 'quiz/order_detail.html', {'order': order})
 
 
@@ -63,6 +64,7 @@ def bot(request):
         text = data["message"]["text"]
         send_message(chat_id=chat_id, text=text)
     return HttpResponse('ok', content_type='text/plain', status=200)
+
 
 # {'update_id': 541049445, 'message':
 #     {'message_id': 60, 'from':
