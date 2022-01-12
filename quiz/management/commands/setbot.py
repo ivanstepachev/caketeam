@@ -22,3 +22,5 @@ class Command(BaseCommand):
             new_token = Token(id=1, token=token)
             new_token.save()
         requests.get(f'https://api.telegram.org/bot{token}/setWebhook?url=https://caketeam.herokuapp.com/bot')
+
+
