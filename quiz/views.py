@@ -38,7 +38,7 @@ def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
         text = request.POST.get('note')
-        note = Note(text=text, order=order.id)
+        note = Note(text=text, order=order)
         note.save()
 
         order_text = f'''Десерт: {order.type_of_cake}
