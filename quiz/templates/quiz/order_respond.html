@@ -9,34 +9,26 @@
 </head>
 <body>
 
-    <div class="container">
-        <p>Номер заказа: {{ order.id }}</p>
-        <p>Имя: {{ order.name }}</p>
-        <p>Телефон: {{ order.phone }}</p>
+    <div class="container mt-3">
+        <h3>Оставить отклик</h3>
         <p>Десерт: {{ order.type_of_cake }}</p>
         <p>Примечание: {{ order.message }}</p>
         <p>Комментарии:</p>
         {% for note in notes %}
         <p>{{ note.date }} {{ note.text }}</p>
         {% endfor %}
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
-                <label for="note">Добавить примечание к заказу</label>
-                <textarea class="form-control my-2" id="note" name="note" rows="3"></textarea>
+                <label for="message">Текст</label>
+                <textarea class="form-control my-2" id="message" name="message" rows="3"></textarea>
             </div>
-            <input class="btn btn-danger btn-block" type="submit">
+            <div class="form-group">
+                <label for="images">Фото</label>
+                <input type="file" class="form-control my-2" id="images" name="images" multiple>
+            </div>
+            <input class="btn btn-primary btn-block" type="submit">
         </form>
-
-        {% for respond in responds %}
-        <p class="mt-3">{{ respond.text }} {{ respond.images.image }}</p>
-            {% for image in respond.images.all %}
-            <div class="text-center">
-                <img src="{{ image.image.url }}" class="rounded" width="250" alt="">
-            </div>
-            {% endfor %}
-        {% endfor %}
     </div>
-
 </body>
 </html>

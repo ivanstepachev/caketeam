@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from quiz.models import Order, Token, Note
+from quiz.models import Order, Token, Note, Respond, Image
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
@@ -46,12 +46,33 @@ def order_detail(request, order_id):
             comments += '\n' + str(note.date) + note.text
         order_text = f'''Десерт: {order.type_of_cake}
                 Примечание: {order.message}
-                Комментарии: {comments}'''
+                Комментарии: {comments}
+                https://caketeam.herokuapp.com/{order.id}'''
         send_message(chat_id=admin_id, text=order_text)
         return redirect('order_detail', order_id)
     else:
         notes = Note.objects.filter(order=order)
+        responds = Respond.objects.filter(order=order)
+        if responds is not None:
+            return render(request, 'quiz/order_detail.html', {'order': order, 'notes': notes, 'responds': responds})
         return render(request, 'quiz/order_detail.html', {'order': order, 'notes': notes})
+
+
+# Оставляем отклик
+def order_respond(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    if request.method == 'POST':
+        text = request.POST.get('message')
+        # Так как несколько изображений
+        images = request.FILES.getlist('images')
+        respond = Respond.objects.create(text=text, order=order)
+        if images:
+            for image in images:
+                Image.objects.create(image=image, respond=respond)
+        return redirect('order_respond', order_id)
+    else:
+        notes = Note.objects.filter(order=order)
+        return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes})
 
 
 def send_message(chat_id, text):

@@ -8,8 +8,8 @@ class Order(models.Model):
     type_of_cake = models.CharField(max_length=10, default='')
     message = models.TextField(default='')
 
-    def __str__(self):
-        return self.name.capitalize()
+    # def __str__(self):
+    #     return self.name.capitalize()
 
 
 class Note(models.Model):
@@ -19,6 +19,24 @@ class Note(models.Model):
 
     def __str__(self):
         return f'{self.date} {self.text}'
+
+
+# Отклик на вакансию
+class Respond(models.Model):
+    text = models.TextField()
+    date = models.DateTimeField(auto_now_add=True)
+    order = models.ForeignKey(Order, null=True, default='', on_delete=models.CASCADE, related_name='responds')
+
+    def __str__(self):
+        return f'{self.date} {self.text}'
+
+
+class Image(models.Model):
+    image = models.ImageField(upload_to='responds/')
+    respond = models.ForeignKey(Respond, null=True, default='', on_delete=models.CASCADE, related_name='images')
+
+    def __str__(self):
+        return str(self.image)
 
 
 class Staff(models.Model):
