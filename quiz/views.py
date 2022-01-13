@@ -35,8 +35,8 @@ def orders(request):
 
 
 def order_detail(request, order_id):
-    order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
+        order = get_object_or_404(Order, id=order_id)
         text = request.POST.get('note')
         note = Note(text=text, order=order)
         note.save()
@@ -48,8 +48,14 @@ def order_detail(request, order_id):
                 Примечание: {order.message}
                 Комментарии: {comments}'''
         send_message(chat_id=admin_id, text=order_text)
-        return redirect('quiz')
-    return render(request, 'quiz/order_detail.html', {'order': order})
+        return redirect('order_detail', order_id)
+    else:
+        order = get_object_or_404(Order, id=order_id)
+        comments = ''
+        notes = Note.objects.filter(order=order)
+        for note in notes:
+            comments += '\n' + str(note.date) + note.text
+        return render(request, 'quiz/order_detail.html', {'order': order, 'comments': comments})
 
 
 def send_message(chat_id, text):
