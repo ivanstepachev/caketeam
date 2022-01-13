@@ -16,7 +16,9 @@
         <p>Десерт: {{ order.type_of_cake }}</p>
         <p>Примечание: {{ order.message }}</p>
         <p>Комментарии:</p>
-        <p>{{ comments }}</p>
+        {% for note in notes %}
+        <p>{{ note.date }} {{ note.text }}</p>
+        {% endfor %}
         <form method="post">
             {% csrf_token %}
             <div class="form-group">
