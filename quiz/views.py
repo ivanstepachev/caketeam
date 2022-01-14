@@ -89,9 +89,10 @@ def bot(request):
     if request.method == "POST":
         data = json.loads(request.body)
         print(data)
-        chat_id = data["message"]["chat"]["id"]
-        text = data["message"]["text"]
-        send_message(chat_id=chat_id, text=text)
+        if "message" in data:
+            chat_id = data["message"]["chat"]["id"]
+            text = data["message"]["text"]
+            send_message(chat_id=chat_id, text=text)
     return HttpResponse('ok', content_type='text/plain', status=200)
 
 
@@ -129,3 +130,9 @@ def deletewebhook(request):
 #         {'id': 896205315, 'is_bot': False, 'first_name': 'Ivan', 'username': 'ivan40', 'language_code': 'ru'},
 #      'chat': {'id': 896205315, 'first_name': 'Ivan', 'username': 'ivan40', 'type': 'private'},
 #      'date': 1641148166, 'text': 'Hdbcnf'}}
+
+# {'update_id': 541049484, 'my_chat_member':
+#     {'chat': {'id': 1715664500, 'first_name': 'Alina', 'type': 'private'},
+#      'from': {'id': 1715664500, 'is_bot': False, 'first_name': 'Alina', 'language_code': 'ru'},
+#      'date': 1642118668, 'old_chat_member': {'user': {'id': 5043578506, 'is_bot': True, 'first_name': 'FirstBot', 'username': 'i1nes_bot'},
+#             'status': 'member'}, 'new_chat_member': {'user': {'id': 5043578506, 'is_bot': True, 'first_name': 'FirstBot', 'username': 'i1nes_bot'}, 'status': 'kicked', 'until_date': 0}}}
