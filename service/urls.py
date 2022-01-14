@@ -14,7 +14,7 @@ urlpatterns = [
     path('bot', quiz_views.bot, name="bot"),
     path('bot/setwebhook', quiz_views.setwebhook, name="setwebhook"),
     path('bot/deletewebhook', quiz_views.deletewebhook, name="deletewebhook")
-]
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
