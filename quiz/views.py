@@ -79,7 +79,11 @@ def order_respond(request, order_id):
         return redirect('order_respond', order_id)
     else:
         notes = Note.objects.filter(order=order)
-        return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes})
+        telegram_id = request.GET.get('id')
+        staff = Staff.objects.filter(telegram_id=telegram_id)
+        # Для проверки отклика по пину сотрудника
+        correct_pin = staff.pin
+        return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'truth_pin': correct_pin})
 
 
 def send_message(chat_id, text):
