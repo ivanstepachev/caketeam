@@ -100,7 +100,7 @@ def bot(request):
             if 'username' in data["message"]["chat"]:
                 handler(chat_id=chat_id, text=text)
             else:
-                text = '''Сначала сделайте себе никнейм'''
+                text = '''Сначала сделайте себе ник нейм'''
                 send_message(chat_id=chat_id, text=text)
     return HttpResponse('ok', content_type='text/plain', status=200)
 
