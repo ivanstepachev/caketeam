@@ -43,9 +43,10 @@ class Staff(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     name = models.CharField(max_length=15)
     surname = models.CharField(max_length=15)
-    telegram_id = models.IntegerField()
+    telegram_id = models.CharField(max_length=15)
     admin = models.BooleanField(default=False)
     date = models.DateField(auto_now_add=True)
+    pin = models.CharField(max_length=4, blank=True)
 
     def __str__(self):
         return self.telegram_id

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from quiz.models import Order, Token, Note, Respond, Image
+from quiz.models import Order, Token, Note, Respond, Image, Staff
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
@@ -23,7 +23,9 @@ def quiz(request):
         Десерт: {order.type_of_cake}
         Примечание: {order.message}
         https://caketeam.herokuapp.com/orders/{order.id}'''
-        send_message(chat_id=admin_id, text=order_text)
+        admin_staff_list = Staff.objects.filter(admin=True)
+        for admin_staff in admin_staff_list:
+            send_message(chat_id=int(admin_staff.telegram_id), text=order_text)
         return redirect('quiz')
     else:
         return render(request, 'quiz/index.html')
@@ -48,7 +50,9 @@ def order_detail(request, order_id):
                 Примечание: {order.message}
                 Комментарии: {comments}
                 https://caketeam.herokuapp.com/{order.id}'''
-        send_message(chat_id=admin_id, text=order_text)
+        staff_list = Staff.objects.all()
+        for staff in staff_list:
+            send_message(chat_id=int(staff.telegram_id), text=order_text)
         return redirect('order_detail', order_id)
     else:
         notes = Note.objects.filter(order=order)
@@ -81,7 +85,6 @@ def send_message(chat_id, text):
     url = f"https://api.telegram.org/bot{token}/{method}"
     data = {"chat_id": chat_id, "text": text}
     requests.post(url, data=data)
-
 
 
 @csrf_exempt
