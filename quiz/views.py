@@ -84,7 +84,7 @@ def order_respond(request, order_id):
     else:
         notes = Note.objects.filter(order=order)
         telegram_id = request.GET.get('id')
-        staff = Staff.objects.filter(telegram_id=telegram_id)
+        staff = Staff.objects.filter(telegram_id=str(telegram_id))
         # Для проверки отклика по пину сотрудника
         correct_pin = staff[0].pin
         return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'correct_pin': correct_pin})
