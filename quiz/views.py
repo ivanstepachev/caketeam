@@ -69,21 +69,25 @@ def order_respond(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
         text = request.POST.get('message')
-        # pin = request.POST.get('pin')
+        pin = request.POST.get('pin')
+        correct_pin = request.POST.get('correct_pin')
         # Так как несколько изображений
         images = request.FILES.getlist('images')
-        respond = Respond.objects.create(text=text, order=order)
-        if images:
-            for image in images:
-                Image.objects.create(image=image, respond=respond)
-        return redirect('order_respond', order_id)
+        if correct_pin == pin:
+            respond = Respond.objects.create(text=text, order=order)
+            if images:
+                for image in images:
+                    Image.objects.create(image=image, respond=respond)
+            return redirect('order_respond', order_id)
+        else:
+            return redirect('quiz')   # Тут надо вызвать ошибку
     else:
         notes = Note.objects.filter(order=order)
         telegram_id = request.GET.get('id')
         staff = Staff.objects.filter(telegram_id=telegram_id)
         # Для проверки отклика по пину сотрудника
-        correct_pin = staff.pin
-        return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'truth_pin': correct_pin})
+        correct_pin = staff[0].pin
+        return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'correct_pin': correct_pin})
 
 
 def send_message(chat_id, text):
