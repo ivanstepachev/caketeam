@@ -15,7 +15,7 @@ def send_message(chat_id, text, reply_markup=None, **kwargs):
 def handler(chat_id, text):
     if text == '/start':
         answer = '''Добро пожаловать на платформу. Здесь ты можешь получать кондитерские задание. Нажми начать для старта'''
-        reply_markup = json.dumps({'keyboard': [[{"text": "A button", "callback_data": "yes"}], ["B button"]],
+        reply_markup = json.dumps({'keyboard': [[{"text": "A button", "url": "naira-arina.ru"}], ["B button"]],
                             'one_time_keyboard': True,
                             'resize_keyboard': True})
         send_message(chat_id=chat_id, text=answer, reply_markup=reply_markup)
