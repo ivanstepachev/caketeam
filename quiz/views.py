@@ -7,6 +7,8 @@ import json
 
 import requests
 
+from quiz.handlers import handler
+
 admin_id = 896205315
 
 
@@ -95,7 +97,7 @@ def bot(request):
         if "message" in data:
             chat_id = data["message"]["chat"]["id"]
             text = data["message"]["text"]
-            send_message(chat_id=chat_id, text=text)
+            handler(chat_id=chat_id, text=text)
     return HttpResponse('ok', content_type='text/plain', status=200)
 
 
