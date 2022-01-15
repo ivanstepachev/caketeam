@@ -48,12 +48,12 @@ def order_detail(request, order_id):
         notes = Note.objects.filter(order=order)
         for note in notes:
             comments += '\n' + str(note.date) + note.text
-        order_text = f'''Десерт: {order.type_of_cake}
-                Примечание: {order.message}
-                Комментарии: {comments}
-                https://caketeam.herokuapp.com/{order.id}'''
         staff_list = Staff.objects.all()
         for staff in staff_list:
+            order_text = f'''Десерт: {order.type_of_cake}
+                            Примечание: {order.message}
+                            Комментарии: {comments}
+                            https://caketeam.herokuapp.com/{order.id}?id={staff.telegram_id}'''
             send_message(chat_id=int(staff.telegram_id), text=order_text)
         return redirect('order_detail', order_id)
     else:
@@ -69,6 +69,7 @@ def order_respond(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
         text = request.POST.get('message')
+        # pin = request.POST.get('pin')
         # Так как несколько изображений
         images = request.FILES.getlist('images')
         respond = Respond.objects.create(text=text, order=order)
