@@ -1,5 +1,6 @@
 import requests
 from quiz.models import Token, Staff
+import json
 
 
 # Отправка сообщений через бота
@@ -14,6 +15,7 @@ def send_message(chat_id, text, reply_markup=None, **kwargs):
 def handler(chat_id, text):
     if text == '/start':
         answer = '''Добро пожаловать на платформу. Здесь ты можешь получать кондитерские задание. Нажми начать для старта'''
-        send_message(chat_id=chat_id, text=answer, reply_markup={"inline_keyboard": [{"text":"yes", "callback_data":"yes"}]})
+        reply_markup = json.dump({"inline_keyboard": [[{"text": "yes", "callback_data": "yes"}]]})
+        send_message(chat_id=chat_id, text=answer, reply_markup=reply_markup)
     else:
         send_message(chat_id=chat_id, text=text)
