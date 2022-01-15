@@ -14,6 +14,6 @@ def send_message(chat_id, text, reply_markup=None, **kwargs):
 def handler(chat_id, text):
     if text == '/start':
         answer = '''Добро пожаловать на платформу. Здесь ты можешь получать кондитерские задание. Нажми начать для старта'''
-        send_message(chat_id=chat_id, text=answer)
+        send_message(chat_id=chat_id, text=answer, reply_markup={'начать': 'начать'})
     else:
         send_message(chat_id=chat_id, text=text)
