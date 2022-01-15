@@ -19,7 +19,7 @@ def handler(chat_id, text):
         #                     'one_time_keyboard': True,
         #                     'resize_keyboard': True})
 
-        reply_markup = json.dumps({'text': 'Перейти', 'url': 'https://naira-arina.ru'})
+        reply_markup = json.dumps([{'text': 'Перейти', 'url': 'https://naira-arina.ru'}])
         send_message(chat_id=chat_id, text=answer, reply_markup=reply_markup)
     else:
         send_message(chat_id=chat_id, text=text)
