@@ -44,6 +44,7 @@ class Staff(models.Model):
     username = models.CharField(max_length=20, default='')
     name = models.CharField(max_length=15)
     surname = models.CharField(max_length=15)
+    city = models.CharField(max_length=15, default='')
     telegram_id = models.CharField(max_length=15)
     admin = models.BooleanField(default=False)
     date = models.DateField(auto_now_add=True)
