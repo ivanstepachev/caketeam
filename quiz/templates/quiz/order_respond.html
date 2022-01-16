@@ -18,8 +18,9 @@
         <p>{{ note.date }} {{ note.text }}</p>
         {% endfor %}
         <p>Количество откликов: {{ responds }} из {{ order.max_responds }}</p>
+        {% load tag_library %}
 
-
+        {% if {{ responds|to_int }} < {{ order.max_responds|to_int }} %}
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -39,9 +40,9 @@
             <input class="btn btn-primary btn-block" type="submit">
         </form>
 
-
+        {% else %}
         <p>К сожалению отклик больше нельзя оставить, так как превышено максимальное количество</p>
-
+        {% endif %}
 
     </div>
 </body>
