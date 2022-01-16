@@ -88,7 +88,7 @@ def order_respond(request, order_id):
         telegram_id = request.GET.get('id')
         staff = Staff.objects.filter(telegram_id=str(telegram_id))
         # Для проверки отклика по пину сотрудника через id чтобы не показывать пин на странице в коде
-        num = staff.id
+        num = staff[0].id
         return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'num': num})
 
 
