@@ -84,6 +84,7 @@ def order_respond(request, order_id):
     else:
         notes = Note.objects.filter(order=order)
         telegram_id = request.GET.get('id')
+        print(telegram_id)
         staff = Staff.objects.get(telegram_id=str(telegram_id))
         # Для проверки отклика по пину сотрудника
         correct_pin = staff.pin
