@@ -18,7 +18,7 @@
         <p>{{ note.date }} {{ note.text }}</p>
         {% endfor %}
         <p>Количество откликов: {{ responds }} из {{ order.max_responds }}</p>
-        {% load tag_library %}
+        {% load template_library %}
 
         {% if {{ responds|to_int }} < {{ order.max_responds|to_int }} %}
 
