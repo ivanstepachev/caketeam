@@ -70,10 +70,11 @@ def order_respond(request, order_id):
     if request.method == 'POST':
         text = request.POST.get('message')
         pin = request.POST.get('pin')
-        correct_pin = request.POST.get('correct_pin')
+        num = request.POST.get('num')
+        staff = Staff.objects.filter(id=num)
         # Так как несколько изображений
         images = request.FILES.getlist('images')
-        if str(correct_pin) == str(pin):
+        if str(staff.pin) == str(pin):
             # Нужно привязать к юзеру
             respond = Respond.objects.create(text=text, order=order)
             if images:
@@ -85,10 +86,10 @@ def order_respond(request, order_id):
     elif request.method == 'GET':
         notes = Note.objects.filter(order=order)
         telegram_id = request.GET.get('id')
-        staff = Staff.objects.get(telegram_id=str(telegram_id))
-        # Для проверки отклика по пину сотрудника
-        correct_pin = staff.pin
-        return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'correct_pin': correct_pin})
+        staff = Staff.objects.filter(telegram_id=str(telegram_id))
+        # Для проверки отклика по пину сотрудника через id чтобы не показывать пин на странице в коде
+        num = staff.id
+        return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'num': num})
 
 
 def send_message(chat_id, text):
