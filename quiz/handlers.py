@@ -16,7 +16,7 @@ def handler(chat_id, text, username):
     if text.lower() == '/start':
         if len(Staff.objects.filter(telegram_id=chat_id)) == 0:
             answer = '''Добро пожаловать на платформу. Здесь ты можешь получать кондитерские задание. Для начала нужно пройти регистрацию'''
-            keyboard = json.dumps({"inline_keyboard": [[{"text": "Регистрация", 'url': f'https://caketeam.herokuapp.com/reg/{chat_id}/{username.lower()}'}]]})
+            keyboard = json.dumps({"inline_keyboard": [[{"text": "Регистрация", 'url': f'https://caketeam.herokuapp.com/reg/{chat_id}/{username}'}]]})
             send_message(chat_id=chat_id, text=answer, reply_markup=keyboard)
         else:
             answer = '''Главное меню'''
