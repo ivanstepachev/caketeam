@@ -114,6 +114,7 @@ def order_respond(request, order_id):
         responds = len(Respond.objects.filter(order=order))
         # Для проверки отклика по пину сотрудника через id чтобы не показывать пин на странице в коде
         num = staff[0].id
+
         return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'num': num, 'responds': responds})
 
 
