@@ -73,7 +73,8 @@ def order_respond(request, order_id):
         correct_pin = request.POST.get('correct_pin')
         # Так как несколько изображений
         images = request.FILES.getlist('images')
-        if correct_pin == pin:
+        if str(correct_pin) == str(pin):
+            # Нужно привязать к юзеру
             respond = Respond.objects.create(text=text, order=order)
             if images:
                 for image in images:
