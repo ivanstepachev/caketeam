@@ -32,11 +32,11 @@ def quiz(request):
 
 def registration(request, chat_id, username):
     if request.method == 'POST':
-        city = request.POST.get('city')
-        name = request.POST.get('name')
-        surname = request.POST.get('surname')
+        city = request.POST.get('city').capitalize()
+        name = request.POST.get('name').capitalize()
+        surname = request.POST.get('surname').capitalize()
         phone = request.POST.get('phone')
-        instagram = request.POST.get('instagram')
+        instagram = request.POST.get('instagram').lower()
         pin = chat_id[-4]
         staff = Staff(username=username.lower(),
                       telegram_id=chat_id,
@@ -49,7 +49,7 @@ def registration(request, chat_id, username):
         staff.save()
         return redirect('quiz')
     if request.method == 'GET':
-        pin = chat_id[-4]
+        pin = chat_id[-4:]
         return render(request, 'quiz/registration.html', {'pin': pin, 'username': username})
 
 
