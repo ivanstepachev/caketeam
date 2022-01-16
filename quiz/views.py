@@ -7,7 +7,7 @@ import json
 
 import requests
 
-from quiz.handlers import handler
+from quiz.handlers import handler, send_message
 
 admin_id = 896205315
 
@@ -20,14 +20,11 @@ def quiz(request):
         message = request.POST.get('message')
         order = Order(name=name, phone=phone, type_of_cake=type_of_cake, message=message)
         order.save()
-        order_text = f'''Имя: {order.name}
-        Телефон: {order.phone}
-        Десерт: {order.type_of_cake}
-        Примечание: {order.message}
-        https://caketeam.herokuapp.com/orders/{order.id}'''
+        order_text = f'''Имя: {order.name}\nТелефон: {order.phone}\nДесерт: {order.type_of_cake}\nПримечание: {order.message}'''
+        keyboard = json.dumps({"inline_keyboard": [[{"text": "Разместить задание", 'url': f'https://caketeam.herokuapp.com/orders/{order.id}'}]]})
         admin_staff_list = Staff.objects.filter(admin=True)
         for admin_staff in admin_staff_list:
-            send_message(chat_id=int(admin_staff.telegram_id), text=order_text)
+            send_message(chat_id=int(admin_staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('quiz')
     else:
         return render(request, 'quiz/index.html')
@@ -50,11 +47,9 @@ def order_detail(request, order_id):
             comments += '\n' + str(note.date) + note.text
         staff_list = Staff.objects.all()
         for staff in staff_list:
-            order_text = f'''Десерт: {order.type_of_cake}
-                            Примечание: {order.message}
-                            Комментарии: {comments}
-                            https://caketeam.herokuapp.com/{order.id}?id={staff.telegram_id}'''
-            send_message(chat_id=int(staff.telegram_id), text=order_text)
+            order_text = f'''Десерт: {order.type_of_cake}\nПримечание: {order.message}\nКомментарии: {comments}'''
+            keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'https://caketeam.herokuapp.com/{order.id}?id={staff.telegram_id}'}]]})
+            send_message(chat_id=int(staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('order_detail', order_id)
     else:
         notes = Note.objects.filter(order=order)
@@ -92,12 +87,12 @@ def order_respond(request, order_id):
         return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'num': num})
 
 
-def send_message(chat_id, text):
-    method = "sendMessage"
-    token = Token.objects.get(id=1).token
-    url = f"https://api.telegram.org/bot{token}/{method}"
-    data = {"chat_id": chat_id, "text": text}
-    requests.post(url, data=data)
+# def send_message(chat_id, text):
+#     method = "sendMessage"
+#     token = Token.objects.get(id=1).token
+#     url = f"https://api.telegram.org/bot{token}/{method}"
+#     data = {"chat_id": chat_id, "text": text}
+#     requests.post(url, data=data)
 
 
 @csrf_exempt

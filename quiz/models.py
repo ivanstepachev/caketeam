@@ -40,7 +40,8 @@ class Image(models.Model):
 
 
 class Staff(models.Model):
-    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    # user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    username = models.CharField(max_length=20, default='')
     name = models.CharField(max_length=15)
     surname = models.CharField(max_length=15)
     telegram_id = models.CharField(max_length=15)
@@ -49,7 +50,7 @@ class Staff(models.Model):
     pin = models.CharField(max_length=4, blank=True)
 
     def __str__(self):
-        return self.telegram_id
+        return self.username
 
 
 class Token(models.Model):
