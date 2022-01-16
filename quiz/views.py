@@ -38,7 +38,14 @@ def registration(request, chat_id, username):
         phone = request.POST.get('phone')
         instagram = request.POST.get('instagram')
         pin = chat_id[-4]
-        staff = Staff(username=username.lower(), telegram_id=chat_id, city=city, name=name, surname=surname, pin=pin)
+        staff = Staff(username=username.lower(),
+                      telegram_id=chat_id,
+                      city=city,
+                      name=name,
+                      surname=surname,
+                      pin=pin,
+                      phone=phone,
+                      instagram=instagram)
         staff.save()
         return redirect('quiz')
     if request.method == 'GET':
@@ -120,7 +127,7 @@ def bot(request):
             chat_id = data["message"]["chat"]["id"]
             text = data["message"]["text"]
             if 'username' in data["message"]["chat"]:
-                username = data["message"]["chat"]
+                username = data["message"]["chat"]["username"]
                 handler(chat_id=chat_id, text=text, username=username)
             else:
                 text = '''Сначала сделайте себе ник нейм'''
