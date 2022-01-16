@@ -74,7 +74,7 @@ def order_respond(request, order_id):
         staff = Staff.objects.filter(id=num)
         # Так как несколько изображений
         images = request.FILES.getlist('images')
-        if str(staff.pin) == str(pin):
+        if str(staff[0].pin) == str(pin):
             # Нужно привязать к юзеру
             respond = Respond.objects.create(text=text, order=order)
             if images:
