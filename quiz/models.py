@@ -7,6 +7,7 @@ class Order(models.Model):
     phone = models.CharField(max_length=15, default='')
     type_of_cake = models.CharField(max_length=10, default='')
     message = models.TextField(default='')
+    max_responds = models.IntegerField(default=5)
 
     # def __str__(self):
     #     return self.name.capitalize()

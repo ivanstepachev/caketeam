@@ -19,15 +19,43 @@
         {% for note in notes %}
         <p>{{ note.date }} {{ note.text }}</p>
         {% endfor %}
+
         <form method="post">
             {% csrf_token %}
             <div class="form-group">
                 <label for="note">Добавить примечание к заказу</label>
                 <textarea class="form-control my-2" id="note" name="note" rows="3"></textarea>
             </div>
+
+            <div class="form-group">
+                <label for="max_responds">Example multiple select</label>
+                <select class="form-control mb-2" id="max_responds" name="max_responds">
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option selected>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
+                    <option>11</option>
+                    <option>12</option>
+                    <option>13</option>
+                    <option>14</option>
+                    <option>15</option>
+                    <option>16</option>
+                    <option>17</option>
+                    <option>18</option>
+                    <option>19</option>
+                    <option>20</option>
+                </select>
+            </div>
+
             <input class="btn btn-danger btn-block" type="submit">
         </form>
-
+        <h3>Отклики:</h3>
         {% for respond in responds %}
         <p class="mt-3">{{ respond.text }} {{ respond.images.image }}</p>
             {% for image in respond.images.all %}

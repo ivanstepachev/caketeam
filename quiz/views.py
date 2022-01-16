@@ -64,6 +64,9 @@ def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
         text = request.POST.get('note')
+        max_responds = request.POST.get('max_responds')
+        order.max_responds = max_responds
+        order.save()
         note = Note(text=text, order=order)
         note.save()
         comments = ''
@@ -107,9 +110,11 @@ def order_respond(request, order_id):
         notes = Note.objects.filter(order=order)
         telegram_id = request.GET.get('id')
         staff = Staff.objects.filter(telegram_id=str(telegram_id))
+        # Для отображения количества откликов максимальных
+        responds = len(Respond.objects.filter(order=order))
         # Для проверки отклика по пину сотрудника через id чтобы не показывать пин на странице в коде
         num = staff[0].id
-        return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'num': num})
+        return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'num': num, 'responds': responds})
 
 
 # def send_message(chat_id, text):
