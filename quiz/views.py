@@ -9,7 +9,7 @@ import requests
 
 from quiz.handlers import handler, send_message
 
-admin_id = 896205315
+from service.settings import admin_id
 
 
 def quiz(request):
@@ -47,6 +47,8 @@ def registration(request, chat_id, username):
                       phone=phone,
                       instagram=instagram)
         staff.save()
+        # Добавить клавиатуру для добавления пользователя
+        send_message(chat_id=admin_id, text=f'''Новый пользователь зарегистрировался @{username.lower()}''')
         return redirect('quiz')
     if request.method == 'GET':
         pin = chat_id[-4:]
