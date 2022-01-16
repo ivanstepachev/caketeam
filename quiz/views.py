@@ -50,7 +50,7 @@ def registration(request, chat_id, username):
         return redirect('quiz')
     if request.method == 'GET':
         pin = chat_id[-4]
-        return render(request, 'quiz/registration', {'pin': pin, 'username': username})
+        return render(request, 'quiz/registration.html', {'pin': pin, 'username': username})
 
 
 def orders(request):
