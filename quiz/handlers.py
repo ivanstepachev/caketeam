@@ -12,16 +12,18 @@ def send_message(chat_id, text, reply_markup=None, **kwargs):
     requests.post(url, data=data)
 
 
-def handler(chat_id, text):
-    if text == '/start':
+def handler(chat_id, text, username):
+    if text.lower() == '/start':
         if len(Staff.objects.filter(telegram_id=chat_id)) == 0:
             answer = '''Добро пожаловать на платформу. Здесь ты можешь получать кондитерские задание. Для начала нужно пройти регистрацию'''
-            keyboard = json.dumps({"inline_keyboard": [[{"text": "Link", 'url': 'https://naira-arina.ru'}]]})
+            keyboard = json.dumps({"inline_keyboard": [[{"text": "Регистрация", 'url': f'https://caketeam.herokuapp.com/reg/{chat_id}/{username.lower()}'}]]})
             send_message(chat_id=chat_id, text=answer, reply_markup=keyboard)
         else:
             answer = '''Главное меню'''
-            keyboard = json.dumps({'keyboard': [["Заказы"], ["Разместить свободную коробку"]], 'one_time_keyboard': True, 'resize_keyboard': True})
+            keyboard = json.dumps({'keyboard': [["Заказы"], ["Разместить свободную коробку"], ["Мой pin-код"]], 'one_time_keyboard': True, 'resize_keyboard': True})
             send_message(chat_id=chat_id, text=answer, reply_markup=keyboard)
+
+
     else:
         send_message(chat_id=chat_id, text=text)
 

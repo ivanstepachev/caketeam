@@ -30,6 +30,22 @@ def quiz(request):
         return render(request, 'quiz/index.html')
 
 
+def registration(request, chat_id, username):
+    if request.method == 'POST':
+        city = request.POST.get('city')
+        name = request.POST.get('name')
+        surname = request.POST.get('surname')
+        phone = request.POST.get('phone')
+        instagram = request.POST.get('instagram')
+        pin = chat_id[-4]
+        staff = Staff(username=username.lower(), telegram_id=chat_id, city=city, name=name, surname=surname, pin=pin)
+        staff.save()
+        return redirect('quiz')
+    if request.method == 'GET':
+        pin = chat_id[-4]
+        return render(request, 'quiz/registration', {'pin': pin, 'username': username})
+
+
 def orders(request):
     orders = Order.objects.all()
     return render(request, 'quiz/orders.html', {'orders': orders})
@@ -45,7 +61,7 @@ def order_detail(request, order_id):
         notes = Note.objects.filter(order=order)
         for note in notes:
             comments += '\n' + str(note.date) + note.text
-        staff_list = Staff.objects.all()
+        staff_list = Staff.objects.filter(active=True)
         for staff in staff_list:
             order_text = f'''Десерт: {order.type_of_cake}\nПримечание: {order.message}\nКомментарии: {comments}'''
             keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'https://caketeam.herokuapp.com/{order.id}?id={staff.telegram_id}'}]]})
@@ -104,7 +120,8 @@ def bot(request):
             chat_id = data["message"]["chat"]["id"]
             text = data["message"]["text"]
             if 'username' in data["message"]["chat"]:
-                handler(chat_id=chat_id, text=text)
+                username = data["message"]["chat"]
+                handler(chat_id=chat_id, text=text, username=username)
             else:
                 text = '''Сначала сделайте себе ник нейм'''
                 send_message(chat_id=chat_id, text=text)

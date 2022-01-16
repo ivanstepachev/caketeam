@@ -42,11 +42,14 @@ class Image(models.Model):
 class Staff(models.Model):
     # user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     username = models.CharField(max_length=20, default='')
-    name = models.CharField(max_length=15)
-    surname = models.CharField(max_length=15)
+    name = models.CharField(max_length=15, default='')
+    surname = models.CharField(max_length=15, default='')
     city = models.CharField(max_length=15, default='')
     telegram_id = models.CharField(max_length=15)
+    phone = models.CharField(max_length=15, default='')
+    instagram = models.CharField(max_length=20, default='')
     admin = models.BooleanField(default=False)
+    active = models.BooleanField(default=False)
     date = models.DateField(auto_now_add=True)
     pin = models.CharField(max_length=4, blank=True)
 

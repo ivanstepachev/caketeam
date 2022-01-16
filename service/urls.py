@@ -13,7 +13,8 @@ urlpatterns = [
     path('orders/<int:order_id>', quiz_views.order_detail, name="order_detail"),
     path('bot', quiz_views.bot, name="bot"),
     path('bot/setwebhook', quiz_views.setwebhook, name="setwebhook"),
-    path('bot/deletewebhook', quiz_views.deletewebhook, name="deletewebhook")
+    path('bot/deletewebhook', quiz_views.deletewebhook, name="deletewebhook"),
+    path('reg/<str:chat_id>/<str:username>', quiz_views.registration, name="registration")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:
