@@ -86,7 +86,7 @@ def order_respond(request, order_id):
             return redirect('order_respond', order_id)
         else:
             return redirect('quiz')   # Тут надо вызвать ошибку
-    else:
+    elif request.method == 'GET':
         notes = Note.objects.filter(order=order)
         telegram_id = request.GET.get('id')
         print(telegram_id)
