@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from quiz.models import Order, Token, Note, Respond, Image, Staff
+from quiz.models import Order, Token, Respond, Image, Staff
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
@@ -18,7 +18,7 @@ def quiz(request):
         phone = request.POST.get('phone')
         type_of_cake = request.POST.get('type_of_cake')
         message = request.POST.get('message')
-        order = Order(name=name, phone=phone, type_of_cake=type_of_cake, message=message)
+        order = Order(name=name, phone=phone, type_of_cake=type_of_cake, message=message, status="NEW", note="")
         order.save()
         order_text = f'''Имя: {order.name}\nТелефон: {order.phone}\nДесерт: {order.type_of_cake}\nПримечание: {order.message}'''
         keyboard = json.dumps({"inline_keyboard": [[{"text": "Разместить задание", 'url': f'https://caketeam.herokuapp.com/orders/{order.id}'}]]})
@@ -76,35 +76,50 @@ def staff_deactivate(request, chat_id):
 
 
 def orders(request):
-    orders = Order.objects.all()
+    if request.GET.get("status") == "ALL":
+        orders = Order.objects.all().order_by('-date')
+    elif request.GET.get("status") == "NEW":
+        orders = Order.objects.filter(status="NEW").order_by('-date')
+    elif request.GET.get("status") == "FIND":
+        orders = Order.objects.filter(status="FIND").order_by('-date')
+    elif request.GET.get("status") == "WORK":
+        orders = Order.objects.filter(status="WORK").order_by('-date')
+    elif request.GET.get("status") == "DONE":
+        orders = Order.objects.filter(status="DONE").order_by('-date')
+    else:
+        orders = Order.objects.all().order_by('-date')
     return render(request, 'quiz/orders.html', {'orders': orders})
 
 
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
-        text = request.POST.get('note')
+        note = request.POST.get('note')
         max_responds = request.POST.get('max_responds')
         order.max_responds = max_responds
+        order.status = "FIND"
+        order.note = note
         order.save()
-        note = Note(text=text, order=order)
-        note.save()
-        comments = ''
-        notes = Note.objects.filter(order=order)
-        for note in notes:
-            comments += '\n' + str(note.date) + note.text
+        # Внутренний код заявки в виде хэштега
+        numb_of_order = order.set_numb_of_order()
         staff_list = Staff.objects.filter(active=True)
         for staff in staff_list:
-            order_text = f'''Десерт: {order.type_of_cake}\nПримечание: {order.message}\nКомментарии: {comments}'''
+            order_text = f'''Заявка {numb_of_order}\n{order.note}'''
             keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'https://caketeam.herokuapp.com/{order.id}?id={staff.telegram_id}'}]]})
             send_message(chat_id=int(staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('order_detail', order_id)
     else:
-        notes = Note.objects.filter(order=order)
+        notes = order.note
         responds = Respond.objects.filter(order=order)
+        # Если заметка еще не была создана, вставляем шаблон, если была то редактируем
+        if notes == "":
+            value =f'''Десерт: {order.type_of_cake}\nГород:\nДата и время:\nДоставка/Самовывоз:\nПримечание:'''
+        else:
+            value = notes
+        # Если есть отклики
         if responds is not None:
-            return render(request, 'quiz/order_detail.html', {'order': order, 'notes': notes, 'responds': responds})
-        return render(request, 'quiz/order_detail.html', {'order': order, 'notes': notes})
+            return render(request, 'quiz/order_detail.html', {'order': order, 'notes': notes, 'value': value, 'responds': responds})
+        return render(request, 'quiz/order_detail.html', {'order': order, 'value': value, 'notes': notes})
 
 
 # Оставляем отклик
@@ -127,7 +142,7 @@ def order_respond(request, order_id):
         else:
             return redirect('quiz')   # Тут надо вызвать ошибку
     elif request.method == 'GET':
-        notes = Note.objects.filter(order=order)
+        notes = order.note
         telegram_id = request.GET.get('id')
         staff = Staff.objects.filter(telegram_id=str(telegram_id))
         # Для отображения количества откликов максимальных
@@ -143,12 +158,12 @@ def order_respond(request, order_id):
         return render(request, 'quiz/order_respond.html', context)
 
 
-# def send_message(chat_id, text):
-#     method = "sendMessage"
-#     token = Token.objects.get(id=1).token
-#     url = f"https://api.telegram.org/bot{token}/{method}"
-#     data = {"chat_id": chat_id, "text": text}
-#     requests.post(url, data=data)
+# Список заявок каждого кондитера
+def responds_list(request, chat_id):
+    staff = Staff.objects.filter(telegram_id=chat_id)[0]
+    responds = Respond.objects.filter(staff=staff).order_by('-date')
+    return render(request, 'quiz/responds.html', {'responds': responds})
+
 
 
 @csrf_exempt

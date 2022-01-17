@@ -21,24 +21,39 @@ class Staff(models.Model):
 
 
 class Order(models.Model):
+    STATUS_CHOICE = (
+        ("NEW", "new"),
+        ("FIND", "find"),
+        ("WORK", "work"),
+        ("DONE", "done"),
+    )
+
     name = models.CharField(max_length=200, default='')
     phone = models.CharField(max_length=15, default='')
     type_of_cake = models.CharField(max_length=10, default='')
     message = models.TextField(default='')
     max_responds = models.IntegerField(default=5)
     date = models.DateTimeField(auto_now_add=True, blank=True)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICE, default="NEW")
+    note = models.TextField(default='')
+
+    # Внутренний код заявки в виде хэштега
+    def set_numb_of_order(self):
+        numb_of_order = '#z' + '{}'.format(self.date.strftime('%Y'))[-2:] + '{}'.format(
+            self.date.strftime('%m%d%H%M'))
+        return numb_of_order
 
     def __str__(self):
         return '{}-{}-{}-{}'.format(self.date.strftime('%d.%m.%Y %H:%M'), self.name, self.phone, self.message)
 
 
-class Note(models.Model):
-    text = models.TextField()
-    date = models.DateTimeField(auto_now_add=True)
-    order = models.ForeignKey(Order, null=True, default='', on_delete=models.CASCADE, related_name='notes')
-
-    def __str__(self):
-        return '{}-{}'.format(self.date.strftime('%d.%m.%Y %H:%M'), self.text)
+# class Note(models.Model):
+#     text = models.TextField()
+#     date = models.DateTimeField(auto_now_add=True)
+#     order = models.ForeignKey(Order, null=True, default='', on_delete=models.CASCADE, related_name='notes')
+#
+#     def __str__(self):
+#         return '{}-{}'.format(self.date.strftime('%d.%m.%Y %H:%M'), self.text)
 
 
 # Отклик на вакансию

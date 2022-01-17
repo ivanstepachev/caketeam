@@ -11,6 +11,7 @@ urlpatterns = [
     path('<int:order_id>', quiz_views.order_respond, name="order_respond"),
     path('orders', quiz_views.orders, name="orders"),
     path('orders/<int:order_id>', quiz_views.order_detail, name="order_detail"),
+    path('responds/<str:chat_id>', quiz_views.responds_list, name="responds_list"),
     path('bot', quiz_views.bot, name="bot"),
 
     path('staff', quiz_views.staff_list, name="staff_list"),

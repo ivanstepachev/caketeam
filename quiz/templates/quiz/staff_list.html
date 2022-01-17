@@ -17,9 +17,10 @@
         <div class="row">
             <div class="col-6">
                 <p class="fw-bold lh-sm">{{ a.name}} {{ a.surname }}
-                    <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-danger">Нективен</span></small>
+                    <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-danger">Неактивен</span></small>
                     <br> <small class="text-muted fw-normal">Регистрация: <b class="text-dark">{{ a.date|date:'Y-m-d H:i' }}</b></small>
                     <br> <small class="text-muted fw-normal">Город: {{ a.city }}</small>
+                    <br>
                     <br><a href="{% url 'staff_activate' chat_id=a.telegram_id %}"><small class="text-primary fw-normal">Активировать</small></a>
                 </p>
             </div>
@@ -43,6 +44,7 @@
                     <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-success">Активен</span></small>
                     <br> <small class="text-muted fw-normal">Регистрация: <b class="text-dark">{{ a.date|date:'Y-m-d H:i' }}</b></small>
                     <br> <small class="text-muted fw-normal">Город: {{ a.city }}</small>
+                    <br>
                     <br><a href="{% url 'staff_deactivate' chat_id=a.telegram_id %}"><small class="text-danger fw-normal">Деактивировать</small></a>
                 </p>
             </div>

@@ -5,12 +5,56 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <title>Document</title>
+    <title>Заявки</title>
 </head>
 <body>
-    <p>Заказы</p>
-    {% for order in orders %}
-    <p>{{ order.name }}</p>
+    <h4 class="text-center mt-3">Заявки:</h4>
+    <div class="container">
+    <form class="row" method="get">
+<!--            {% csrf_token %}-->
+        <div class="col-8 ">
+            <div class="form-group form-control-sm">
+                <select class="form-control mb-2" id="status" name="status">
+                    <option value="ALL">Все</option>
+                    <option value="NEW">Новая</option>
+                    <option value="FIND">Обрабатывается</option>
+                    <option value="WORK">Выполняется</option>
+                    <option value="DONE">Сделан</option>
+                </select>
+            </div>
+        </div>
+            <div class="col-4">
+                <div class="form-group form-control-sm">
+                    <input class="btn btn-outline-danger" type="submit" value="Фильтр">
+                </div>
+            </div>
+        </form>
+        </div>
+    {% for a in orders %}
+    <div class="container-fluid border-bottom border-top pt-2">
+        <div class="row">
+            <div class="col-6">
+                <p class="fw-bold lh-sm"><a href="{% url 'order_detail' order_id=a.id %}">Заявка {{ a.set_numb_of_order }}</a>
+                    <br> <small class="text-muted fw-normal">Дата: <b class="text-dark">{{ a.date|date:'d/m/Y H:i' }}-{{ a.id }}</b></small>
+                    {% if a.status == 'NEW' %}
+                    <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-warning text-dark">Новая</span></small>
+                    {% elif a.status == 'FIND' %}
+                    <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-primary">Обрабатывается</span></small>
+                    <br> <small class="text-muted fw-normal">Заявок: <b class="text-dark">{{ a.responds.all.count }}/{{ a.max_responds }}</b></small>
+                    {% elif a.status == 'WORK' %}
+                    <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-success">Выполняется</span></small>
+                    <br> <small class="text-muted fw-normal">Исполнитель: <b class="text-dark">не выбран</b></small>
+                    {% elif a.status == 'DONE' %}
+                    <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-secondary">Сделан</span></small>
+                    <br> <small class="text-muted fw-normal">Исполнитель: <b class="text-dark">не выбран</b></small>
+                    {% endif %}
+                    <br> <small class="text-muted fw-normal">Имя: <b class="text-dark">{{ a.name }}</b></small>
+                    <br> <small class="text-muted fw-normal">Номер: <b class="text-dark">{{ a.phone }}</b></small>
+                    <br> <small class="text-muted fw-normal">Примечание: <b class="text-dark">{{ a.message }}</b></small>
+                </p>
+            </div>
+        </div>
+    </div>
     {% endfor %}
 </body>
 </html>

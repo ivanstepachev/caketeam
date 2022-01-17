@@ -9,27 +9,18 @@
 </head>
 <body>
 
-    <div class="container">
-        <p>Номер заказа: {{ order.id }}</p>
-        <p>Имя: {{ order.name }}</p>
-        <p>Телефон: {{ order.phone }}</p>
-        <p>Десерт: {{ order.type_of_cake }}</p>
-        <p>Примечание: {{ order.message }}</p>
-        <p>Комментарии:</p>
-        {% for note in notes %}
-        <p>{{ note.date }} {{ note.text }}</p>
-        {% endfor %}
-
+    <div class="container mt-3">
+        <h4>Заявка {{ order.set_numb_of_order }}</h4>
+        <div class="my-2">
+            Имя: {{ order.name }} <br>
+            Телефон: {{ order.phone }} <br>
+            Десерт: {{ order.type_of_cake }} <br>
+            Примечание: {{ order.message }} <br>
+        </div>
         <form method="post">
             {% csrf_token %}
-            <div class="form-group">
-                <label for="note">Добавить примечание к заказу</label>
-                <textarea class="form-control my-2" id="note" name="note" rows="3"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="max_responds">Example multiple select</label>
-                <select class="form-control mb-2" id="max_responds" name="max_responds">
+            <label for="max_responds">Максимальное количество откликов:</label>
+            <select class="form-control mb-2" id="max_responds" name="max_responds">
                     <option>1</option>
                     <option>2</option>
                     <option>3</option>
@@ -51,7 +42,13 @@
                     <option>19</option>
                     <option>20</option>
                 </select>
+
+            <div class="form-group">
+                <label for="note">Добавить примечание к заказу</label>
+                <textarea class="form-control my-2" id="note" name="note" rows="6">{{ value }}</textarea>
             </div>
+
+
 
             <input class="btn btn-danger btn-block" type="submit">
         </form>
