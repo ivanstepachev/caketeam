@@ -37,7 +37,7 @@ def registration(request, chat_id, username):
         surname = request.POST.get('surname').capitalize()
         phone = request.POST.get('phone')
         instagram = request.POST.get('instagram').lower()
-        pin = chat_id[-4]
+        pin = chat_id[-4:]
         staff = Staff(username=username.lower(),
                       telegram_id=chat_id,
                       city=city,
