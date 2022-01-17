@@ -33,7 +33,7 @@
     {% for a in orders %}
     <div class="container-fluid border-bottom border-top pt-2">
         <div class="row">
-            <div class="col-6">
+            <div class="col-12">
                 <p class="fw-bold lh-sm"><a href="{% url 'order_detail' order_id=a.id %}">Заявка {{ a.set_numb_of_order }}</a>
                     <br> <small class="text-muted fw-normal">Дата: <b class="text-dark">{{ a.date|date:'d/m/Y H:i' }}-{{ a.id }}</b></small>
                     {% if a.status == 'NEW' %}

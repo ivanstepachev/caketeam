@@ -103,9 +103,10 @@ def order_detail(request, order_id):
         # Внутренний код заявки в виде хэштега
         numb_of_order = order.set_numb_of_order()
         staff_list = Staff.objects.filter(active=True)
+        print(staff_list)
         for staff in staff_list:
             order_text = f'''Заявка {numb_of_order}\n{order.note}'''
-            keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'https://caketeam.herokuapp.com/{order.id}?id={staff.telegram_id}'}]]})
+            keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'https://caketeam.herokuapp.com/{order.id}/{staff.telegram_id}'}]]})
             send_message(chat_id=int(staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('order_detail', order_id)
     else:
@@ -123,7 +124,7 @@ def order_detail(request, order_id):
 
 
 # Оставляем отклик
-def order_respond(request, order_id):
+def order_respond(request, order_id, telegram_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
         text = request.POST.get('message')
@@ -143,7 +144,7 @@ def order_respond(request, order_id):
             return redirect('quiz')   # Тут надо вызвать ошибку
     elif request.method == 'GET':
         notes = order.note
-        telegram_id = request.GET.get('id')
+        telegram_id = telegram_id
         staff = Staff.objects.filter(telegram_id=str(telegram_id))
         # Для отображения количества откликов максимальных
         responds = len(Respond.objects.filter(order=order))
