@@ -19,8 +19,9 @@
         {% endfor %}
         <p>Количество откликов: {{ responds }} из {{ order.max_responds }}</p>
 
+        <!-- Проверка что у него нет отклика  -->
 
-        {% if responds < order.max_responds %}
+        {% if responds < order.max_responds and no_respond %}
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -40,8 +41,11 @@
             <input class="btn btn-primary btn-block" type="submit">
         </form>
 
-        {% else %}
+        {% elif responds >= order.max_responds %}
         <p>К сожалению отклик больше нельзя оставить, так как превышено максимальное количество</p>
+
+        {% elif not no_respond %}
+        <p>Вы уже оставили отклик</p>
         {% endif %}
 
     </div>

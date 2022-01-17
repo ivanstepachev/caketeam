@@ -99,7 +99,7 @@ def order_respond(request, order_id):
         images = request.FILES.getlist('images')
         if str(staff[0].pin) == str(pin):
             # Нужно привязать к юзеру
-            respond = Respond.objects.create(text=text, order=order)
+            respond = Respond.objects.create(text=text, order=order, staff=staff[0])
             if images:
                 for image in images:
                     Image.objects.create(image=image, respond=respond)
@@ -115,7 +115,12 @@ def order_respond(request, order_id):
         # Для проверки отклика по пину сотрудника через id чтобы не показывать пин на странице в коде
         num = staff[0].id
 
-        return render(request, 'quiz/order_respond.html', {'order': order, 'notes': notes, 'num': num, 'responds': responds})
+        # Проверка на оставленный отзыв данным юзером
+        respond = Respond.objects.filter(order=order, staff=staff[0])
+        no_respond = len(respond) == 0
+
+        context = {'order': order, 'notes': notes, 'num': num, 'responds': responds, 'no_respond': no_respond}
+        return render(request, 'quiz/order_respond.html', context)
 
 
 # def send_message(chat_id, text):
