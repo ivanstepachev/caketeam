@@ -75,6 +75,12 @@ def staff_deactivate(request, chat_id):
     return redirect('staff_list')
 
 
+def staff_delete(request, chat_id):
+    staff = Staff.objects.filter(telegram_id=chat_id)[0]
+    staff.delete()
+    return redirect('staff_list')
+
+
 def orders(request):
     if request.GET.get("status") == "ALL":
         orders = Order.objects.all().order_by('-date')
@@ -114,7 +120,7 @@ def order_detail(request, order_id):
         responds = Respond.objects.filter(order=order)
         # Если заметка еще не была создана, вставляем шаблон, если была то редактируем
         if notes == "":
-            value =f'''Десерт: {order.type_of_cake}\nГород:\nДата и время:\nДоставка/Самовывоз:\nПримечание:'''
+            value =f'''- Десерт: {order.type_of_cake}\n- Город:\n- Дата и время:\n- Доставка/Самовывоз:\n- Примечание:'''
         else:
             value = notes
         # Если есть отклики
@@ -164,7 +170,6 @@ def responds_list(request, chat_id):
     staff = Staff.objects.filter(telegram_id=chat_id)[0]
     responds = Respond.objects.filter(staff=staff).order_by('-date')
     return render(request, 'quiz/responds.html', {'responds': responds})
-
 
 
 @csrf_exempt

@@ -30,6 +30,7 @@
                     <br><small class="text-muted fw-normal">Instagram: <a href="https://instagram.com/{{ a.instagram }}"><b class="text-dark">@{{ a.instagram }}</b></a></small>
                     <br> <small class="text-muted fw-normal">WhatsApp: <a href="https://wa.me/{{ a.phone }}"><b class="text-dark">{{ a.phone }}</b></a></small>
                     <br> <small class="text-muted fw-normal">Откликов: {{ a.responds.all.count }}</small>
+                    <br><a href="{% url 'staff_delete' chat_id=a.telegram_id %}"><small class="text-warning fw-normal">Удалить</small></a>
                 </p>
             </div>
         </div>
