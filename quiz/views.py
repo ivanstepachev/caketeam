@@ -68,6 +68,13 @@ def staff_activate(request, chat_id):
     return redirect('staff_list')
 
 
+def staff_deactivate(request, chat_id):
+    staff = Staff.objects.filter(telegram_id=chat_id)[0]
+    staff.active = False
+    staff.save()
+    return redirect('staff_list')
+
+
 def orders(request):
     orders = Order.objects.all()
     return render(request, 'quiz/orders.html', {'orders': orders})

@@ -8,46 +8,28 @@
     <title>Document</title>
 </head>
 <body>
+{% if inactive.all.count > 0 %}
 <h4 class="text-center mt-3">Неактивные:</h4>
+{% endif %}
+
 {% for a in inactive %}
 <div class="container-fluid border-bottom border-top pt-2">
         <div class="row">
-            <div class="col-5">
-                <p class="fw-bold lh-sm">{{ a.name}} {{ a.surname }} <span class="text-muted fw-normal">@{{ a.username }}</span>
+            <div class="col-6">
+                <p class="fw-bold lh-sm">{{ a.name}} {{ a.surname }}
                     <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-danger">Нективен</span></small>
-                    <br> <small class="text-muted fw-normal">Номер: <b class="text-dark">{{ a.phone }}</b></b></small>
+                    <br> <small class="text-muted fw-normal">Регистрация: <b class="text-dark">{{ a.date|date:'Y-m-d H:i' }}</b></small>
                     <br> <small class="text-muted fw-normal">Город: {{ a.city }}</small>
+                    <br><a href="{% url 'staff_activate' chat_id=a.telegram_id %}"><small class="text-primary fw-normal">Активировать</small></a>
                 </p>
-<!--                <a href="http://127.0.0.1:8000/staff/activate/{{ a.telegram_id }}">Активировать</a>-->
-                <a href="{% url 'staff_activate' chat_id=a.telegram_id %}">Активировать</a>
             </div>
 
-            <div class="col-5">
-                    <small class="text-muted fw-normal">Instagram: <b class="text-dark">@{{ a.instagram }}</b></small>
-                    <br> <small class="text-muted fw-normal">Регистрация: <b class="text-dark">{{ a.date|date:'Y-m-d H:i' }}</b></small>
+            <div class="col-6">
+                    <small class="text-muted fw-normal">Telegram: <a href="https://t.me/{{ a.username }}"><b class="text-dark">@{{ a.username }}</b></a></small>
+                    <br><small class="text-muted fw-normal">Instagram: <a href="https://instagram.com/{{ a.instagram }}"><b class="text-dark">@{{ a.instagram }}</b></a></small>
+                    <br> <small class="text-muted fw-normal">WhatsApp: <a href="https://wa.me/{{ a.phone }}"><b class="text-dark">{{ a.phone }}</b></a></small>
                     <br> <small class="text-muted fw-normal">Откликов: {{ a.responds.all.count }}</small>
                 </p>
-            </div>
-
-            <div class="col-2">
-                <div class="row text-center">
-                    <div class="col-12 mt-1">
-                        <a href="https://instagram.com/{{ a.instagram }}">
-                        <img src="https://static.tildacdn.com/tild6238-6231-4635-b135-383063393862/instagram.svg" width="20px" alt="">
-                        </a>
-                    </div>
-                    <div class="col-12 mt-1">
-                        <a href="https://wa.me/{{ a.phone }}">
-                        <img src="https://static.tildacdn.com/tild6238-3464-4338-a335-666362626134/whatsapp.svg" width="20px" alt="">
-                        </a>
-                    </div>
-                    <div class="col-12 mt-1">
-                        <a href="https://t.me/{{ a.username }}">
-                        <img src="https://static.tildacdn.com/tild3066-3830-4362-b730-333438623930/telegram.svg" width="20px" alt="">
-                        </a>
-                    </div>
-                </div>
-
             </div>
         </div>
 </div>
@@ -56,40 +38,21 @@
 {% for a in active %}
 <div class="container-fluid border-bottom border-top pt-2">
         <div class="row">
-            <div class="col-5">
-                <p class="fw-bold lh-sm">{{ a.name}} {{ a.surname }} <span class="text-muted fw-normal">@{{ a.username }}</span>
+            <div class="col-6">
+                <p class="fw-bold lh-sm">{{ a.name}} {{ a.surname }}
                     <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-success">Активен</span></small>
-                    <br> <small class="text-muted fw-normal">Номер: <b class="text-dark">{{ a.phone }}</b></b></small>
+                    <br> <small class="text-muted fw-normal">Регистрация: <b class="text-dark">{{ a.date|date:'Y-m-d H:i' }}</b></small>
                     <br> <small class="text-muted fw-normal">Город: {{ a.city }}</small>
+                    <br><a href="{% url 'staff_deactivate' chat_id=a.telegram_id %}"><small class="text-danger fw-normal">Деактивировать</small></a>
                 </p>
             </div>
 
-            <div class="col-5">
-                    <small class="text-muted fw-normal">Instagram: <b class="text-dark">@{{ a.instagram }}</b></small>
-                    <br> <small class="text-muted fw-normal">Регистрация: <b class="text-dark">{{ a.date|date:'Y-m-d H:i' }}</b></small>
+            <div class="col-6">
+                    <small class="text-muted fw-normal">Telegram: <a href="https://t.me/{{ a.username }}"><b class="text-dark">@{{ a.username }}</b></a></small>
+                    <br><small class="text-muted fw-normal">Instagram: <a href="https://instagram.com/{{ a.instagram }}"><b class="text-dark">@{{ a.instagram }}</b></a></small>
+                    <br> <small class="text-muted fw-normal">WhatsApp: <a href="https://wa.me/{{ a.phone }}"><b class="text-dark">{{ a.phone }}</b></a></small>
                     <br> <small class="text-muted fw-normal">Откликов: {{ a.responds.all.count }}</small>
                 </p>
-            </div>
-
-            <div class="col-2">
-                <div class="row text-center">
-                    <div class="col-12 mt-1">
-                        <a href="https://instagram.com/{{ a.instagram }}">
-                        <img src="https://static.tildacdn.com/tild6238-6231-4635-b135-383063393862/instagram.svg" width="20px" alt="">
-                        </a>
-                    </div>
-                    <div class="col-12 mt-1">
-                        <a href="https://wa.me/{{ a.phone }}">
-                        <img src="https://static.tildacdn.com/tild6238-3464-4338-a335-666362626134/whatsapp.svg" width="20px" alt="">
-                        </a>
-                    </div>
-                    <div class="col-12 mt-1">
-                        <a href="https://t.me/{{ a.username }}">
-                        <img src="https://static.tildacdn.com/tild3066-3830-4362-b730-333438623930/telegram.svg" width="20px" alt="">
-                        </a>
-                    </div>
-                </div>
-
             </div>
         </div>
 </div>
