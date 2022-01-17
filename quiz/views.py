@@ -55,6 +55,19 @@ def registration(request, chat_id, username):
         return render(request, 'quiz/registration.html', {'pin': pin, 'username': username})
 
 
+def staff_list(request):
+    active = Staff.objects.filter(active=True).order_by('-date')
+    inactive = Staff.objects.filter(active=False).order_by('-date')
+    return render(request, 'quiz/staff_list.html', {'active': active, 'inactive': inactive})
+
+
+def staff_activate(request, chat_id):
+    staff = Staff.objects.filter(telegram_id=chat_id)[0]
+    staff.active = True
+    staff.save()
+    return redirect('staff_list')
+
+
 def orders(request):
     orders = Order.objects.all()
     return render(request, 'quiz/orders.html', {'orders': orders})

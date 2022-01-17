@@ -12,6 +12,9 @@ urlpatterns = [
     path('orders', quiz_views.orders, name="orders"),
     path('orders/<int:order_id>', quiz_views.order_detail, name="order_detail"),
     path('bot', quiz_views.bot, name="bot"),
+
+    path('staff', quiz_views.staff_list, name="staff_list"),
+    path('staff/activate/<str:chat_id>', quiz_views.staff_activate, name="staff_activate"),
     path('bot/setwebhook', quiz_views.setwebhook, name="setwebhook"),
     path('bot/deletewebhook', quiz_views.deletewebhook, name="deletewebhook"),
     path('reg/<str:chat_id>/<str:username>', quiz_views.registration, name="registration")

@@ -13,7 +13,7 @@ class Staff(models.Model):
     instagram = models.CharField(max_length=20, default='')
     admin = models.BooleanField(default=False)
     active = models.BooleanField(default=False)
-    date = models.DateField(auto_now_add=True)
+    date = models.DateTimeField(auto_now_add=True)
     pin = models.CharField(max_length=4, blank=True)
 
     def __str__(self):
