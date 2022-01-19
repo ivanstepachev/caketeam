@@ -15,7 +15,7 @@
 
         .responds-img {
             width: 10em;
-                height: 10em;
+            height: 14em;
         }
 
     </style>
@@ -78,7 +78,7 @@
                 <div class="row text-center">
                     {% for image in respond.images.all %}
                     <div class="col-6 my-2">
-                        <img src="{{ image.image.url }}" class="image-fluid responds-img" alt="...">
+                        <img src="{{ image.image.url }}" class="image-fluid rounded responds-img" alt="...">
                     </div>
                     {% endfor %}
                 </div>
