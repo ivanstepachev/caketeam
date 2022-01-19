@@ -134,14 +134,14 @@ def order_respond(request, order_id, telegram_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
         text = request.POST.get('message')
+        price = request.POST.get('price')
         pin = request.POST.get('pin')
-        num = request.POST.get('num')
-        staff = Staff.objects.filter(id=num)
+        staff = Staff.objects.filter(id=telegram_id)
         # Так как несколько изображений
         images = request.FILES.getlist('images')
         if str(staff[0].pin) == str(pin):
             # Нужно привязать к юзеру
-            respond = Respond.objects.create(text=text, order=order, staff=staff[0])
+            respond = Respond.objects.create(text=text, order=order, staff=staff[0], price=price)
             if images:
                 for image in images:
                     Image.objects.create(image=image, respond=respond)

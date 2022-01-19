@@ -62,6 +62,7 @@ class Respond(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     order = models.ForeignKey(Order, null=True, default='', on_delete=models.CASCADE, related_name='responds')
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE, default='', related_name='responds')
+    price = models.CharField(max_length=50, default="")
 
     def __str__(self):
         return f'{self.staff.username} - {self.text}'
