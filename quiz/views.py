@@ -114,7 +114,7 @@ def order_detail(request, order_id):
             order_text = f'''Заявка {numb_of_order}\n{order.note}'''
             keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'https://caketeam.herokuapp.com/{order.id}/{staff.telegram_id}'}]]})
             send_message(chat_id=int(staff.telegram_id), text=order_text, reply_markup=keyboard)
-        return redirect('order_detail', order_id)
+        return redirect('orders')
     else:
         notes = order.note
         responds = Respond.objects.filter(order=order)
