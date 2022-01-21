@@ -18,8 +18,48 @@
             height: 14em;
         }
 
+        #win_respond {
+            background-color: #E6F1DA;
+        }
+
+        #done_respond {
+            background-color: #E6F1DA;
+        }
+
     </style>
 
+    <!-- Если задание выполнено -->
+    {% if order.status == "DONE" %}
+
+    <div class="container mt-3">
+        <h4>Заявка {{ order.set_numb_of_order }} <span class="text-success">ВЫПОЛНЕНА</span></h4>
+        <div class="my-2">
+            <b>Имя:</b> {{ order.name }} <br>
+            <b>Телефон:</b> {{ order.phone }} <br>
+            <b>Десерт:</b> {{ order.type_of_cake }} <br>
+            <b>Примечание:</b> {{ order.message }} <br>
+        </div>
+        <div class="form-group">
+            <label for="note2">Примечание к заказу:</label><br>
+            <textarea class="form-control my-2" id="note2" name="note" rows="6" disabled>{{ value }}</textarea>
+        </div>
+    <h4 class="my-3">Исполнитель:</h4>
+    <div id="done_respond" class="border border-2 responds-block mb-3">
+            <div class="container p-3">
+                <h5><a class="text-dark" href="{% url 'staff_list' %}#{{ respond.staff.id }}">{{ respond.staff.name }} {{ respond.staff.surname }}</a></h5>
+                <small class="text-muted">Telegram: <a href="https://t.me/{{ respond.staff.username }}">@{{ respond.staff.username }}</a></small><br>
+                <small class="text-muted">Номер: {{ respond.staff.phone }}</small><br>
+                <small class="text-muted"><a href="https://wa.me/{{ respond.staff.phone }}">Написать в Whatsapp</a></small><br>
+                <b>Ответ:</b> {{ respond.text }}<br>
+                <b>Цена:</b> {{ respond.price }}
+            </div>
+    </div>
+    </div>
+
+
+
+    {% else %}
+    <!--Если задание не выполнено-->
     <div class="container mt-3">
         <h4>Заявка {{ order.set_numb_of_order }}</h4>
         <div class="my-2">
@@ -55,18 +95,22 @@
                 </select>
 
             <div class="form-group">
-                <label for="note">Добавить примечание к заказу</label>
+                <label for="note">Добавить примечание к заказу:</label><br>
+                <small>("-" не удалять)</small>
                 <textarea class="form-control my-2" id="note" name="note" rows="6">{{ value }}</textarea>
             </div>
             <input class="btn btn-primary btn-block" type="submit">
         </form>
-        <h4 class="mb-3">Отклики ({{ responds.count }}):</h4>
 
+        <!-- Если исполнитель не выбран -->
+        {% if order.staff is None %}
+
+        <h4 class="mb-3">Отклики ({{ responds.count }}):</h4>
         {% for respond in responds %}
         <div class="border border-2 responds-block mb-3 bg-light">
 
             <div class="container p-3">
-                <h5>{{ respond.staff.name }} {{ respond.staff.surname }}</h5>
+                <h5><a class="text-dark" href="{% url 'staff_list' %}#{{ respond.staff.id }}">{{ respond.staff.name }} {{ respond.staff.surname }}</a></h5>
                 <small class="text-muted">Telegram: <a href="https://t.me/{{ respond.staff.username }}">@{{ respond.staff.username }}</a></small><br>
                 <small class="text-muted">Номер: {{ respond.staff.phone }}</small><br>
                 <small class="text-muted"><a href="https://wa.me/{{ respond.staff.phone }}">Написать в Whatsapp</a></small><br>
@@ -83,12 +127,106 @@
                 </div>
             </div>
                 <div class="text-center">
-                    <button type="button" class="btn btn-danger mt-2">Выбрать</button>
+                    <a href="#" type="button" class="btn btn-danger mt-2" data-bs-toggle="modal" data-bs-target="#choiceRespond">Выбрать</a>
                 </div>
         </div>
     </div>
+
+    <!-- MODAL   -->
+    <div class="modal fade" id="choiceRespond" tabindex="-1" aria-labelledby="ModalLabel1" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="ModalLabel1">Выбрать этого исполнителя?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Подтвердите свое действие
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            <a href="{% url 'respond_choice' respond_id=respond.id %}" type="button" class="btn btn-success">Выбрать исполнителя</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
     {% endfor %}
 
+    <!-- Если исполнитель уже выбран   -->
+    {% else %}
+    <h4 class="mb-3">Исполнитель:</h4>
+    <div id="win_respond" class="border border-2 responds-block mb-3">
+
+            <div class="container p-3">
+                <h5><a class="text-dark" href="{% url 'staff_list' %}#{{ respond.staff.id }}">{{ respond.staff.name }} {{ respond.staff.surname }}</a></h5>
+                <small class="text-muted">Telegram: <a href="https://t.me/{{ respond.staff.username }}">@{{ respond.staff.username }}</a></small><br>
+                <small class="text-muted">Номер: {{ respond.staff.phone }}</small><br>
+                <small class="text-muted"><a href="https://wa.me/{{ respond.staff.phone }}">Написать в Whatsapp</a></small><br>
+                <b>Ответ:</b> {{ respond.text }}<br>
+                <b>Цена:</b> {{ respond.price }}
+
+            <div class="container mt-3">
+                <div class="row text-center">
+                    {% for image in respond.images.all %}
+                    <div class="col-6 my-2">
+                        <img src="{{ image.image.url }}" class="image-fluid rounded responds-img" alt="...">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+                <div class="text-center">
+                    <small><a href="#" data-bs-toggle="modal" data-bs-target="#deleteRespond">Отменить исполнителя</a></small>
+                </div>
+            </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="deleteRespond" tabindex="-1" aria-labelledby="ModalLabel2" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="ModalLabel2">Отменить исполнителя?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Это действие невозможно отменить
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            <a href="{% url 'respond_delete' respond_id=respond.id %}" type="button" class="btn btn-danger">Отменить исполнителя</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mb-5">
+            <a href="#" type="button" class="btn btn-success mt-2" data-bs-toggle="modal" data-bs-target="#orderDone">Заказ выполнен</a>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="orderDone" tabindex="-1" aria-labelledby="ModalLabel3" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="ModalLabel3">Задание выполнено?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            Это действие невозможно отменить
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            <a href="{% url 'order_done' order_id=order.id %}" type="button" class="btn btn-success">Задание выполнено</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+
+</div>
+{% endif %}
 
 
 

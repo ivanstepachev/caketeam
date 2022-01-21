@@ -125,7 +125,15 @@ def order_detail(request, order_id):
             value = notes
         # Если есть отклики
         if responds is not None:
+            # Если уже выбран исполнитель
+            if order.staff is not None:
+                staff = order.staff
+                respond = Respond.objects.filter(order=order, staff=staff)[0]
+                return render(request, 'quiz/order_detail.html',
+                              {'order': order, 'notes': notes, 'value': value, 'respond': respond})
             return render(request, 'quiz/order_detail.html', {'order': order, 'notes': notes, 'value': value, 'responds': responds})
+
+        # Если нет откликов
         return render(request, 'quiz/order_detail.html', {'order': order, 'value': value, 'notes': notes})
 
 
@@ -136,7 +144,7 @@ def order_respond(request, order_id, telegram_id):
         text = request.POST.get('message')
         price = request.POST.get('price')
         pin = request.POST.get('pin')
-        staff = Staff.objects.filter(id=telegram_id)
+        staff = Staff.objects.filter(telegram_id=telegram_id)
         # Так как несколько изображений
         images = request.FILES.getlist('images')
         if str(staff[0].pin) == str(pin):
@@ -163,6 +171,32 @@ def order_respond(request, order_id, telegram_id):
 
         context = {'order': order, 'notes': notes, 'num': num, 'responds': responds, 'no_respond': no_respond}
         return render(request, 'quiz/order_respond.html', context)
+
+
+def respond_choice(request, respond_id):
+    respond = get_object_or_404(Respond, id=respond_id)
+    staff = respond.staff
+    order = respond.order
+    order.staff = staff
+    order.status = "WORK"
+    order.save()
+    return redirect('order_detail', order.id)
+
+
+def respond_delete(request, respond_id):
+    respond = get_object_or_404(Respond, id=respond_id)
+    order = respond.order
+    order.staff = None
+    order.status = "FIND"
+    order.save()
+    return redirect('order_detail', order.id)
+
+
+def order_done(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    order.status = "DONE"
+    order.save()
+    return redirect('order_detail', order.id)
 
 
 # Список заявок каждого кондитера

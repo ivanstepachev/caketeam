@@ -36,6 +36,7 @@ class Order(models.Model):
     date = models.DateTimeField(auto_now_add=True, blank=True)
     status = models.CharField(max_length=15, choices=STATUS_CHOICE, default="NEW")
     note = models.TextField(default='')
+    staff = models.ForeignKey(Staff, null=True, blank=True, on_delete=models.PROTECT, related_name="orders")
 
     # Внутренний код заявки в виде хэштега
     def set_numb_of_order(self):
@@ -45,15 +46,6 @@ class Order(models.Model):
 
     def __str__(self):
         return '{}-{}-{}-{}'.format(self.date.strftime('%d.%m.%Y %H:%M'), self.name, self.phone, self.message)
-
-
-# class Note(models.Model):
-#     text = models.TextField()
-#     date = models.DateTimeField(auto_now_add=True)
-#     order = models.ForeignKey(Order, null=True, default='', on_delete=models.CASCADE, related_name='notes')
-#
-#     def __str__(self):
-#         return '{}-{}'.format(self.date.strftime('%d.%m.%Y %H:%M'), self.text)
 
 
 # Отклик на вакансию

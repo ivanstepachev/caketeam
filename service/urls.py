@@ -11,7 +11,11 @@ urlpatterns = [
     path('<int:order_id>/<str:telegram_id>', quiz_views.order_respond, name="order_respond"),
     path('orders', quiz_views.orders, name="orders"),
     path('orders/<int:order_id>', quiz_views.order_detail, name="order_detail"),
+    path('orders/done/<int:order_id>', quiz_views.order_done, name="order_done"),
     path('responds/<str:chat_id>', quiz_views.responds_list, name="responds_list"),
+    # выбор отклика
+    path('respond/<int:respond_id>', quiz_views.respond_choice, name="respond_choice"),
+    path('respond/delete/<int:respond_id>', quiz_views.respond_delete, name="respond_delete"),
     path('bot', quiz_views.bot, name="bot"),
 
     path('staff', quiz_views.staff_list, name="staff_list"),

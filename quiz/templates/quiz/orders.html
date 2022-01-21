@@ -43,10 +43,11 @@
                     <br> <small class="text-muted fw-normal">Заявок: <b class="text-dark">{{ a.responds.all.count }}/{{ a.max_responds }}</b></small>
                     {% elif a.status == 'WORK' %}
                     <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-success">Выполняется</span></small>
-                    <br> <small class="text-muted fw-normal">Исполнитель: <b class="text-dark">не выбран</b></small>
+                    <!--  Ссылка с якорем на исполнителя                    -->
+                    <br> <small class="text-muted fw-normal">Исполнитель: <b class="text-dark"><a href="{% url 'staff_list' %}#{{ a.id }}">{{ a.staff.name }} {{ a.staff.surname }}</a></b></small>
                     {% elif a.status == 'DONE' %}
                     <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-secondary">Сделан</span></small>
-                    <br> <small class="text-muted fw-normal">Исполнитель: <b class="text-dark">не выбран</b></small>
+                    <br> <small class="text-muted fw-normal">Исполнитель: <b class="text-dark"><a href="{% url 'staff_list' %}#{{ a.id }}">{{ a.staff.name }} {{ a.staff.surname }}</a></b></small>
                     {% endif %}
                     <br> <small class="text-muted fw-normal">Имя: <b class="text-dark">{{ a.name }}</b></small>
                     <br> <small class="text-muted fw-normal">Номер: <b class="text-dark">{{ a.phone }}</b></small>

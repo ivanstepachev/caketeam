@@ -12,25 +12,25 @@
 <h4 class="text-center mt-3">Неактивные:</h4>
 {% endif %}
 
-{% for a in inactive %}
-<div class="container-fluid border-bottom border-top pt-2">
+{% for i in inactive %}
+<div id="{{ i.id }}" class="container-fluid border-bottom border-top pt-2">
         <div class="row">
             <div class="col-6">
-                <p class="fw-bold lh-sm">{{ a.name}} {{ a.surname }}
+                <p class="fw-bold lh-sm">{{ i.name}} {{ i.surname }}
                     <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-danger">Неактивен</span></small>
-                    <br> <small class="text-muted fw-normal">Регистрация: <b class="text-dark">{{ a.date|date:'Y-m-d H:i' }}</b></small>
-                    <br> <small class="text-muted fw-normal">Город: {{ a.city }}</small>
+                    <br> <small class="text-muted fw-normal">Регистрация: <b class="text-dark">{{ i.date|date:'Y-m-d H:i' }}</b></small>
+                    <br> <small class="text-muted fw-normal">Город: {{ i.city }}</small>
                     <br>
-                    <br><a href="{% url 'staff_activate' chat_id=a.telegram_id %}"><small class="text-primary fw-normal">Активировать</small></a>
+                    <br><a href="{% url 'staff_activate' chat_id=i.telegram_id %}"><small class="text-primary fw-normal">Активировать</small></a>
                 </p>
             </div>
 
             <div class="col-6">
-                    <small class="text-muted fw-normal">Telegram: <a href="https://t.me/{{ a.username }}"><b class="text-dark">@{{ a.username }}</b></a></small>
-                    <br><small class="text-muted fw-normal">Instagram: <a href="https://instagram.com/{{ a.instagram }}"><b class="text-dark">@{{ a.instagram }}</b></a></small>
-                    <br> <small class="text-muted fw-normal">WhatsApp: <a href="https://wa.me/{{ a.phone }}"><b class="text-dark">{{ a.phone }}</b></a></small>
-                    <br> <small class="text-muted fw-normal">Откликов: {{ a.responds.all.count }}</small>
-                    <br><a href="{% url 'staff_delete' chat_id=a.telegram_id %}"><small class="text-warning fw-normal">Удалить</small></a>
+                    <small class="text-muted fw-normal">Telegram: <a href="https://t.me/{{ i.username }}"><b class="text-dark">@{{ i.username }}</b></a></small>
+                    <br><small class="text-muted fw-normal">Instagram: <a href="https://instagram.com/{{ a.instagram }}"><b class="text-dark">@{{ i.instagram }}</b></a></small>
+                    <br> <small class="text-muted fw-normal">WhatsApp: <a href="https://wa.me/{{ a.phone }}"><b class="text-dark">{{ i.phone }}</b></a></small>
+                    <br> <small class="text-muted fw-normal">Откликов: {{ i.responds.all.count }}</small>
+                    <br><a href="{% url 'staff_delete' chat_id=i.telegram_id %}"><small class="text-warning fw-normal">Удалить</small></a>
                 </p>
             </div>
         </div>
@@ -38,7 +38,7 @@
 {% endfor %}
 <h4 class="text-center mt-3">Активные:</h4>
 {% for a in active %}
-<div class="container-fluid border-bottom border-top pt-2">
+<div id="{{ a.id }}" class="container-fluid border-bottom border-top pt-2">
         <div class="row">
             <div class="col-6">
                 <p class="fw-bold lh-sm">{{ a.name}} {{ a.surname }}
