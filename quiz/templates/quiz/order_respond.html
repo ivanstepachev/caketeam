@@ -13,6 +13,9 @@
     .form-rounded {
         border-radius: 1rem;
     }
+    .label-text {
+        font-size: 0.8em;
+    }
 </style>
 
     <div class="container mt-3">
@@ -22,7 +25,8 @@
         <p>{{ order.note|to_replace }}</p>
         {% endautoescape %}
 
-        <p>Количество откликов: {{ responds }} из {{ order.max_responds }}</p>
+        <p><small class="text-muted">Количество откликов:</small> {{ responds }} из {{ order.max_responds }}</p>
+        <hr>
 
         <!-- Проверка что у него нет отклика  -->
 
@@ -31,26 +35,26 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
-                <label for="message">Текст отклика</label>
+                <label class="text-muted label-text" for="message">Текст отклика:</label>
                 <textarea class="form-control form-control-sm form-rounded" id="message" name="message" rows="3"></textarea>
             </div>
             <div class="form-group my-2">
-                <label for="instagram">Instagram</label>
+                <label class="text-muted label-text" for="instagram">Мой Instagram:</label>
                 <input type="text" class="form-control form-control-sm" id="instagram" name="instagram" value="https://instagram.com/{{ staff.instagram }}">
             </div>
             <div class="form-group my-2">
-                <label for="images">Фото работ</label>
+                <label class="text-muted label-text" for="images">Фото работ</label>
                 <input type="file" class="form-control form-control-sm" id="images" name="images" multiple>
             </div>
             <div class="form-group my-2">
-                <label for="price">Цена</label>
+                <label class="text-muted label-text" for="price">Цена:</label>
                 <input type="text" class="form-control form-control-sm" id="price" name="price">
             </div>
             <div class="form-group my-2">
-                <label for="pin">ПИН</label>
+                <label class="text-muted label-text" for="pin">pin</label>
                 <input type="text" class="form-control form-control-sm" id="pin" name="pin">
             </div>
-            <input class="btn btn-primary btn-block" type="submit">
+            <input class="btn btn-primary btn-sm" type="submit">
         </form>
 
         {% elif not no_respond %}
