@@ -11,21 +11,27 @@
 <body>
 <style>
     .form-rounded {
-        border-radius: 1rem;
+        border-radius: 0.7rem;
     }
     .label-text {
         font-size: 0.8em;
+    }
+    .offer-text {
+        font-size: 0.6em;
     }
 </style>
 
     <div class="container mt-3">
         <h5>Оставить отклик к заданию {{ order.set_numb_of_order }}</h5>
+        <hr>
         <!--Экранирование html-->
         {% autoescape off %}
         <p>{{ order.note|to_replace }}</p>
         {% endautoescape %}
 
-        <p><small class="text-muted">Количество откликов:</small> {{ responds }} из {{ order.max_responds }}</p>
+        <p><small class="text-muted">Количество откликов:</small> {{ responds }} из {{ order.max_responds }}<br>
+        <small class="text-muted">Стоимость отклика:</small> {{ order.respond_price }} руб.<br>
+        <small class="text-muted">Мой баланс:</small> {{ staff.balance }} руб. <a href="#"><small>(пополнить)</small></a></p>
         <hr>
 
         <!-- Проверка что у него нет отклика  -->
@@ -39,22 +45,37 @@
                 <textarea class="form-control form-control-sm form-rounded" id="message" name="message" rows="3"></textarea>
             </div>
             <div class="form-group my-2">
-                <label class="text-muted label-text" for="instagram">Мой Instagram:</label>
-                <input type="text" class="form-control form-control-sm" id="instagram" name="instagram" value="https://instagram.com/{{ staff.instagram }}">
+                <div class="row">
+                    <div class="col-6">
+                        <label class="text-muted label-text" for="instagram">Мой Instagram:</label>
+                        <input type="text" class="form-control form-control-sm" id="instagram" name="instagram" value="@{{ staff.instagram }}" disabled>
+                    </div>
+                    <div class="col-6">
+                        <label class="text-muted label-text" for="whatsapp">Мой Whatsapp:</label>
+                        <input type="text" class="form-control form-control-sm" id="whatsapp" name="whatsapp" value="+{{ staff.phone }}" disabled>
+                    </div>
+                </div>
             </div>
             <div class="form-group my-2">
                 <label class="text-muted label-text" for="images">Фото работ</label>
                 <input type="file" class="form-control form-control-sm" id="images" name="images" multiple>
             </div>
             <div class="form-group my-2">
-                <label class="text-muted label-text" for="price">Цена:</label>
-                <input type="text" class="form-control form-control-sm" id="price" name="price">
+                <div class="row">
+                    <div class="col-6">
+                        <label class="text-muted label-text" for="price">Цена:</label>
+                        <input type="text" class="form-control form-control-sm" id="price" name="price">
+                    </div>
+                    <div class="col-6">
+                         <label class="text-muted label-text" for="pin">pin</label>
+                         <input type="text" class="form-control form-control-sm" id="pin" name="pin">
+                    </div>
+                </div>
             </div>
-            <div class="form-group my-2">
-                <label class="text-muted label-text" for="pin">pin</label>
-                <input type="text" class="form-control form-control-sm" id="pin" name="pin">
+            <div class="d-grid gap-2">
+                <small class="offer-text text-muted">Нажимая кнопку "Откликнуться" с баланса будут списаны {{ order.respond_price }} руб. и отклик с вашими контактными данными будет отправлен заказчику. Закачик свяжется с вами, если ваш отклик его заинтересует.</small>
+                <input class="btn btn-success btn-sm mt-2 form-rounded" type="submit" value="Откликнуться">
             </div>
-            <input class="btn btn-primary btn-sm" type="submit">
         </form>
 
         {% elif not no_respond %}
