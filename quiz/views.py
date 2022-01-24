@@ -167,6 +167,9 @@ def order_respond(request, order_id, telegram_id):
             if images:
                 for image in images:
                     Image.objects.create(image=image, respond=respond)
+            staff = staff[0]
+            staff.balance = staff.balance - order.respond_price
+            staff.save()
             return redirect('quiz')
         else:
             return redirect('quiz')   # Тут надо вызвать ошибку
@@ -183,7 +186,10 @@ def order_respond(request, order_id, telegram_id):
         respond = Respond.objects.filter(order=order, staff=staff[0])
         no_respond = len(respond) == 0
 
-        context = {'order': order, 'staff': staff[0], 'notes': notes, 'num': num, 'responds': responds, 'no_respond': no_respond}
+        # Проверка достаточности баланса
+        has_balance = staff[0].balance - order.respond_price >= 0
+
+        context = {'order': order, 'staff': staff[0], 'notes': notes, 'num': num, 'responds': responds, 'no_respond': no_respond, 'has_balance': has_balance}
         return render(request, 'quiz/order_respond.html', context)
 
 

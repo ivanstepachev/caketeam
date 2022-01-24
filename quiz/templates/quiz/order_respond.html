@@ -72,10 +72,17 @@
                     </div>
                 </div>
             </div>
-            <div class="d-grid gap-2">
+            {% if has_balance %}
+            <div class="d-grid gap-2 mt-2">
                 <small class="offer-text text-muted">Нажимая кнопку "Откликнуться" с баланса будут списаны {{ order.respond_price }} руб. и отклик с вашими контактными данными будет отправлен заказчику. Закачик свяжется с вами, если ваш отклик его заинтересует.</small>
-                <input class="btn btn-success btn-md mt-2 form-rounded" type="submit" value="Откликнуться">
+                <input class="btn btn-success btn-md form-rounded" type="submit" value="Откликнуться">
             </div>
+            {% else %}
+            <div class="d-grid gap-2 mt-2">
+                <small class="offer-text text-muted">Для того, чтобы отправить свой отклик клиенту с вашими контактными данными требуется пополнить баланс. Для отклика требуется {{ order.respond_price }} руб., а ваш баланс равен {{ staff.balance }} руб..</small>
+                <button class="btn btn-danger btn-md form-rounded" disabled>Пополните баланс</button>
+            </div>
+            {% endif %}
         </form>
 
         {% elif not no_respond %}
