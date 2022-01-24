@@ -17,12 +17,12 @@
         font-size: 0.8em;
     }
     .offer-text {
-        font-size: 0.6em;
+        font-size: 0.7em;
     }
 </style>
 
     <div class="container mt-3">
-        <h5>Оставить отклик к заданию {{ order.set_numb_of_order }}</h5>
+        <h5>Отклик к заданию {{ order.set_numb_of_order }}</h5>
         <hr>
         <!--Экранирование html-->
         {% autoescape off %}
@@ -74,7 +74,7 @@
             </div>
             <div class="d-grid gap-2">
                 <small class="offer-text text-muted">Нажимая кнопку "Откликнуться" с баланса будут списаны {{ order.respond_price }} руб. и отклик с вашими контактными данными будет отправлен заказчику. Закачик свяжется с вами, если ваш отклик его заинтересует.</small>
-                <input class="btn btn-success btn-sm mt-2 form-rounded" type="submit" value="Откликнуться">
+                <input class="btn btn-success btn-md mt-2 form-rounded" type="submit" value="Откликнуться">
             </div>
         </form>
 
