@@ -3,7 +3,7 @@ from django.urls import path
 from quiz import views as quiz_views
 from django.conf.urls.static import static
 from service import settings
-from bot_token import token
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,7 +24,8 @@ urlpatterns = [
     path('staff/delete/<str:chat_id>', quiz_views.staff_delete, name="staff_delete"),
     path('bot/setwebhook', quiz_views.setwebhook, name="setwebhook"),
     path('bot/deletewebhook', quiz_views.deletewebhook, name="deletewebhook"),
-    path('reg/<str:chat_id>/<str:username>', quiz_views.registration, name="registration")
+    path('reg/<str:chat_id>/<str:username>', quiz_views.registration, name="registration"),
+    path('calc', quiz_views.calc, name="calc")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 if settings.DEBUG:

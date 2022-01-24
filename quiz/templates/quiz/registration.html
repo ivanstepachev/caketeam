@@ -13,8 +13,14 @@
         <form method="post">
             {% csrf_token %}
            <div class="form-group">
-               <label for="username">Имя пользователя Telegram</label>
-               <input class="form-control my-2" type="text" id="username" value="{{ username }}" disabled>
+
+               <label for="username">Имя пользователя</label><br>
+               <small class="text-muted">как в Telegram</small>
+               <input class="form-control my-2" type="text" id="username" name="username" value="{{ username }}" disabled>
+
+               <label for="{{ form.email.id_for_label }}">Электронная почта</label>
+               {{ form.email }}
+
                <label for="name">Имя</label>
                <input class="form-control my-2" type="text" id="name" name="name">
                <label for="surname">Фамилия</label>
@@ -25,10 +31,16 @@
                <input class="form-control my-2" type="text" id="instagram" name="instagram" placeholder="naira_arina">
                <label for="city">Город</label>
                <input class="form-control my-2" type="text" id="city" name="city" placeholder="Москва">
-               <label for="pin">Твой идентификационный pin-код, используется для подтвержения размещения отклика и свободных коробок</label>
+               <label for="pin">Твой идентификационный pin-код</label><br>
+               <small class="text-muted">используется для подтвержения размещения отклика и свободных коробок</small>
                <input class="form-control my-2" type="text" id="pin" name="pin" value="{{ pin }}" disabled>
+
+               <label for="{{ form.password.id_for_label }}">Придумайте пароль</label>
+               {{ form.password }}
+               <label for="{{ form.password_repeat.id_for_label }}">Повторите пароль</label>
+               {{ form.password_repeat }}
            </div>
-            <input class="btn btn-primary btn-block" type="submit">
+            <input class="my-2 btn btn-primary btn-block" type="submit">
         </form>
     </div>
 </body>

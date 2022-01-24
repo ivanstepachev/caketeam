@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load to_replace %}
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -8,15 +9,19 @@
     <title>Document</title>
 </head>
 <body>
+<style>
+    .form-rounded {
+        border-radius: 1rem;
+    }
+</style>
 
     <div class="container mt-3">
-        <h3>Оставить отклик</h3>
-        <p>Десерт: {{ order.type_of_cake }}</p>
-        <p>Примечание: {{ order.message }}</p>
-        <p>Комментарии:</p>
-        {% for note in notes %}
-        <p>{{ note.date }} {{ note.text }}</p>
-        {% endfor %}
+        <h5>Оставить отклик к заданию {{ order.set_numb_of_order }}</h5>
+        <!--Экранирование html-->
+        {% autoescape off %}
+        <p>{{ order.note|to_replace }}</p>
+        {% endautoescape %}
+
         <p>Количество откликов: {{ responds }} из {{ order.max_responds }}</p>
 
         <!-- Проверка что у него нет отклика  -->
@@ -26,20 +31,24 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             <div class="form-group">
-                <label for="message">Текст</label>
-                <textarea class="form-control my-2" id="message" name="message" rows="3"></textarea>
+                <label for="message">Текст отклика</label>
+                <textarea class="form-control form-control-sm form-rounded" id="message" name="message" rows="3"></textarea>
             </div>
-            <div class="form-group">
-                <label for="images">Фото</label>
-                <input type="file" class="form-control my-2" id="images" name="images" multiple>
+            <div class="form-group my-2">
+                <label for="instagram">Instagram</label>
+                <input type="text" class="form-control form-control-sm" id="instagram" name="instagram" value="https://instagram.com/{{ staff.instagram }}">
             </div>
-            <div class="form-group">
+            <div class="form-group my-2">
+                <label for="images">Фото работ</label>
+                <input type="file" class="form-control form-control-sm" id="images" name="images" multiple>
+            </div>
+            <div class="form-group my-2">
                 <label for="price">Цена</label>
-                <input type="text" class="form-control my-2" id="price" name="price">
+                <input type="text" class="form-control form-control-sm" id="price" name="price">
             </div>
-            <div class="form-group">
+            <div class="form-group my-2">
                 <label for="pin">ПИН</label>
-                <input type="text" class="form-control my-2" id="pin" name="pin">
+                <input type="text" class="form-control form-control-sm" id="pin" name="pin">
             </div>
             <input class="btn btn-primary btn-block" type="submit">
         </form>

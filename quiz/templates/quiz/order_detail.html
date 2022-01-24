@@ -67,9 +67,11 @@
             <b>Телефон:</b> {{ order.phone }} <br>
             <b>Десерт:</b> {{ order.type_of_cake }} <br>
             <b>Примечание:</b> {{ order.message }} <br>
+
         </div>
         <form class="mb-5" method="post">
             {% csrf_token %}
+            <div class="form-group">
             <label for="max_responds">Максимальное количество откликов:</label>
             <select class="form-control mb-2" id="max_responds" name="max_responds">
                     <option>1</option>
@@ -94,8 +96,10 @@
                     <option>20</option>
                 </select>
 
-            <div class="form-group">
-                <label for="note">Добавить примечание к заказу:</label><br>
+                <label for="respond_price">Стоимость отклика:</label>
+                <input class="form-control my-2" type="text" id="respond_price" name="respond_price" value="{{ respond_price }}">
+
+                <label for="note">Отправить задание:</label><br>
                 <small>("-" не удалять)</small>
                 <textarea class="form-control my-2" id="note" name="note" rows="6">{{ value }}</textarea>
             </div>

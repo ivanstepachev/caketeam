@@ -3,8 +3,8 @@ from django.conf import settings
 
 
 class Staff(models.Model):
-    # user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    username = models.CharField(max_length=20, default='')
+    username = models.CharField(max_length=25, default='')
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default='')
     name = models.CharField(max_length=15, default='')
     surname = models.CharField(max_length=15, default='')
     city = models.CharField(max_length=15, default='')
@@ -15,9 +15,10 @@ class Staff(models.Model):
     active = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
     pin = models.CharField(max_length=4, blank=True)
+    balance = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.username
+        return str(self.user)
 
 
 class Order(models.Model):
@@ -37,6 +38,7 @@ class Order(models.Model):
     status = models.CharField(max_length=15, choices=STATUS_CHOICE, default="NEW")
     note = models.TextField(default='')
     staff = models.ForeignKey(Staff, null=True, blank=True, on_delete=models.PROTECT, related_name="orders")
+    respond_price = models.IntegerField(default=50)
 
     # Внутренний код заявки в виде хэштега
     def set_numb_of_order(self):

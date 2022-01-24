@@ -1,5 +1,8 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User
 from quiz.models import Order, Token, Respond, Image, Staff
+from django.contrib.auth import login, authenticate
+from quiz.forms import RegisterForm
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 
@@ -17,8 +20,9 @@ def quiz(request):
         name = request.POST.get('name')
         phone = request.POST.get('phone')
         type_of_cake = request.POST.get('type_of_cake')
+        respond_price = request.POST.get('budget')
         message = request.POST.get('message')
-        order = Order(name=name, phone=phone, type_of_cake=type_of_cake, message=message, status="NEW", note="")
+        order = Order(name=name, phone=phone, type_of_cake=type_of_cake, message=message, status="NEW", note="", respond_price=int(respond_price))
         order.save()
         order_text = f'''Имя: {order.name}\nТелефон: {order.phone}\nДесерт: {order.type_of_cake}\nПримечание: {order.message}'''
         keyboard = json.dumps({"inline_keyboard": [[{"text": "Разместить задание", 'url': f'https://caketeam.herokuapp.com/orders/{order.id}'}]]})
@@ -32,27 +36,27 @@ def quiz(request):
 
 def registration(request, chat_id, username):
     if request.method == 'POST':
-        city = request.POST.get('city').capitalize()
+        username = username.lower()
         name = request.POST.get('name').capitalize()
         surname = request.POST.get('surname').capitalize()
         phone = request.POST.get('phone')
+        city = request.POST.get('city').capitalize()
         instagram = request.POST.get('instagram').lower()
         pin = chat_id[-4:]
-        staff = Staff(username=username.lower(),
-                      telegram_id=chat_id,
-                      city=city,
-                      name=name,
-                      surname=surname,
-                      pin=pin,
-                      phone=phone,
-                      instagram=instagram)
-        staff.save()
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = User.objects.create_user(username=username, email=email, password=password)
+            staff = Staff(username=username, telegram_id=chat_id, city=city, name=name, surname=surname, pin=pin, phone=phone, instagram=instagram, user=user)
+            staff.save()
         # Добавить клавиатуру для добавления пользователя
         send_message(chat_id=admin_id, text=f'''Новый пользователь зарегистрировался @{username.lower()}''')
         return redirect('quiz')
     if request.method == 'GET':
+        user_form = RegisterForm()
         pin = chat_id[-4:]
-        return render(request, 'quiz/registration.html', {'pin': pin, 'username': username})
+        return render(request, 'quiz/registration.html', {'pin': pin, 'username': username.lower(), 'form': user_form})
 
 
 def staff_list(request):
@@ -102,25 +106,35 @@ def order_detail(request, order_id):
     if request.method == 'POST':
         note = request.POST.get('note')
         max_responds = request.POST.get('max_responds')
+        respond_price = request.POST.get('respond_price')
         order.max_responds = max_responds
+        order.respond_price = int(respond_price)
         order.status = "FIND"
         order.note = note
         order.save()
         # Внутренний код заявки в виде хэштега
         numb_of_order = order.set_numb_of_order()
         staff_list = Staff.objects.filter(active=True)
-        print(staff_list)
         for staff in staff_list:
-            order_text = f'''Заявка {numb_of_order}\n{order.note}'''
+            order_text = f'''Заявка {numb_of_order}\n{order.note.replace(";", "")}'''
             keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'https://caketeam.herokuapp.com/{order.id}/{staff.telegram_id}'}]]})
             send_message(chat_id=int(staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('orders')
     else:
         notes = order.note
         responds = Respond.objects.filter(order=order)
+        respond_price = order.respond_price
+        # Для указания бюджета
+        budget = ''
+        if respond_price == 50:
+            budget = 'До 1500 руб'
+        elif respond_price == 100:
+            budget = '1500 - 3000 руб'
+        else:
+            budget = 'Больше 3000 руб'
         # Если заметка еще не была создана, вставляем шаблон, если была то редактируем
         if notes == "":
-            value =f'''- Десерт: {order.type_of_cake}\n- Город:\n- Дата и время:\n- Доставка/Самовывоз:\n- Примечание:'''
+            value =f'''Десерт: {order.type_of_cake};\nГород: ;\nДата и время: ;\nДоставка/Самовывоз: ;\nБюджет: {budget};\nПримечание: ;'''
         else:
             value = notes
         # Если есть отклики
@@ -130,11 +144,11 @@ def order_detail(request, order_id):
                 staff = order.staff
                 respond = Respond.objects.filter(order=order, staff=staff)[0]
                 return render(request, 'quiz/order_detail.html',
-                              {'order': order, 'notes': notes, 'value': value, 'respond': respond})
-            return render(request, 'quiz/order_detail.html', {'order': order, 'notes': notes, 'value': value, 'responds': responds})
+                              {'order': order, 'notes': notes, 'value': value, 'respond_price': respond_price, 'respond': respond})
+            return render(request, 'quiz/order_detail.html', {'order': order, 'notes': notes, 'value': value, 'respond_price': respond_price, 'responds': responds})
 
         # Если нет откликов
-        return render(request, 'quiz/order_detail.html', {'order': order, 'value': value, 'notes': notes})
+        return render(request, 'quiz/order_detail.html', {'order': order, 'value': value, 'respond_price': respond_price, 'notes': notes})
 
 
 # Оставляем отклик
@@ -157,7 +171,7 @@ def order_respond(request, order_id, telegram_id):
         else:
             return redirect('quiz')   # Тут надо вызвать ошибку
     elif request.method == 'GET':
-        notes = order.note
+        notes = order.note.replace('-', '<br>')
         telegram_id = telegram_id
         staff = Staff.objects.filter(telegram_id=str(telegram_id))
         # Для отображения количества откликов максимальных
@@ -169,7 +183,7 @@ def order_respond(request, order_id, telegram_id):
         respond = Respond.objects.filter(order=order, staff=staff[0])
         no_respond = len(respond) == 0
 
-        context = {'order': order, 'notes': notes, 'num': num, 'responds': responds, 'no_respond': no_respond}
+        context = {'order': order, 'staff': staff[0], 'notes': notes, 'num': num, 'responds': responds, 'no_respond': no_respond}
         return render(request, 'quiz/order_respond.html', context)
 
 
@@ -250,6 +264,15 @@ def deletewebhook(request):
     else:
         token = Token.objects.filter(id=1)
         return render(request, 'quiz/deletewebhook.html', {'token': token})
+
+
+def calc(request):
+    if request.method == "POST":
+        price = request.POST.get('price')
+        print(price)
+        return redirect('calc')
+    else:
+        return render(request, 'quiz/calc.html')
 
 
 # {'update_id': 541049445, 'message':
