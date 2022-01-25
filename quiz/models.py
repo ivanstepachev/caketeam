@@ -1,8 +1,10 @@
 from django.db import models
 from django.conf import settings
+from django.urls import reverse
 
 
 class Staff(models.Model):
+    avatar = models.ImageField(upload_to='avatars/', default='avatars/ava_F68lBxi.jpeg')
     username = models.CharField(max_length=25, default='')
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default='')
     name = models.CharField(max_length=15, default='')
@@ -39,12 +41,17 @@ class Order(models.Model):
     note = models.TextField(default='')
     staff = models.ForeignKey(Staff, null=True, blank=True, on_delete=models.PROTECT, related_name="orders")
     respond_price = models.IntegerField(default=50)
+    # Будем формировать для уникального url c помощью библиотеки hashids
+    order_url = models.CharField(max_length=50, default="", unique=True)
 
     # Внутренний код заявки в виде хэштега
     def set_numb_of_order(self):
         numb_of_order = '#z' + '{}'.format(self.date.strftime('%Y'))[-2:] + '{}'.format(
             self.date.strftime('%m%d%H%M'))
         return numb_of_order
+
+    def get_absolute_url(self):
+        return reverse('order_for_client', args=[str(self.order_url)])
 
     def __str__(self):
         return '{}-{}-{}-{}'.format(self.date.strftime('%d.%m.%Y %H:%M'), self.name, self.phone, self.message)

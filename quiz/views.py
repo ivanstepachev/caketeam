@@ -4,7 +4,7 @@ from quiz.models import Order, Token, Respond, Image, Staff
 from django.contrib.auth import login, authenticate
 from quiz.forms import RegisterForm
 from django.views.decorators.csrf import csrf_exempt
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 
 import json
 
@@ -14,6 +14,8 @@ from quiz.handlers import handler, send_message
 
 from service.settings import admin_id
 
+from hashids import Hashids
+
 
 def quiz(request):
     if request.method == 'POST':
@@ -22,7 +24,11 @@ def quiz(request):
         type_of_cake = request.POST.get('type_of_cake')
         respond_price = request.POST.get('budget')
         message = request.POST.get('message')
+        hashids = Hashids()
         order = Order(name=name, phone=phone, type_of_cake=type_of_cake, message=message, status="NEW", note="", respond_price=int(respond_price))
+        order.save()
+        order_url = hashids.encode(order.id)
+        order.order_url = order_url
         order.save()
         order_text = f'''Имя: {order.name}\nТелефон: {order.phone}\nДесерт: {order.type_of_cake}\nПримечание: {order.message}'''
         keyboard = json.dumps({"inline_keyboard": [[{"text": "Разместить задание", 'url': f'https://caketeam.herokuapp.com/orders/{order.id}'}]]})
@@ -31,7 +37,15 @@ def quiz(request):
             send_message(chat_id=int(admin_staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('quiz')
     else:
-        return render(request, 'quiz/index.html')
+        return render(request, 'quiz/quiz.html')
+
+
+def order_for_client(request, order_url):
+    # Находим id так как он идет после "-"
+    order = get_object_or_404(Order, order_url=order_url)
+    responds = Respond.objects.filter(order=order)
+    context = {'order': order, 'responds': responds}
+    return render(request, 'quiz/order_for_client.html', context)
 
 
 def registration(request, chat_id, username):
@@ -119,7 +133,7 @@ def order_detail(request, order_id):
             order_text = f'''Заявка {numb_of_order}\n{order.note.replace(";", "")}'''
             keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'https://caketeam.herokuapp.com/{order.id}/{staff.telegram_id}'}]]})
             send_message(chat_id=int(staff.telegram_id), text=order_text, reply_markup=keyboard)
-        return redirect('orders')
+        return redirect('order_detail', order_id=order_id)
     else:
         notes = order.note
         responds = Respond.objects.filter(order=order)
@@ -158,52 +172,54 @@ def order_respond(request, order_id, telegram_id):
         text = request.POST.get('message')
         price = request.POST.get('price')
         pin = request.POST.get('pin')
-        staff = Staff.objects.filter(telegram_id=telegram_id)
+        staff = Staff.objects.filter(telegram_id=telegram_id)[0]
         # Так как несколько изображений
         images = request.FILES.getlist('images')
-        if str(staff[0].pin) == str(pin):
+        if str(staff.pin) == str(pin):
             # Проверка на оставленный отзыв, если его нет, значит это первичное размещение отзыва и деньги списываются, а редактирование бесплатно
-            if len(Respond.objects.filter(order=order, staff=staff[0])) == 0:
+            if len(Respond.objects.filter(order=order, staff=staff)) == 0:
                 # Нужно привязать к юзеру
-                respond = Respond.objects.create(text=text, order=order, staff=staff[0], price=price)
+                respond = Respond.objects.create(text=text, order=order, staff=staff, price=price)
                 if images:
                     for image in images:
                         Image.objects.create(image=image, respond=respond)
-                staff = staff[0]
                 staff.balance = staff.balance - order.respond_price
                 staff.save()
             # Редактирование уже оставленный отзыв
             else:
-                respond = Respond.objects.filter(order=order, staff=staff[0])[0]
+                respond = Respond.objects.filter(order=order, staff=staff)[0]
                 respond.text = text
                 respond.price = price
                 respond.save()
                 if images:
                     for image in images:
                         Image.objects.create(image=image, respond=respond)
-            return redirect('order_respond', order_id=order.id, telegram_id=staff[0].telegram_id)
+            return redirect('order_respond', order_id=order.id, telegram_id=staff.telegram_id)
         else:
             return redirect('quiz')   # Тут надо вызвать ошибку неправильного пина
     elif request.method == 'GET':
-        notes = order.note.replace('-', '<br>')
-        telegram_id = telegram_id
-        staff = Staff.objects.filter(telegram_id=str(telegram_id))
-        # Для отображения количества откликов максимальных
-        amount_responds = len(Respond.objects.filter(order=order))
-        # Для проверки отклика по пину сотрудника через id чтобы не показывать пин на странице в коде
-        num = staff[0].id
+        if order.status == "FIND" or order.status == "WORK":
+            notes = order.note.replace('-', '<br>')
+            telegram_id = telegram_id
+            staff = Staff.objects.filter(telegram_id=str(telegram_id))
+            # Для отображения количества откликов максимальных
+            amount_responds = len(Respond.objects.filter(order=order))
+            # Для проверки отклика по пину сотрудника через id чтобы не показывать пин на странице в коде
+            num = staff[0].id
 
-        # Проверка на оставленный отзыв данным юзером
-        if len(Respond.objects.filter(order=order, staff=staff[0])) > 0:
-            respond = Respond.objects.filter(order=order, staff=staff[0])[0]
+            # Проверка на оставленный отзыв данным юзером
+            if len(Respond.objects.filter(order=order, staff=staff[0])) > 0:
+                respond = Respond.objects.filter(order=order, staff=staff[0])[0]
+            else:
+                respond = None
+
+            # Проверка достаточности баланса
+            has_balance = staff[0].balance - order.respond_price >= 0
+
+            context = {'order': order, 'staff': staff[0], 'notes': notes, 'num': num, 'amount_responds': amount_responds, 'respond': respond, 'has_balance': has_balance}
+            return render(request, 'quiz/order_respond.html', context)
         else:
-            respond = None
-
-        # Проверка достаточности баланса
-        has_balance = staff[0].balance - order.respond_price >= 0
-
-        context = {'order': order, 'staff': staff[0], 'notes': notes, 'num': num, 'amount_responds': amount_responds, 'respond': respond, 'has_balance': has_balance}
-        return render(request, 'quiz/order_respond.html', context)
+            raise Http404("Такой страницы не существует")
 
 
 def respond_choice(request, respond_id):

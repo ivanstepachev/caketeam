@@ -22,22 +22,22 @@
     }
 
     #win_respond {
-            background-color: #E6F1DA;
+        background-color: #E6F1DA;
     }
     .responds-block {
-            border-radius: 20px;
+        border-radius: 20px;
     }
     .responds-img {
-            width: 8em;
-            height: 10em;
+        width: 8em;
+        height: 10em;
     }
     .form-img {
-            width: 3em;
-            height: 4em;
+        width: 3em;
+        height: 4em;
     }
     .remove-foto {
-            text-decoration: none;
-            font-size: 0.8em;
+        text-decoration: none;
+        font-size: 0.8em;
     }
 </style>
 
@@ -125,7 +125,7 @@
                     </div>
                 </div>
                     <div class="text-center">
-                        <small><a href="#" data-bs-toggle="modal" data-bs-target="#editRespond">Редактировать отклик</a></small>
+                        <small><a href="#" class="offer-text" data-bs-toggle="modal" data-bs-target="#editRespond">Редактировать отклик</a></small>
                     </div>
                 </div>
             </div>
@@ -194,29 +194,6 @@
   integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
   crossorigin="anonymous"></script>
 <script>
-<!--$(document).ready(function(){-->
-<!--          $(".remove-foto").on("click", function(e) {-->
-<!--                e.preventDefault();-->
-<!--                var dataId = $(this).attr("data-id")-->
-<!--                $.ajax({-->
-<!--                    type: "POST",-->
-<!--                    url: "/delete/foto",-->
-<!--                    data: {-->
-<!--                        id: dataId,-->
-<!--                        csrfmiddlewaretoken: '{{ csrf_token }}'-->
-<!--                    },-->
-<!--                    success: function(result) {-->
-<!--                        $(`#${dataId}`).css("display", "none");-->
-<!--                        console.log('Foto delete');-->
-<!--                    },-->
-<!--                    error: function(result) {-->
-<!--                        console.log('error');-->
-<!--                    }-->
-<!--                });-->
-<!--            });-->
-<!--});-->
-
-
 $(document).ready(function(){
           var images = []
           $(".remove-foto").on("click", function(e) {
