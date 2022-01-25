@@ -162,17 +162,28 @@ def order_respond(request, order_id, telegram_id):
         # Так как несколько изображений
         images = request.FILES.getlist('images')
         if str(staff[0].pin) == str(pin):
-            # Нужно привязать к юзеру
-            respond = Respond.objects.create(text=text, order=order, staff=staff[0], price=price)
-            if images:
-                for image in images:
-                    Image.objects.create(image=image, respond=respond)
-            staff = staff[0]
-            staff.balance = staff.balance - order.respond_price
-            staff.save()
+            # Проверка на оставленный отзыв, если его нет, значит это первичное размещение отзыва и деньги списываются, а редактирование бесплатно
+            if len(Respond.objects.filter(order=order, staff=staff[0])) == 0:
+                # Нужно привязать к юзеру
+                respond = Respond.objects.create(text=text, order=order, staff=staff[0], price=price)
+                if images:
+                    for image in images:
+                        Image.objects.create(image=image, respond=respond)
+                staff = staff[0]
+                staff.balance = staff.balance - order.respond_price
+                staff.save()
+            # Редактирование уже оставленный отзыв
+            else:
+                respond = Respond.objects.filter(order=order, staff=staff[0])[0]
+                respond.text = text
+                respond.price = price
+                respond.save()
+                if images:
+                    for image in images:
+                        Image.objects.create(image=image, respond=respond)
             return redirect('quiz')
         else:
-            return redirect('quiz')   # Тут надо вызвать ошибку
+            return redirect('quiz')   # Тут надо вызвать ошибку неправильного пина
     elif request.method == 'GET':
         notes = order.note.replace('-', '<br>')
         telegram_id = telegram_id

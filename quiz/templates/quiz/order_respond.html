@@ -27,8 +27,16 @@
             border-radius: 20px;
     }
     .responds-img {
-            width: 10em;
-            height: 14em;
+            width: 8em;
+            height: 10em;
+    }
+    .form-img {
+            width: 3em;
+            height: 4em;
+    }
+    .remove-foto {
+            text-decoration: none;
+            font-size: 0.8em;
     }
 </style>
 
@@ -97,30 +105,78 @@
         </form>
 
         {% elif respond %}
-        <p>Вы уже оставили отклик</p>
+        <p>Вы уже оставили отклик:</p>
         <div id="win_respond" class="border border-1 responds-block mb-3">
 
             <div class="container p-3">
-                <h5><a class="text-dark" href="{% url 'staff_list' %}#{{ respond.staff.id }}">{{ respond.staff.name }} {{ respond.staff.surname }}</a></h5>
-                <small class="text-muted">Telegram: <a href="https://t.me/{{ respond.staff.username }}">@{{ respond.staff.username }}</a></small><br>
-                <small class="text-muted">Номер: {{ respond.staff.phone }}</small><br>
-                <small class="text-muted"><a href="https://wa.me/{{ respond.staff.phone }}">Написать в Whatsapp</a></small><br>
-                <b>Ответ:</b> {{ respond.text }}<br>
-                <b>Цена:</b> {{ respond.price }}
-
+                <small><b>{{ respond.text }}</b></small><br>
+                <small>Стоимость: {{ respond.price }} руб.</small><br>
+                <hr>
+                <small class="text-muted">Instagram: <a href="https://instagram.com/{{ respond.staff.instagram }}">instagram.com/{{ respond.staff.username }}</a></small><br>
+                <small class="text-muted">WhatsApp: <a href="https://wa.me/{{ respond.staff.phone }}">+{{ respond.staff.phone }}</a></small><br>
                 <div class="container mt-3">
                     <div class="row">
                         {% for image in respond.images.all %}
-                        <div class="col-lg-3 col-md-4 col-6 my-2 text-center border">
+                        <div class="col-lg-3 col-md-4 col-6 my-2 text-center">
                             <img src="{{ image.image.url }}" class="image-fluid rounded responds-img" alt="...">
                         </div>
                         {% endfor %}
                     </div>
                 </div>
                     <div class="text-center">
-                        <small><a href="#" data-bs-toggle="modal" data-bs-target="#deleteRespond">Отменить исполнителя</a></small>
+                        <small><a href="#" data-bs-toggle="modal" data-bs-target="#editRespond">Редактировать отклик</a></small>
                     </div>
                 </div>
+            </div>
+
+            <!-- МОДАЛЬНОЕ ОКНО  -->
+            <div class="modal fade" id="editRespond" tabindex="-1" aria-labelledby="ModalLabel3" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="ModalLabel3">Редактировать отклик</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                      <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-group">
+                            <label class="text-muted label-text" for="message2">Текст отклика:</label>
+                            <textarea class="form-control form-control-sm form-rounded" id="message2" name="message" rows="3">{{ respond.text }}</textarea>
+                        </div>
+                        <small class="label-text text-muted mt-3">Удалить фото:</small>
+                          <div class="row">
+                            {% for image in respond.images.all %}
+                            <div class="col-2 my-2 text-center">
+                                <img src="{{ image.image.url }}" class="image-fluid rounded form-img" alt="..."><br>
+                                <a class="remove-foto" href="#">x</a>
+                            </div>
+                            {% endfor %}
+                    </div>
+
+                        <div class="form-group my-2">
+                            <label class="text-muted label-text" for="images2">Добавить фото:</label>
+                            <input type="file" class="form-control form-control-sm" id="images2" name="images" multiple>
+                        </div>
+                        <div class="form-group my-2">
+                            <div class="row">
+                                <div class="col-6">
+                                    <label class="text-muted label-text" for="price2">Цена:</label>
+                                    <input type="text" class="form-control form-control-sm" id="price2" name="price" value="{{ respond.price }}">
+                                </div>
+                                <div class="col-6">
+                                     <label class="text-muted label-text" for="pin2">pin</label>
+                                     <input type="text" class="form-control form-control-sm" id="pin2" name="pin">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2 my-3">
+                            <input class="btn btn-success btn-md form-rounded" type="submit" value="Редактировать">
+                        </div>
+                      </form>
+                  </div>
+                </div>
+              </div>
             </div>
 
         {% elif amount_responds >= order.max_responds %}
@@ -131,4 +187,5 @@
 
     </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </html>
