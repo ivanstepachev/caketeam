@@ -25,6 +25,7 @@ urlpatterns = [
     path('bot/setwebhook', quiz_views.setwebhook, name="setwebhook"),
     path('bot/deletewebhook', quiz_views.deletewebhook, name="deletewebhook"),
     path('reg/<str:chat_id>/<str:username>', quiz_views.registration, name="registration"),
+    path('delete/foto', quiz_views.delete_foto, name="delete_foto"),
     path('calc', quiz_views.calc, name="calc")
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 

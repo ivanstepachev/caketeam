@@ -181,7 +181,7 @@ def order_respond(request, order_id, telegram_id):
                 if images:
                     for image in images:
                         Image.objects.create(image=image, respond=respond)
-            return redirect('quiz')
+            return redirect('order_respond', order_id=order.id, telegram_id=staff[0].telegram_id)
         else:
             return redirect('quiz')   # Тут надо вызвать ошибку неправильного пина
     elif request.method == 'GET':
@@ -254,6 +254,17 @@ def bot(request):
                 text = '''Сначала сделайте себе ник нейм'''
                 send_message(chat_id=chat_id, text=text)
     return HttpResponse('ok', content_type='text/plain', status=200)
+
+
+# удаление фото, принимает массив
+def delete_foto(request):
+    if request.method == "POST":
+        # так как отправляет списком
+        image_ids = request.POST.getlist('ids[]')
+        for image_id in image_ids:
+            image = Image.objects.get(id=image_id)
+            image.delete()
+        return HttpResponse('ok', content_type='text/plain', status=200)
 
 
 def setwebhook(request):
