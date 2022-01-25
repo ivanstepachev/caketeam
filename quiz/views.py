@@ -134,7 +134,7 @@ def order_detail(request, order_id):
             budget = 'Больше 3000 руб'
         # Если заметка еще не была создана, вставляем шаблон, если была то редактируем
         if notes == "":
-            value =f'''Десерт: {order.type_of_cake};\nГород: ;\nДата и время: ;\nДоставка/Самовывоз: ;\nБюджет: {budget};\nПримечание: ;'''
+            value =f'''Имя: {order.name};\nДесерт: {order.type_of_cake};\nГород: ;\nДата и время: ;\nДоставка/Самовывоз: ;\nБюджет: {budget};\nПримечание: ;'''
         else:
             value = notes
         # Если есть отклики
@@ -178,18 +178,20 @@ def order_respond(request, order_id, telegram_id):
         telegram_id = telegram_id
         staff = Staff.objects.filter(telegram_id=str(telegram_id))
         # Для отображения количества откликов максимальных
-        responds = len(Respond.objects.filter(order=order))
+        amount_responds = len(Respond.objects.filter(order=order))
         # Для проверки отклика по пину сотрудника через id чтобы не показывать пин на странице в коде
         num = staff[0].id
 
         # Проверка на оставленный отзыв данным юзером
-        respond = Respond.objects.filter(order=order, staff=staff[0])
-        no_respond = len(respond) == 0
+        if len(Respond.objects.filter(order=order, staff=staff[0])) > 0:
+            respond = Respond.objects.filter(order=order, staff=staff[0])[0]
+        else:
+            respond = None
 
         # Проверка достаточности баланса
         has_balance = staff[0].balance - order.respond_price >= 0
 
-        context = {'order': order, 'staff': staff[0], 'notes': notes, 'num': num, 'responds': responds, 'no_respond': no_respond, 'has_balance': has_balance}
+        context = {'order': order, 'staff': staff[0], 'notes': notes, 'num': num, 'amount_responds': amount_responds, 'respond': respond, 'has_balance': has_balance}
         return render(request, 'quiz/order_respond.html', context)
 
 

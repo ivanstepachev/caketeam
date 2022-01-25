@@ -19,6 +19,17 @@
     .offer-text {
         font-size: 0.7em;
     }
+
+    #win_respond {
+            background-color: #E6F1DA;
+    }
+    .responds-block {
+            border-radius: 20px;
+    }
+    .responds-img {
+            width: 10em;
+            height: 14em;
+    }
 </style>
 
     <div class="container mt-3">
@@ -29,14 +40,14 @@
         <p>{{ order.note|to_replace }}</p>
         {% endautoescape %}
 
-        <p><small class="text-muted">Количество откликов:</small> {{ responds }} из {{ order.max_responds }}<br>
+        <p><small class="text-muted">Количество откликов:</small> {{ amount_responds }} из {{ order.max_responds }}<br>
         <small class="text-muted">Стоимость отклика:</small> {{ order.respond_price }} руб.<br>
         <small class="text-muted">Мой баланс:</small> {{ staff.balance }} руб. <a href="#"><small>(пополнить)</small></a></p>
         <hr>
 
         <!-- Проверка что у него нет отклика  -->
 
-        {% if responds < order.max_responds and no_respond %}
+        {% if amount_responds < order.max_responds and respond == None %}
 
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -85,11 +96,36 @@
             {% endif %}
         </form>
 
-        {% elif not no_respond %}
+        {% elif respond %}
         <p>Вы уже оставили отклик</p>
+        <div id="win_respond" class="border border-1 responds-block mb-3">
 
-        {% elif responds >= order.max_responds %}
-        <p>К сожалению отклик больше нельзя оставить, так как превышено максимальное количество</p>
+            <div class="container p-3">
+                <h5><a class="text-dark" href="{% url 'staff_list' %}#{{ respond.staff.id }}">{{ respond.staff.name }} {{ respond.staff.surname }}</a></h5>
+                <small class="text-muted">Telegram: <a href="https://t.me/{{ respond.staff.username }}">@{{ respond.staff.username }}</a></small><br>
+                <small class="text-muted">Номер: {{ respond.staff.phone }}</small><br>
+                <small class="text-muted"><a href="https://wa.me/{{ respond.staff.phone }}">Написать в Whatsapp</a></small><br>
+                <b>Ответ:</b> {{ respond.text }}<br>
+                <b>Цена:</b> {{ respond.price }}
+
+                <div class="container mt-3">
+                    <div class="row">
+                        {% for image in respond.images.all %}
+                        <div class="col-lg-3 col-md-4 col-6 my-2 text-center border">
+                            <img src="{{ image.image.url }}" class="image-fluid rounded responds-img" alt="...">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                    <div class="text-center">
+                        <small><a href="#" data-bs-toggle="modal" data-bs-target="#deleteRespond">Отменить исполнителя</a></small>
+                    </div>
+                </div>
+            </div>
+
+        {% elif amount_responds >= order.max_responds %}
+        <p>К сожалению, отклик к этому заданию больше нельзя оставить, так как превышено максимальное количество откликов.<br>
+        Если потребуются дополнительные отклики, вам придет уведомление.</p>
 
         {% endif %}
 
