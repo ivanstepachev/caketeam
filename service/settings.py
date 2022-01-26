@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'quiz',
+    'django_cleanup',
 ]
 
 MIDDLEWARE = [
@@ -129,4 +130,7 @@ MEDIA_ROOT = 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 admin_id = 896205315
+
+hashid_salt = "the best of the best"
+alphabet='abcdefghijklmnopqrstuvwxyz0123456789'
 

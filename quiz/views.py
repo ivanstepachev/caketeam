@@ -12,7 +12,7 @@ import requests
 
 from quiz.handlers import handler, send_message
 
-from service.settings import admin_id
+from service.settings import admin_id, hashid_salt, alphabet
 
 from hashids import Hashids
 
@@ -24,7 +24,7 @@ def quiz(request):
         type_of_cake = request.POST.get('type_of_cake')
         respond_price = request.POST.get('budget')
         message = request.POST.get('message')
-        hashids = Hashids()
+        hashids = Hashids(salt=hashid_salt, alphabet=alphabet, min_length=5)
         order = Order(name=name, phone=phone, type_of_cake=type_of_cake, message=message, status="NEW", note="", respond_price=int(respond_price))
         order.save()
         order_url = hashids.encode(order.id)
@@ -182,7 +182,8 @@ def order_respond(request, order_id, telegram_id):
                 respond = Respond.objects.create(text=text, order=order, staff=staff, price=price)
                 if images:
                     for image in images:
-                        Image.objects.create(image=image, respond=respond)
+                        img = Image(image=image, respond=respond)
+                        img.save()
                 staff.balance = staff.balance - order.respond_price
                 staff.save()
             # Редактирование уже оставленный отзыв

@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from PIL import Image as PillowImage
 
 
 class Staff(models.Model):
@@ -75,6 +76,14 @@ class Image(models.Model):
 
     def __str__(self):
         return str(self.image)
+
+    def save(self, *args, **kwargs):
+        super(Image, self).save(*args, **kwargs)
+        img = PillowImage.open(self.image.path)
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)
+            img.save(self.image.path)
 
 
 class Token(models.Model):
