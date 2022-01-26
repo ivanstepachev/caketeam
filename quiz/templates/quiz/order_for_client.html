@@ -24,7 +24,9 @@
         background-color: #E6F1DA;
     }
     .responds-block {
-        border-radius: 20px;
+        border-radius: 10px;
+        width: 90%;
+        background-color: #F6FEEB;
     }
     .responds-img {
         width: 8em;
@@ -32,8 +34,8 @@
     }
 
     .avatar {
-        width: 3em;
-        height: 3em;
+        width: 4em;
+        height: 4em;
     }
 
     .staff-info {
@@ -53,17 +55,18 @@
             <p class="label-text text-muted order-info">{{ order.note|to_replace }}</p>
             {% endautoescape %}
             <b class="label-text">Откликов на задание от кондитеров: {{ responds.all.count }}</b>
+            <hr>
         </div>
     </div>
     <!--  Отклики  -->
     {% for respond in responds %}
-    <div class="container-fluid border border-3 mt-2">
+    <div class="container mt-2">
         <div class="container">
             <div class="row my-3">
-                <div class="col-2">
-                    <img src="{{ respond.staff.avatar.url }}" class="rounded-circle avatar">
+                <div class="col-3">
+                    <img src="{{ respond.staff.avatar.url }}" class="responds-block avatar">
                 </div>
-                <div class="col-10">
+                <div class="col-9">
                     <p class="staff-info mt-1">
                     <small>{{ respond.staff.name }}</small><br>
                     <small class="offer-text text-warning"><i class="bi bi-star-fill"></i> <span class="text-muted">4.9 359 отзывов</span></small><br>
@@ -72,20 +75,24 @@
                 </div>
             </div>
         </div>
-        <hr>
 
-        <div class="container">
-            <p class="label-text">Стоимость: <b>{{ respond.price }} ₽</b></p>
-            <p class="label-text">{{ respond.text }}</p>
-        </div>
+        <div class="container responds-block py-3 w-80">
+            <div class="container">
+                <p class="label-text">Стоимость: <b>{{ respond.price }} ₽</b></p>
+                <p class="label-text">{{ respond.text }}</p>
+            </div>
 
-        <div class="container">
-            <div class="row">
-            {% for image in respond.images.all %}
-                <div class="col-lg-3 col-md-4 col-6 my-2 text-center">
-                    <img src="{{ image.image.url }}" class="image-fluid rounded responds-img" alt="...">
+            <div class="container">
+                <div class="row">
+                {% for image in respond.images.all %}
+                    <div class="col-lg-3 col-md-4 col-6 my-2 text-center">
+                        <img src="{{ image.image.url }}" class="image-fluid rounded responds-img" alt="...">
+                    </div>
+                {% endfor %}
                 </div>
-            {% endfor %}
+            </div>
+            <div class="d-grid gap-2 mt-2">
+                <button class="btn btn-success btn-sm form-rounded">Выбрать исполнителем</button>
             </div>
         </div>
     </div>
