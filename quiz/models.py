@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
-from PIL import Image as PillowImage
+from PIL import ImageOps, Image as PillowImage
 
 
 class Staff(models.Model):
@@ -81,6 +81,8 @@ class Image(models.Model):
     def save(self, *args, **kwargs):
         super().save()
         img = PillowImage.open(self.image.path)
+        # Для того чтобы картинка с телефона не поворачивалась
+        img = ImageOps.exif_transpose(img)
         # Когда высота больше ширины
         if img.height > img.width:
             # обрезаем вверх и низ делая квадратной
