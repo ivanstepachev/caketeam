@@ -29,8 +29,7 @@
         background-color: #F6FEEB;
     }
     .responds-img {
-        width: 2em;
-        height: 2em;
+        width: 100%;
     }
     .first-img {
         width: 100%;
@@ -97,7 +96,7 @@
                 {% if respond.images.all.count > 1 %}
                 <div class="row">
                 {% for image in respond.images.all %}
-                    <div class="col-2 mb-3 text-center">
+                    <div class="col-4 mb-3 text-center">
                         <img src="{{ image.image.url }}" class="image-fluid responds-img">
                     </div>
                 {% endfor %}
