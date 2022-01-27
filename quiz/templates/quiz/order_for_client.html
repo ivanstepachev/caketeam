@@ -31,6 +31,11 @@
     .responds-img {
         width: 100%;
     }
+    .active-img {
+        filter: brightness(0.3);
+        width: 85%;
+
+    }
     .first-img {
         width: 100%;
     }
@@ -83,26 +88,25 @@
                 <p class="label-text">{{ respond.text|linebreaksbr }}</p>
             </div>
 
-<!--            <div class="container">-->
+
                 {% if respond.images.all %}
                 <div class="row">
                 {% with respond.images.all|first as image %}
                 <div class="col-12 my-2 text-center">
-                    <img src="{{ image.image.url }}" class="image-fluid rounded first-img">
+                    <img id="main-foto" src="{{ image.image.url }}" class="image-fluid rounded first-img">
                 </div>
                 {% endwith %}
                 </div>
                 {% endif %}
-                {% if respond.images.all.count > 1 %}
-                <div class="row">
+                {% if respond.images.all.count %}
+                <div id="gallery-row" class="row align-items-center">
                 {% for image in respond.images.all %}
-                    <div class="col-4 mb-3 text-center">
-                        <img src="{{ image.image.url }}" class="image-fluid responds-img">
+                    <div class="col-4 mb-3 text-center gallery-col">
+                        <a class="gallery-foto" data-url="{{ image.image.url }}"><img src="{{ image.image.url }}" class="responds-img rounded"></a>
                     </div>
                 {% endfor %}
                 </div>
                 {% endif %}
-<!--            </div>-->
             <div class="d-grid gap-2 mt-2">
                 <button class="btn btn-success btn-sm form-rounded">Выбрать исполнителем</button>
             </div>
@@ -111,4 +115,22 @@
     {% endfor %}
 
 </body>
+<script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
+<script>
+
+
+$(document).ready(function(){
+    $('.gallery-foto:first img').addClass("active-img");
+    $(".gallery-foto").on("click", function(e) {
+        e.preventDefault();
+        var dataUrl = $(this).attr("data-url")
+        $("#main-foto").attr("src", dataUrl);
+        $(".gallery-foto img").removeClass("active-img");
+        $(this).children().addClass("active-img");
+        });
+});
+</script>
 </html>
