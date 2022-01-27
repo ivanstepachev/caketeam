@@ -8,39 +8,39 @@
     <title>Document</title>
 </head>
 <body>
-    <style>
-        .responds-block {
-            border-radius: 20px;
-        }
+<style>
+    .responds-block {
+        border-radius: 20px;
+    }
 
-        .responds-img {
-            width: 8em;
-            height: 10em;
-        }
+    .responds-img {
+        width: 8em;
+        height: 10em;
+    }
 
-        #win_respond {
-            background-color: #E6F1DA;
-        }
+    #win_respond {
+        background-color: #E6F1DA;
+    }
 
-        #done_respond {
-            background-color: #E6F1DA;
-        }
+    #done_respond {
+        background-color: #E6F1DA;
+    }
 
-        .label-text {
-            font-size: 0.8em;
-        }
+    .label-text {
+        font-size: 0.8em;
+    }
 
-        .offer-text {
-            font-size: 0.7em;
-            line-height: 100%;
-        }
+    .offer-text {
+        font-size: 0.7em;
+        line-height: 100%;
+    }
 
-        p.offer-text {
-            line-height: 110%;
-        }
+    p.offer-text {
+        line-height: 110%;
+    }
 
-    </style>
-
+</style>
+<div class="container mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
     <!-- Если задание выполнено -->
     {% if order.status == "DONE" %}
 
@@ -264,7 +264,7 @@ http://127.0.0.1:8000{{ order.get_absolute_url }}
 {% endif %}
 
 
-
+</div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </html>
