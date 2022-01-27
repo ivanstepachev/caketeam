@@ -39,6 +39,11 @@
         text-decoration: none;
         font-size: 0.8em;
     }
+    .refresh-icon {
+        text-decoration: none;
+        font-size: 1em;
+        display: none;
+    }
 </style>
 
     <div class="container mt-3">
@@ -110,7 +115,9 @@
         <div id="win_respond" class="border border-1 responds-block mb-3">
 
             <div class="container p-3">
-                <small><b>{{ respond.text }}</b></small><br>
+
+                <small><b>{{ respond.text|linebreaksbr }}</b></small><br>
+
                 <small>Стоимость: {{ respond.price }} руб.</small><br>
                 <hr>
                 <small class="text-muted">Instagram: <a href="https://instagram.com/{{ respond.staff.instagram }}">instagram.com/{{ respond.staff.username }}</a></small><br>
@@ -143,17 +150,19 @@
                         {% csrf_token %}
                         <div class="form-group">
                             <label class="text-muted label-text" for="message2">Текст отклика:</label>
-                            <textarea class="form-control form-control-sm form-rounded" id="message2" name="message" rows="3">{{ respond.text }}</textarea>
+                            <textarea class="form-control form-control-sm form-rounded" id="message2" name="message" rows="6">{{ respond.text }}</textarea>
                         </div>
                         <small class="label-text text-muted mt-3">Удалить фото:</small>
                           <div class="row">
                             {% for image in respond.images.all %}
-                            <div id="{{ image.id }}" class="col-2 my-2 text-center">
-                                <img src="{{ image.image.url }}" class="image-fluid rounded form-img" alt="..."><br>
-                                <a data-id="{{ image.id }}" class="remove-foto text-danger" href="#"><i class="bi bi-trash"></i></a>
+                            <div id="{{ image.id }}" class="col-2 my-2 text-center er">
+                                <a data-id="{{ image.id }}" class="remove-foto text-danger" href="#"><img src="{{ image.image.url }}" class="image-fluid rounded form-img border border-2 border-danger" alt="..."></a>
+<!--                                <p> <a data-id="{{ image.id }}" class="remove-foto text-danger" href="#"> <i class="bi bi-trash"></i></a></p>-->
                             </div>
                             {% endfor %}
-                    </div>
+                            <a class="refresh-icon text-success" href="#"><i class="bi bi-x-square"></i><span class="offer-text align-middle"> отменить</span></a>
+
+                          </div>
 
                         <div class="form-group my-2">
                             <label class="text-muted label-text" for="images2">Добавить фото:</label>
@@ -201,8 +210,17 @@ $(document).ready(function(){
                 var dataId = $(this).attr("data-id")
                 images.push(dataId);
                 $(`#${dataId}`).css("display", "none");
-                console.log(images);
-            });
+                $(".refresh-icon").css("display", "block");
+          });
+
+          $(".refresh-icon").on("click", function(e) {
+                for (var dataId of images) {
+                $(`#${dataId}`).css("display", "block");
+                }
+                images.splice(0, images.length);
+                $(".refresh-icon").css("display", "none");
+          });
+
           $("#change").on("click", function(e) {
                 $.ajax({
                     type: "POST",

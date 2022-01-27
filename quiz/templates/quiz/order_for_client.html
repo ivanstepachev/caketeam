@@ -29,10 +29,13 @@
         background-color: #F6FEEB;
     }
     .responds-img {
-        width: 8em;
-        height: 8em;
+        width: 5em;
+        height: 5em;
     }
-
+    .first-img {
+        width: 18em;
+        height: 18em;
+    }
     .avatar {
         width: 4em;
         height: 4em;
@@ -79,17 +82,28 @@
         <div class="container responds-block py-3 w-80">
             <div class="container">
                 <p class="label-text">Стоимость: <b>{{ respond.price }} ₽</b></p>
-                <p class="label-text">{{ respond.text }}</p>
+                <p class="label-text">{{ respond.text|linebreaksbr }}</p>
             </div>
 
             <div class="container">
+                {% if respond.images.all %}
+                <div class="row">
+                {% with respond.images.all|first as image %}
+                <div class="col-12 my-2 text-center">
+                    <img src="{{ image.image.url }}" class="image-fluid rounded first-img">
+                </div>
+                {% endwith %}
+                </div>
+                {% endif %}
+                {% if respond.images.all.count > 1 %}
                 <div class="row">
                 {% for image in respond.images.all %}
-                    <div class="col-lg-3 col-md-4 col-6 my-2 text-center">
-                        <img src="{{ image.image.url }}" class="image-fluid rounded responds-img" alt="...">
+                    <div class="col-4 my-2 text-center">
+                        <img src="{{ image.image.url }}" class="image-fluid responds-img" alt="...">
                     </div>
                 {% endfor %}
                 </div>
+                {% endif %}
             </div>
             <div class="d-grid gap-2 mt-2">
                 <button class="btn btn-success btn-sm form-rounded">Выбрать исполнителем</button>
