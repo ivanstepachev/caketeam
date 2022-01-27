@@ -29,12 +29,11 @@
         background-color: #F6FEEB;
     }
     .responds-img {
-        width: 5em;
-        height: 5em;
+        width: 2em;
+        height: 2em;
     }
     .first-img {
-        width: 18em;
-        height: 18em;
+        width: 100%;
     }
     .avatar {
         width: 4em;
@@ -85,7 +84,7 @@
                 <p class="label-text">{{ respond.text|linebreaksbr }}</p>
             </div>
 
-            <div class="container">
+<!--            <div class="container">-->
                 {% if respond.images.all %}
                 <div class="row">
                 {% with respond.images.all|first as image %}
@@ -98,13 +97,13 @@
                 {% if respond.images.all.count > 1 %}
                 <div class="row">
                 {% for image in respond.images.all %}
-                    <div class="col-4 my-2 text-center">
-                        <img src="{{ image.image.url }}" class="image-fluid responds-img" alt="...">
+                    <div class="col-2 mb-3 text-center">
+                        <img src="{{ image.image.url }}" class="image-fluid responds-img">
                     </div>
                 {% endfor %}
                 </div>
                 {% endif %}
-            </div>
+<!--            </div>-->
             <div class="d-grid gap-2 mt-2">
                 <button class="btn btn-success btn-sm form-rounded">Выбрать исполнителем</button>
             </div>
