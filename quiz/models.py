@@ -23,6 +23,49 @@ class Staff(models.Model):
     def __str__(self):
         return str(self.user)
 
+    def save(self, *args, **kwargs):
+        super().save()
+        img = PillowImage.open(self.avatar.path)
+        img = ImageOps.exif_transpose(img)
+        # Когда высота больше ширины
+        if img.height > img.width:
+            left = 0
+            right = img.width
+            top = (img.height - img.width) / 2
+            bottom = (img.height + img.width) / 2
+            img = img.crop((left, top, right, bottom))
+            if img.height > 500 or img.width > 500:
+                output_size = (500, 500)
+                img.thumbnail(output_size)
+                img.save(self.avatar.path)
+            else:
+                output_size = (img.width, img.width)
+                img.thumbnail(output_size)
+                img.save(self.avatar.path)
+        elif img.width > img.height:
+            left = (img.width - img.height) / 2
+            right = (img.width + img.height) / 2
+            top = 0
+            bottom = img.height
+            img = img.crop((left, top, right, bottom))
+            if img.height > 500 or img.width > 500:
+                output_size = (500, 500)
+                img.thumbnail(output_size)
+                img.save(self.avatar.path)
+            else:
+                output_size = (img.height, img.height)
+                img.thumbnail(output_size)
+                img.save(self.avatar.path)
+        else:
+            if img.height > 500 and img.width > 500:
+                output_size = (500, 500)
+                img.thumbnail(output_size)
+                img.save(self.avatar.path)
+            else:
+                output_size = (img.height, img.height)
+                img.thumbnail(output_size)
+                img.save(self.avatar.path)
+
 
 class Order(models.Model):
     STATUS_CHOICE = (
@@ -44,6 +87,7 @@ class Order(models.Model):
     respond_price = models.IntegerField(default=50)
     # Будем формировать для уникального url c помощью библиотеки hashids
     order_url = models.CharField(max_length=50, default="", unique=True)
+    views = models.PositiveIntegerField(default=0)
 
     # Внутренний код заявки в виде хэштега
     def set_numb_of_order(self):
@@ -115,6 +159,16 @@ class Image(models.Model):
                 output_size = (img.height, img.height)
                 img.thumbnail(output_size)
                 img.save(self.image.path)
+        # если изображение квадратное
+        else:
+            if img.height > 1000 and img.width > 1000:
+                output_size = (1000, 100)
+                img.thumbnail(output_size)
+                img.save(self.avatar.path)
+            else:
+                output_size = (img.height, img.height)
+                img.thumbnail(output_size)
+                img.save(self.avatar.path)
 
 
 class Token(models.Model):

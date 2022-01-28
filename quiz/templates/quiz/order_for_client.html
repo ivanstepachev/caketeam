@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <title>Document</title>
+    <title>Заявка {{ order.set_numb_of_order }}</title>
 </head>
 <body>
 <style>
@@ -17,8 +17,19 @@
     .label-text {
         font-size: 0.8em;
     }
+    .price-text {
+        font-size: 0.8em;
+        font-weight: 500;
+    }
+    .name-text {
+        font-weight: 500;
+    }
     .offer-text {
         font-size: 0.7em;
+    }
+    .add-text {
+        font-size: 0.55em;
+        line-height: 90%;
     }
     #win_respond {
         background-color: #E6F1DA;
@@ -58,40 +69,47 @@
     .instagram {
         color: #ba30b6;
     }
+    .respond-card {
+        margin-bottom: 5em;
+    }
 </style>
     <div class="container mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
-        <h6 class="text-center">Заявка {{ order.set_numb_of_order }}</h6>
+        <h5 class="text-center">Заявка {{ order.set_numb_of_order }}</h5>
         <hr>
         <div class="container">
             <!--Экранирование html-->
             {% autoescape off %}
             <p class="label-text text-muted order-info">{{ order.note|to_replace }}</p>
             {% endautoescape %}
-            <b class="label-text">Откликов на задание от кондитеров: {{ responds.all.count }}</b>
+            <b class="name-text">Откликов на задание от кондитеров: {{ responds.all.count }}</b><br>
+            <span class="add-text">Просмотров: 45</span><br>
             <hr>
         </div>
-        <!--  Отклики  -->
-        {% for respond in responds %}
-        <div class="info-block container">
-            <div class="row my-3 align-items-center">
-                <div class="col-3">
-                    <img src="{{ respond.staff.avatar.url }}" class="responds-block avatar">
-                </div>
-                <div class="col-9">
-                    <p class="staff-info mt-1">
-                    <small>{{ respond.staff.name }}</small><br>
-                    <small class="offer-text text-warning"><i class="bi bi-star-fill"></i> <span class="text-muted">4.9 359 отзывов</span></small><br>
-                    <small class="offer-text">Моё портфолио и контакты:<br>
-                    <a class="contacts" href="https://instagram.com/{{ respond.staff.instagram }}"><i class="bi bi-instagram instagram"></i>  instagram.com/{{ respond.staff.instagram }}</a><br>
-                    <a class="contacts" href="https://wa.me/{{ respond.staff.phone }}"><i class="bi bi-whatsapp text-success"></i>  +{{ respond.staff.phone }}</a></small>
-                    </p>
-                </div>
+    </div>
+    <!--  Отклики  -->
+    {% for respond in responds %}
+    <div class="container respond-card mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <div class="row mt-3">
+            <div class="col-3 mt-2">
+                <img src="{{ respond.staff.avatar.url }}" class="responds-block avatar">
+            </div>
+            <div class="col-9">
+                <p class="staff-info mt-1">
+                <span class="name-text text-primary">{{ respond.staff.name }} S.</span><br>
+                <span class="offer-text text-warning"><i class="bi bi-star-fill"></i> <span class="text-muted">4.9 359 отзывов</span></span><br>
+                <span class="offer-text">Моё портфолио и контакты:<br>
+                <a class="contacts" href="https://instagram.com/{{ respond.staff.instagram }}"><i class="bi bi-instagram instagram"></i>  instagram.com/{{ respond.staff.instagram }}</a><br>
+                <a class="contacts" href="https://wa.me/{{ respond.staff.phone }}"><i class="bi bi-whatsapp text-success"></i>  +{{ respond.staff.phone }}</a></span>
+                </p>
             </div>
         </div>
 
+
         <div class="container responds-block py-3">
             <div class="container">
-                <p class="label-text">Стоимость: <b>{{ respond.price }} ₽</b></p>
+                <p class="price-text">Стоимость: <b>{{ respond.price }} ₽</b></br>
+                <span class="add-text text-muted">Цена является приблизительной, прежде обсудите все детали с кондитером, чтобы установить точную цену.</span></p>
+                <hr>
                 <p class="label-text">{{ respond.text|linebreaksbr }}</p>
             </div>
 
@@ -114,12 +132,12 @@
                 {% endfor %}
                 </div>
                 {% endif %}
-            <div class="d-grid gap-2 mt-2">
+            <div class="d-grid gap-2 mt-2 my-3">
                 <button class="btn btn-success btn-sm form-rounded">Выбрать исполнителем</button>
             </div>
         </div>
     </div>
-    {% endfor %}
+{% endfor %}
 
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
