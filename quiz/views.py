@@ -11,10 +11,13 @@ import json
 import requests
 
 from quiz.handlers import handler, send_message
+from quiz.utilities import unique_view_of_order, to_hash, from_hash
 
 from service.settings import admin_id, hashid_salt, alphabet
 
 from hashids import Hashids
+
+from django.contrib.auth.decorators import login_required
 
 
 def quiz(request):
@@ -24,6 +27,7 @@ def quiz(request):
         type_of_cake = request.POST.get('type_of_cake')
         respond_price = request.POST.get('budget')
         message = request.POST.get('message')
+        # Для генерации сссылки
         hashids = Hashids(salt=hashid_salt, alphabet=alphabet, min_length=5)
         order = Order(name=name, phone=phone, type_of_cake=type_of_cake, message=message, status="NEW", note="", respond_price=int(respond_price))
         order.save()
@@ -130,8 +134,10 @@ def order_detail(request, order_id):
         numb_of_order = order.set_numb_of_order()
         staff_list = Staff.objects.filter(active=True)
         for staff in staff_list:
+            hash_order_id = to_hash(order.id)
+            hash_telegram_id = to_hash(int(staff.telegram_id))
             order_text = f'''Заявка {numb_of_order}\n{order.note.replace(";", "")}'''
-            keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'https://caketeam.herokuapp.com/{order.id}/{staff.telegram_id}'}]]})
+            keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'http://127.0.0.1:8000/n/{hash_telegram_id}/{hash_order_id}'}]]})
             send_message(chat_id=int(staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('order_detail', order_id=order_id)
     else:
@@ -165,14 +171,19 @@ def order_detail(request, order_id):
         return render(request, 'quiz/order_detail.html', {'order': order, 'value': value, 'respond_price': respond_price, 'notes': notes})
 
 
-# Оставляем отклик
-def order_respond(request, order_id, telegram_id):
+# Для быстрого отклика для перехода из телеграма без логина
+def order_respond(request, hash_order_id, hash_telegram_id):
+    order_id = int(from_hash(hash_order_id))
+    telegram_id = str(from_hash(hash_telegram_id))
+    # Проверяем авторизован ли пользователь, если да то переводим на view понятным адоресом страницы
+    if request.user.is_authenticated:
+        return redirect('order_respond_login', order_id=order_id, telegram_id=telegram_id)
     order = get_object_or_404(Order, id=order_id)
+    staff = Staff.objects.filter(telegram_id=telegram_id)[0]
     if request.method == 'POST':
         text = request.POST.get('message')
         price = request.POST.get('price')
         pin = request.POST.get('pin')
-        staff = Staff.objects.filter(telegram_id=telegram_id)[0]
         # Так как несколько изображений
         images = request.FILES.getlist('images')
         if str(staff.pin) == str(pin):
@@ -201,26 +212,103 @@ def order_respond(request, order_id, telegram_id):
     elif request.method == 'GET':
         if order.status == "FIND" or order.status == "WORK":
             notes = order.note.replace('-', '<br>')
-            telegram_id = telegram_id
-            staff = Staff.objects.filter(telegram_id=str(telegram_id))
+            # Просмотры страницы
+            if unique_view_of_order(order=order, staff=staff):
+                order.views = order.views + 1
+                order.save()
             # Для отображения количества откликов максимальных
             amount_responds = len(Respond.objects.filter(order=order))
             # Для проверки отклика по пину сотрудника через id чтобы не показывать пин на странице в коде
-            num = staff[0].id
+            num = staff.id
 
             # Проверка на оставленный отзыв данным юзером
-            if len(Respond.objects.filter(order=order, staff=staff[0])) > 0:
-                respond = Respond.objects.filter(order=order, staff=staff[0])[0]
+            if len(Respond.objects.filter(order=order, staff=staff)) > 0:
+                respond = Respond.objects.filter(order=order, staff=staff)[0]
             else:
                 respond = None
-
             # Проверка достаточности баланса
-            has_balance = staff[0].balance - order.respond_price >= 0
-
-            context = {'order': order, 'staff': staff[0], 'notes': notes, 'num': num, 'amount_responds': amount_responds, 'respond': respond, 'has_balance': has_balance}
+            has_balance = staff.balance - order.respond_price >= 0
+            context = {'order': order, 'staff': staff, 'notes': notes, 'num': num, 'amount_responds': amount_responds, 'respond': respond, 'has_balance': has_balance}
             return render(request, 'quiz/order_respond.html', context)
         else:
             raise Http404("Такой страницы не существует")
+
+
+# Если юзер залогинен !! ДОБАВИТЬ декоратор
+@login_required
+def order_respond_login(request, order_id, telegram_id):
+    order = get_object_or_404(Order, id=order_id)
+    staff = Staff.objects.filter(telegram_id=telegram_id)[0]
+    # Проверка на то что нужно быть залогиненым и смотреть можно только свою страницу
+    if request.user.staff.telegram_id == telegram_id:
+        if request.method == 'POST':
+            text = request.POST.get('message')
+            price = request.POST.get('price')
+            pin = request.POST.get('pin')
+            # Так как несколько изображений
+            images = request.FILES.getlist('images')
+            if str(staff.pin) == str(pin):
+                # Проверка на оставленный отзыв, если его нет, значит это первичное размещение отзыва и деньги списываются, а редактирование бесплатно
+                if len(Respond.objects.filter(order=order, staff=staff)) == 0:
+                    # Нужно привязать к юзеру
+                    respond = Respond.objects.create(text=text, order=order, staff=staff, price=price)
+                    if images:
+                        for image in images:
+                            img = Image(image=image, respond=respond)
+                            img.save()
+                    staff.balance = staff.balance - order.respond_price
+                    staff.save()
+                # Редактирование уже оставленный отзыв
+                else:
+                    respond = Respond.objects.filter(order=order, staff=staff)[0]
+                    respond.text = text
+                    respond.price = price
+                    respond.save()
+                    if images:
+                        for image in images:
+                            Image.objects.create(image=image, respond=respond)
+                return redirect('order_respond_login', order_id=order.id, telegram_id=staff.telegram_id)
+            else:
+                return redirect('quiz')   # Тут надо вызвать ошибку неправильного пина
+        elif request.method == 'GET':
+            if order.status == "FIND" or order.status == "WORK":
+                notes = order.note.replace('-', '<br>')
+                # Просмотры страницы
+                if unique_view_of_order(order=order, staff=staff):
+                    order.views = order.views + 1
+                    order.save()
+                # Для отображения количества откликов максимальных
+                amount_responds = len(Respond.objects.filter(order=order))
+                # Для проверки отклика по пину сотрудника через id чтобы не показывать пин на странице в коде
+                num = staff.id
+
+                # Проверка на оставленный отзыв данным юзером
+                if len(Respond.objects.filter(order=order, staff=staff)) > 0:
+                    respond = Respond.objects.filter(order=order, staff=staff)[0]
+                else:
+                    respond = None
+                # Проверка достаточности баланса
+                has_balance = staff.balance - order.respond_price >= 0
+                context = {'order': order, 'staff': staff, 'notes': notes, 'num': num, 'amount_responds': amount_responds, 'respond': respond, 'has_balance': has_balance}
+                return render(request, 'quiz/order_respond.html', context)
+            else:
+                raise Http404("Такой страницы не существует")
+    else:
+        raise Http404("Страницы нет")
+
+
+@login_required
+def profile_edit(request, telegram_id):
+    staff = get_object_or_404(Staff, telegram_id=telegram_id)
+    if request.user.staff == staff:
+        if request.method == "GET":
+            # Чтобы получить список городов из БД оформленной списком с разделителем в виде точки с запятой
+            cities = staff.cities[:-1].split(";")
+            context = {'staff': staff, 'cities': cities}
+            return render(request, 'quiz/profile_edit.html', context=context)
+    else:
+        raise Http404("Такой страницы нет")
+
 
 
 def respond_choice(request, respond_id):
@@ -313,6 +401,20 @@ def deletewebhook(request):
         return render(request, 'quiz/deletewebhook.html', {'token': token})
 
 
+def hint(request):
+    if request.method == "POST":
+        to = request.POST.get("to")
+        respond_id = request.POST.get("id")
+        if to == "wa":
+            respond = Respond.objects.filter(id=respond_id)[0]
+            respond.wa_hint = respond.wa_hint + 1
+            respond.save()
+        elif to == "insta":
+            respond = Respond.objects.filter(id=respond_id)[0]
+            respond.insta_hint = respond.insta_hint + 1
+            respond.save()
+        return HttpResponse('ok', content_type='text/plain', status=200)
+
 def calc(request):
     if request.method == "POST":
         price = request.POST.get('price')
@@ -320,6 +422,22 @@ def calc(request):
         return redirect('calc')
     else:
         return render(request, 'quiz/calc.html')
+
+
+def edit_city(request):
+    if request.method == "POST":
+        telegram_id = request.POST.get("telegram_id")
+        action = request.POST.get("action")
+        city = request.POST.get("city")
+        staff = Staff.objects.filter(telegram_id=telegram_id)[0]
+        if action == "add":
+            staff.cities = staff.cities + (city + ";")
+            staff.save()
+        elif action == "delete":
+            staff.cities = staff.cities.replace(f'{city};', '')
+            staff.save()
+        return HttpResponse('ok', content_type='text/plain', status=200)
+
 
 
 # {'update_id': 541049445, 'message':

@@ -15,7 +15,7 @@
     <div class="container-fluid border-bottom border-top pt-2">
         <div class="row">
             <div class="col-12">
-                <p class="fw-bold lh-sm"><a class="text-dark" href="{% url 'order_respond' order_id=r.order.id telegram_id=r.staff.telegram_id %}">Отклик к заявке {{ r.order.set_numb_of_order }}</a>
+                <p class="fw-bold lh-sm"><a class="text-dark" href="{% url 'order_respond_login' order_id=r.order.id telegram_id=r.staff.telegram_id %}">Отклик к заявке {{ r.order.set_numb_of_order }}</a>
                     <small class="text-muted fw-normal">от {{ r.date|date:'d/m/Y H:i' }}</small>
                     <div>
                         <!--Экранирование html-->

@@ -19,6 +19,7 @@ class Staff(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     pin = models.CharField(max_length=4, blank=True)
     balance = models.IntegerField(default=0)
+    cities = models.TextField(default='Все города', blank=True)
 
     def __str__(self):
         return str(self.user)
@@ -99,16 +100,28 @@ class Order(models.Model):
         return reverse('order_for_client', args=[str(self.order_url)])
 
     def __str__(self):
-        return '{}-{}-{}-{}'.format(self.date.strftime('%d.%m.%Y %H:%M'), self.name, self.phone, self.message)
+        return '''{}, id:{}, {}'''.format(self.date.strftime('%d.%m.%Y %H:%M'), self.id, self.set_numb_of_order())
+
+
+class OrderCounter(models.Model):
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="orders")
+    staff = models.ForeignKey(Staff, on_delete=models.PROTECT, related_name="staffs")
+    date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.order.set_numb_of_order(), self.staff.username
 
 
 # Отклик на вакансию
 class Respond(models.Model):
     text = models.TextField()
-    date = models.DateTimeField(auto_now_add=True)
+    date = models.DateTimeField(auto_now=True)
     order = models.ForeignKey(Order, null=True, default='', on_delete=models.CASCADE, related_name='responds')
     staff = models.ForeignKey(Staff, on_delete=models.CASCADE, default='', related_name='responds')
     price = models.CharField(max_length=50, default="")
+    # Счетчик переходов от клмента, приемка через ajax
+    wa_hint = models.PositiveIntegerField(default=0)
+    insta_hint = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return f'{self.staff.username} - {self.text}'
@@ -164,11 +177,11 @@ class Image(models.Model):
             if img.height > 1000 and img.width > 1000:
                 output_size = (1000, 100)
                 img.thumbnail(output_size)
-                img.save(self.avatar.path)
+                img.save(self.image.path)
             else:
                 output_size = (img.height, img.height)
                 img.thumbnail(output_size)
-                img.save(self.avatar.path)
+                img.save(self.image.path)
 
 
 class Token(models.Model):
