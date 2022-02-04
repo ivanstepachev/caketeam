@@ -117,12 +117,15 @@
         border-radius: 0.8em;
         background-color: #e2e2ee;
     }
-    .aa {
-        border : 0px !important;
+    #not-city {
+        color: red;
+        display: none;
     }
-    .ui-menu-item {
-        background-color: white !important;
+    #already-city {
+        color: red;
+        display: none;
     }
+
 </style>
 <nav class="navbar navbar-expand-md border-bottom navbar-light bg-light">
   <div class="container">
@@ -136,7 +139,7 @@
           <a class="nav-link active" aria-current="page" href="#">Мой профиль</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Пополнить баланс <span class="offer-text"> ({{ staff.balance }} руб.)</span></a>
+            <a class="nav-link" href="#">Пополнить баланс <span class="offer-text"> ({{ user.staff.balance }} руб.)</span></a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Задания</a>
@@ -154,21 +157,21 @@
 </nav>
 
 <div class="container mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
-<h3 class="my-4 fw-bolder">{{ staff.name}} {{ staff.surname }}</h3>
-<div class="row">
-    <div class="col-6">
-        <img src="{{ staff.avatar.url }}" class="avatar">
-        <div class="d-grid gap-2 mt-2">
-            <button class="btn btn-light btn-sm"><i class="bi bi-camera-fill"></i> Изменить фото</button>
+    <h3 class="my-4 fw-bolder">{{ staff.name}} {{ staff.surname }}</h3>
+    <div class="row">
+        <div class="col-6">
+            <img src="{{ staff.avatar.url }}" class="avatar">
+            <div class="d-grid gap-2 mt-2">
+                <button class="btn btn-light btn-sm"><i class="bi bi-camera-fill"></i> Изменить фото</button>
+            </div>
+        </div>
+        <div class="col-6">
+            <p class="label-text">
+                <span>Выполнено:</span> {{ staff.orders.all.count }} заказов<br>
+                <span class="fa-2 text-warning"><i class="bi bi-star-fill"></i> <span class="text-muted">4.9 359 отзывов</span></span><br>
+            </p>
         </div>
     </div>
-    <div class="col-6">
-        <p class="label-text">
-            Выполнено: {{ staff.orders.all.count }} заказов<br>
-            <span class="offer-text text-warning"><i class="bi bi-star-fill"></i> <span class="text-muted">4.9 359 отзывов</span></span><br>
-        </p>
-    </div>
-</div>
     <hr>
     <p class="mt-4"><span class="big-text ">Расскажите о себе:        </span><a class="text-muted link-text"><i class="bi bi-pencil"></i> Редактировать</a></p>
     <div id="no-info">
@@ -195,6 +198,38 @@
         <p class="label-text">{{ staff.info|linebreaksbr }}</p>
     </div>
     <hr>
+
+    <p class="mt-4"><span class="big-text ">Города по которым получать заказы:</span></p>
+
+    <div class="container">
+        <div class="row justify-content-center">
+            <div id="cities" class="col-12 border">
+                {% if cities|first|length == 0 %}
+                    <span class="offer-text city text-dark">Все города</span>
+                {% else %}
+                    {% for city in cities %}
+                    <span class="offer-text city"><a data-id="{{ city }}" class="text-dark delete-city">{{ city }}&nbsp;X</a></span>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+            <div class="mt-3">
+                <div class="row">
+                    <div class="col-12">
+                        <label for="add-city-input" class="label-text">Добавить город</label>
+                    </div>
+                    <div class="col-9">
+                        <input type="text" class="form-control form-control-sm" id="add-city-input" name="add-city">
+                        <div>
+                            <p id="not-city" class="offer-text">Добавить можно только город.</p>
+                            <p id="already-city" class="offer-text">Этот город у вас уже добавлен.</p>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <button id="add-city" class="btn btn-sm btn-outline-dark dark" disabled>Добавить</button>
+                    </div>
+                </div>
+            </div>
 
     <p class="mt-4"><span class="big-text ">Контактные данные:        </span><a class="text-muted link-text"><i class="bi bi-pencil"></i> Редактировать</a></p>
     <div id="contacts" class="container fs-3 fw-normal">
@@ -224,35 +259,7 @@
         </form>
     </div>
     <hr>
-
-    <p class="mt-4"><span class="big-text ">Города по которым получать заказы:</span></p>
-    <div class="container">
-        <div class="row justify-content-center">
-            <div id="cities" class="col-12 border">
-                {% if cities|first|length == 0 %}
-                    <span class="offer-text city text-dark">Все города</span>
-                {% else %}
-                    {% for city in cities %}
-                    <span class="offer-text city"><a class="text-dark delete-city">{{ city }}&nbsp;X</a></span>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        </div>
-            <div class="mt-3">
-                <div class="row">
-                    <div class="col-12">
-                        <label for="add-city-input" class="label-text">Добавить город</label>
-                    </div>
-                    <div class="col-9">
-                        <input type="text" class="form-control form-control-sm" id="add-city-input" name="add-city">
-                    </div>
-                    <div class="col-3">
-                        <button id="add-city" class="btn btn-sm btn-outline-dark dark" disabled>Добавить</button>
-                    </div>
-                </div>
-            </div>
     <p class="mt-4"><span class="big-text ">Отзывы        </span></p>
-
 </div>
 </div>
 
@@ -263,11 +270,6 @@
   src="https://code.jquery.com/jquery-3.6.0.js"
   integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
   crossorigin="anonymous"></script>
-<script
-  src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"
-  integrity="sha256-hlKLmzaRlE8SCJC1Kw8zoUbU8BxA+8kR3gseuKfMjxA="
-  crossorigin="anonymous"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/js/jquery.suggestions.min.js"></script>
 
 <script>
@@ -275,28 +277,37 @@
 $(document).ready(function(){
 
     $("#add-city").on("click", function(e) {
-    var city = $("#add-city-input").val();
-    $("#add-city-input").val("");
-    $(this).prop("disabled", true);
-    $.ajax({
-                        type: "POST",
-                        url: "/a/city",
-                        data: {
-                            telegram_id: '{{ staff.telegram_id }}',
-                            city: `${city}`,
-                            action: 'add',
-                            csrfmiddlewaretoken: '{{ csrf_token }}'
-                        },
-                        success: function(result) {
-                            console.log('City add');
-                        },
-                        error: function(result) {
-                            console.log('error');
-                        }
-                    });
-    setTimeout(function(){
-    $("#cities").load(window.location.href + " #cities" );
-    }, 300);
+    var city = $("#add-city-input").val().slice(2);
+    var ifExist = $(`.delete-city[data-id='${city}']`);
+    if (ifExist.length === 0) {
+        $("#add-city-input").removeClass("is-invalid");
+        $("#already-city").css("display", "none");
+        $("#add-city-input").val("");
+        $(this).prop("disabled", true);
+        $.ajax({
+                            type: "POST",
+                            url: "/a/city",
+                            data: {
+                                telegram_id: '{{ staff.telegram_id }}',
+                                city: `${city}`,
+                                action: 'add',
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                            success: function(result) {
+                                console.log('City add');
+                            },
+                            error: function(result) {
+                                console.log('error');
+                            }
+                        });
+        setTimeout(function(){
+        $("#cities").load(window.location.href + " #cities" );
+        }, 300);
+    } else {
+        $("#add-city-input").val("");
+        $("#add-city-input").addClass("is-invalid");
+        $("#already-city").css("display", "block");
+    }
     });
 
     $(document).on("click", ".delete-city", function(e) {
@@ -329,11 +340,22 @@ $(document).ready(function(){
         /* Вызывается, когда пользователь выбирает одну из подсказок */
         onSelect: function(suggestion) {
             $('#add-city').prop("disabled", false);
-            console.log(suggestion);
             console.log(suggestion.data.city_with_type);
+            if (suggestion.data.city_with_type) {
+            $("#add-city-input").removeClass("is-invalid");
+            $("#already-city").css("display", "none");
+            $("#not-city").css("display", "none");
             $('[name="add-city"]').val(suggestion.data.city_with_type);
+            } else {
+            $("#add-city-input").val("");
+            $("#add-city-input").addClass("is-invalid");
+            $("#not-city").css("display", "block");
+            }
+
+
         }
-    });
+  });
+
 });
 
 </script>

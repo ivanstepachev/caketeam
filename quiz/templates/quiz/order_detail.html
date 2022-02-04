@@ -48,13 +48,11 @@
         <h4>Заявка {{ order.set_numb_of_order }} <span class="text-success">ВЫПОЛНЕНА</span></h4>
         <div class="my-2">
             <b>Имя:</b> {{ order.name }} <br>
-            <b>Телефон:</b> {{ order.phone }} <br>
-            <b>Десерт:</b> {{ order.type_of_cake }} <br>
-            <b>Примечание:</b> {{ order.message }} <br>
+            <b>Телефон:</b> {{ order.phone }}
         </div>
         <div class="form-group">
             <label class="label-text" for="note2">Примечание к заказу:</label><br>
-            <textarea class="form-control form-control-sm my-2" id="note2" name="note" rows="6" disabled>{{ value }}</textarea>
+            <textarea class="form-control form-control-sm my-2" id="note2" name="note" rows="6" disabled>{{ notes }}</textarea>
         </div>
     <h4 class="my-3">Исполнитель:</h4>
     <div id="done_respond" class="border border-2 responds-block mb-3">
@@ -78,9 +76,7 @@
         <div class="my-2">
             <p class="label-text">
             <b>Имя:</b> {{ order.name }} <br>
-            <b>Телефон:</b> {{ order.phone }} <br>
-            <b>Десерт:</b> {{ order.type_of_cake }} <br>
-            <b>Примечание:</b> {{ order.message }} <br>
+            <b>Телефон:</b> {{ order.phone }}
             </p>
         </div>
         <hr>
@@ -120,7 +116,11 @@
                 </div>
                 <label class="label-text" for="note">Отправить задание:</label><br>
                 <small class="offer-text">(";" добавлять в конце каждой строки)</small>
-                <textarea class="form-control form-control-sm mb-2" id="note" name="note" cols="6" rows="6">{{ value }}</textarea>
+                <textarea class="form-control form-control-sm mb-2" id="note" name="note" cols="6" rows="6">{{ notes }}</textarea>
+            </div>
+            <div class="form-check mb-2">
+              <input class="form-check-input" type="checkbox" name="send_all" value="1" id="flexCheckDefault">
+              <label class="form-check-label label-text" for="flexCheckDefault">Разослать всем (без фильтра по городам)</label>
             </div>
             <input class="btn btn-primary btn-sm" type="submit" value="Отправить задание кондитерам">
         </form>

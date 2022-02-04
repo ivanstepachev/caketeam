@@ -36,6 +36,7 @@
             <div class="col-12">
                 <p class="fw-bold lh-sm"><a href="{% url 'order_detail' order_id=a.id %}">Заявка {{ a.set_numb_of_order }}</a>
                     <br> <small class="text-muted fw-normal">Дата: <b class="text-dark">{{ a.date|date:'d/m/Y H:i' }}-{{ a.id }}</b></small>
+                    <a class="text-danger" href="{% url 'delete_order' order_id=a.id %}">Удалить</a>
                     {% if a.status == 'NEW' %}
                     <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-warning text-dark">Новая</span></small>
                     {% elif a.status == 'FIND' %}

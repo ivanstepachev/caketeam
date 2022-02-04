@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+{% load to_replace %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/css/suggestions.min.css" rel="stylesheet" />
+    <title>Заявка {{ order.set_numb_of_order }}</title>
+</head>
+<body>
+<style>
+    .form-rounded {
+        border-radius: 0.7rem;
+    }
+    .label-text {
+        font-size: 0.8em;
+    }
+    .price-text {
+        font-size: 0.8em;
+        font-weight: 500;
+    }
+    .name-text {
+        font-weight: 500;
+    }
+    .offer-text {
+        font-size: 0.7em;
+    }
+    .add-text {
+        font-size: 0.55em;
+        line-height: 90%;
+    }
+    #win_respond {
+        background-color: #E6F1DA;
+    }
+    .responds-block {
+        border-radius: 10px;
+        width: 90%;
+        background-color: #F6FEEB;
+    }
+    .responds-img {
+        width: 100%;
+    }
+    .active-img {
+        filter: brightness(0.3);
+        width: 85%;
+
+    }
+    .first-img {
+        width: 100%;
+    }
+    .avatar {
+        width: 100%;
+    }
+
+    .staff-info {
+        line-height: 95%;
+    }
+
+    .order-info {
+        line-height: 110%;
+    }
+    .contacts {
+
+        color: black;
+        font-size: 1.1em;
+    }
+    .instagram {
+        color: #ba30b6;
+    }
+    .respond-card {
+        margin-bottom: 5em;
+    }
+
+
+    .navbar-toggler {
+        border: none !important;
+    }
+    .avatar {
+        width: 100%;
+    }
+    .link-text {
+        font-size: 0.7em;
+        text-decoration: none;
+    }
+    .big-text {
+        font-size: 1.2em;
+        font-weight: 700;
+    }
+    .label-text {
+        font-size: 0.8em;
+    }
+    #add-info {
+        display: block;
+    }
+    .instagram {
+        color: #ba30b6;
+    }
+    #cities {
+        height: 6em;
+        border-radius: 0.7rem;
+        padding: 2px;
+        overflow-x: hidden;
+        overflow-y: auto;
+        text-align:justify;
+    }
+    .city a {
+        text-decoration: none;
+    }
+    .city {
+        border: solid 1px #e2e2ee;
+        padding: 0.2em;
+        padding-left: 0.4em;
+        padding-right: 0.4em;
+        border-radius: 0.8em;
+        background-color: #e2e2ee;
+    }
+    #not-city {
+        color: red;
+        display: none;
+    }
+    #already-city {
+        color: red;
+        display: none;
+    }
+    .form-screen {
+        height: 80vh;
+    }
+    .form-title {
+        margin-top: 15vh;
+    }
+    .form-step {
+        margin-top: 5vh;
+    }
+    #first-form-step {
+        margin-top: 28vh;
+    }
+    #second-form {
+        display: none;
+    }
+    #third-form {
+        display: none;
+    }
+    #fourth-form {
+        display: none;
+    }
+    #fifth-form {
+        display: none;
+    }
+    #sixth-form {
+        display: none;
+    }
+    #delivery-need {
+        display: none;
+    }
+    ::placeholder {
+        font-size: 14px;
+    }
+    .phone-text {
+        font-size: 0.7em;
+        line-height: 0.9em;
+    }
+
+
+</style>
+<nav class="navbar navbar-expand-md border-bottom navbar-light bg-white">
+  <div class="container">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="fs-1"><i class="bi bi-list fa-md text-dark"></i></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        {% if user.is_authenticated %}
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Мой профиль</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Пополнить баланс <span class="offer-text"> ({{ staff.balance }} руб.)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Задания</a>
+        </li>
+      </ul>
+        {% else %}
+        <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Войти</a>
+        </li>
+      </ul>
+        {% endif %}
+    </div>
+  </div>
+</nav>
+<div class="container mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+<form method="post">
+    {% csrf_token %}
+    <!--Первое окно-->
+    <div id="first-form" class="container form-screen">
+            <div id="first-form-step" class="form-group form-step">
+                <div class="row">
+                    <div class="col-12">
+                        <input id="first-input" class="form-control form-control-lg" type="text" placeholder="Что хотите заказть?" name="title">
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <p class="offer-text text-muted">Например: <a class="add-to-input" href="#">торт на день рождения</a>, <a class="add-to-input" href="#">макаронс сегодня</a></p>
+                    </div>
+                    <div class="col-12">
+                        <div class="d-grid gap-2">
+                        <a id="first-button" class="btn btn-md btn-outline-success">Начать</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+    </div>
+    <!--Второе окно-->
+    <div id="second-form" class="container form-screen">
+    <div class="progress">
+        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 20%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+        <p class="form-title text-center fs-2 fa-bold align-center">Из какого вы города?</p>
+            <div class="form-group form-step">
+                <div class="row">
+                    <div class="col-12">
+                        <input id="second-input" class="form-control form-control-lg" type="text" name="address" placeholder="Город / улица / метро">
+                        <input id="city-input" class="form-control" type="hidden" name="city">
+                    </div>
+                    <div class="col-12 mt-2">
+                      <input class="form-check-input" type="checkbox" name="delivery" value="need" id="check">
+                      <label class="label-text form-check-label" for="check">
+                        Мне понадобится доставка
+                      </label><br>
+                        <span id="delivery-need" class="mt-2 offer-text text-muted">В этом случае можете указать более подробный адрес</span>
+                    </div>
+                </div>
+                <div class="container fixed-bottom mb-3">
+                    <div class="col-12">
+                        <a id="second-back" class="btn btn-lg btn-outline-dark w-100">Назад</a>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <a id="second-button" class="btn btn-lg btn-success w-100">Дальше</a>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!--Третье окно-->
+    <div id="third-form" class="container form-screen">
+    <div class="progress">
+        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 40%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+        <p class="form-title text-center fs-2 fa-bold align-center">К какой дате?</p>
+            <div class="form-group form-step">
+                <div class="row">
+                    <div class="col-12">
+                       <input id="third-input" class="form-control form-control-lg" type="date" name="date"/>
+                    </div>
+                </div>
+                <div class="container fixed-bottom mb-3">
+                    <div class="col-12">
+                        <a id="third-back" class="btn btn-lg btn-outline-dark w-100">Назад</a>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <a id="third-button" class="btn btn-lg btn-success w-100">Дальше</a>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!--Четвертое окно-->
+    <div id="fourth-form" class="container form-screen">
+    <div class="progress">
+        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 60%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+        <p class="form-title text-center fs-2 fa-bold align-center">Расскажите подробнее?</p>
+            <div class="form-group form-step">
+                <div class="row">
+                    <div class="col-12">
+
+                        <textarea id="fourth-input" name="message" class="form-control form-control-md" rows="6" placeholder="Опишите какой десерт, какую начинку и какое оформление предпочитаете. Укажите требуемый вес десерта или необходимое количество. Добавьте любую информацию, которая может быть полезна кондитерам."></textarea>
+                        <label for="order-images" class="form-label label-text text-muted mt-2">Добавьте фото понравившихся работ:</label>
+                        <input class="form-control" type="file" id="order-images" accept=".jpg, .jpeg, .png" multiple>
+                    </div>
+                </div>
+                <div class="container fixed-bottom mb-3">
+                    <div class="col-12">
+                        <a id="fourth-back" class="btn btn-lg btn-outline-dark w-100">Назад</a>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <a id="fourth-button" class="btn btn-lg btn-success w-100">Дальше</a>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!--Пятое окно-->
+    <div id="fifth-form" class="container form-screen">
+    <div class="progress">
+        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 80%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+        <p class="form-title text-center fs-2 fa-bold align-center">Какой бюджет?</p>
+            <div class="form-group form-step">
+                <div class="row">
+                    <div class="col-12">
+                        <select class="form-select form-select-lg" name="respond_price">
+                            <option value="30" selected>до 1500 руб.</option>
+                            <option value="50">до 2500 руб.</option>
+                            <option value="75">до 3500 руб.</option>
+                            <option value="100">до 5000 руб.</option>
+                            <option value="150">от 5000 руб.</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="container fixed-bottom mb-3">
+                    <div class="col-12">
+                        <a id="fifth-back" class="btn btn-lg btn-outline-dark w-100">Назад</a>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <a id="fifth-button" class="btn btn-lg btn-success w-100">Дальше</a>
+                    </div>
+                </div>
+            </div>
+    </div>
+
+    <!--Шестое окно-->
+    <div id="sixth-form" class="container form-screen">
+    <div class="progress">
+        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>
+        <p class="form-title text-center fs-2 fa-bold align-center">Укажите контактные данные</p>
+            <div class="form-group form-step">
+                <div class="row">
+                    <div class="col-12">
+                        <label for="sixth-input1" class="form-label label-text text-muted mt-2">Ваше имя</label>
+                        <input type="text" id="sixth-input1" class="form-control form-control-lg" name="name">
+                        <label for="sixth-input2" class="form-label label-text text-muted mt-2">Ваш контактный телефон:</label>
+                        <div class="input-group">
+                            <span class="input-group-text label-text" id="basic-addon1">+</span>
+                            <input type="tel" id="sixth-input2" class="form-control form-control-lg" name="phone" value="7(___)___-__-__" pattern="\7\s?[\(]{0,1}9[0-9]{2}[\)]{0,1}\s?\d{3}[-]{0,1}\d{2}[-]{0,1}\d{2}">
+                        </div>
+                        <p class="phone-text text-muted mt-2">* Мы не сообщаем ваши контактные данные кондитерам и другим третьим лицам, они необходимы для комфортного использования сервиса. Нажимая кнопку "Опубликовать", вы принимаете наше <a href="#">Пользовательское соглашение</a></p>
+                    </div>
+                </div>
+                <div class="container fixed-bottom mb-3">
+                    <div class="col-12">
+                        <a id="sixth-back" class="btn btn-lg btn-outline-dark w-100">Назад</a>
+                    </div>
+                    <div class="col-12 mt-2">
+                        <input type="submit" id="sixth-button" class="btn btn-lg btn-success w-100" value="Опубликовать">
+                    </div>
+                </div>
+            </div>
+    </div>
+
+
+</form>
+</div>
+
+
+
+
+
+
+</div>
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/js/jquery.suggestions.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.js" type="text/javascript"></script>
+<script>
+
+    $(document).ready(function(){
+
+    $(".add-to-input").on("click", function(e) {
+        e.preventDefault();
+        var value = $(this).text()
+        $("#first-input").val(value);
+    });
+
+    $("#first-button").click(function(e) {
+        if ($("#first-input").val().length === 0) {
+            $("#first-input").addClass("is-invalid");
+        } else {
+            $("#first-form").css("display", "none");
+            $("#second-form").css("display", "block");
+        }
+    });
+    $("#second-back").click(function(e) {
+        $("#second-form").css("display", "none");
+        $("#first-form").css("display", "block");
+    });
+    $("#second-button").click(function(e) {
+        if ($("#second-input").val().length === 0) {
+            $("#second-input").addClass("is-invalid");
+        } else {
+            $("#second-form").css("display", "none");
+            $("#third-form").css("display", "block");
+        }
+    });
+    $("#third-back").click(function(e) {
+        $("#third-form").css("display", "none");
+        $("#second-form").css("display", "block");
+    });
+    $("#third-button").click(function(e) {
+        if ($("#third-input").val().length === 0) {
+            $("#third-input").addClass("is-invalid");
+        } else {
+            $("#third-form").css("display", "none");
+            $("#fourth-form").css("display", "block");
+        }
+    });
+    $("#fourth-back").click(function(e) {
+        $("#fourth-form").css("display", "none");
+        $("#third-form").css("display", "block");
+    });
+    $("#fourth-button").click(function(e) {
+        $("#fourth-form").css("display", "none");
+        $("#fifth-form").css("display", "block");
+    });
+    $("#fifth-back").click(function(e) {
+        $("#fifth-form").css("display", "none");
+        $("#fourth-form").css("display", "block");
+    });
+    $("#fifth-button").click(function(e) {
+        $("#fifth-form").css("display", "none");
+        $("#sixth-form").css("display", "block");
+    });
+    $("#sixth-back").click(function(e) {
+        $("#sixth-form").css("display", "none");
+        $("#fifth-form").css("display", "block");
+    });
+
+    $("#sixth-button").click(function(e) {
+        if ($("#sixth-input1").val().length === 0) {
+            e.preventDefault();
+            $("#sixth-input1").addClass("is-invalid");
+        } else {
+            $("#sixth-input1").removeClass("is-invalid");
+        }
+        if ($("#sixth-input2").val().length === 0) {
+            e.preventDefault();
+            $("#sixth-input2").addClass("is-invalid");
+        } else {
+            $("#sixth-input2").removeClass("is-invalid");
+        }
+
+    });
+
+    $("#second-input").suggestions({
+        token: "1fb228bbc969c88de6a9998d1b20bff93cd8ba94",
+        type: "ADDRESS",
+        /* Вызывается, когда пользователь выбирает одну из подсказок */
+        onSelect: function(suggestion) {
+            $('#city-input').val(suggestion.data.city_with_type);
+            $('#second-input').val(suggestion.value);
+        }
+    });
+
+    $("#check").change(function() {
+    if(this.checked) {
+        $("#delivery-need").css("display", "block");
+    } else {
+        $("#delivery-need").css("display", "none");
+    }
+    });
+
+    $("#sixth-input2").mask("7(999)999-99-99");
+
+});
+
+
+</script>
+</html>

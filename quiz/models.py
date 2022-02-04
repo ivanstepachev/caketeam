@@ -78,8 +78,7 @@ class Order(models.Model):
 
     name = models.CharField(max_length=200, default='')
     phone = models.CharField(max_length=15, default='')
-    type_of_cake = models.CharField(max_length=10, default='')
-    message = models.TextField(default='')
+    city = models.CharField(max_length=30, default='')
     max_responds = models.IntegerField(default=5)
     date = models.DateTimeField(auto_now_add=True, blank=True)
     status = models.CharField(max_length=15, choices=STATUS_CHOICE, default="NEW")
@@ -100,7 +99,7 @@ class Order(models.Model):
         return reverse('order_for_client', args=[str(self.order_url)])
 
     def __str__(self):
-        return '''{}, id:{}, {}'''.format(self.date.strftime('%d.%m.%Y %H:%M'), self.id, self.set_numb_of_order())
+        return str(self.id)
 
 
 class OrderCounter(models.Model):
@@ -109,7 +108,7 @@ class OrderCounter(models.Model):
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.order.set_numb_of_order(), self.staff.username
+        return str(self.order.set_numb_of_order() + ' ' + self.staff.username)
 
 
 # Отклик на вакансию

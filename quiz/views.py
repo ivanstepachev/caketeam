@@ -20,28 +20,46 @@ from hashids import Hashids
 from django.contrib.auth.decorators import login_required
 
 
+budget = {
+    '30': 'до 1500 руб',
+    '50': 'до 2500 руб',
+    '75': 'до 3500 руб',
+    '100': 'до 5000 руб',
+    '150': 'от 5000 руб'
+}
+
+
 def quiz(request):
     if request.method == 'POST':
-        name = request.POST.get('name')
-        phone = request.POST.get('phone')
-        type_of_cake = request.POST.get('type_of_cake')
-        respond_price = request.POST.get('budget')
+        name = request.POST.get('name').capitalize()
+        phone = request.POST.get('phone').replace('(', '').replace(')', '').replace('-', '')
+        title = request.POST.get('title').capitalize()
+        respond_price = request.POST.get('respond_price')
         message = request.POST.get('message')
+        city = request.POST.get('city')[2:]
+        address = request.POST.get('address')
+        delivery = request.POST.get('delivery')
+        date = request.POST.get('date')
+        if delivery == "need":
+            delivery_info = "Требуется"
+        else:
+            delivery_info = "Не требуется"
+        note = f'''Имя: {name};\nЗадание: {title};\nАдрес: {address};\nДоставка: {delivery_info};\nК дате: {date};\nБюджет: {budget.get(str(respond_price))};\nПодробнее: {message};'''
         # Для генерации сссылки
         hashids = Hashids(salt=hashid_salt, alphabet=alphabet, min_length=5)
-        order = Order(name=name, phone=phone, type_of_cake=type_of_cake, message=message, status="NEW", note="", respond_price=int(respond_price))
+        order = Order(name=name, phone=phone, status="NEW", note=note, respond_price=int(respond_price), city=city)
         order.save()
         order_url = hashids.encode(order.id)
         order.order_url = order_url
         order.save()
-        order_text = f'''Имя: {order.name}\nТелефон: {order.phone}\nДесерт: {order.type_of_cake}\nПримечание: {order.message}'''
+        order_text = f'''🔴НОВОЕ ЗАДАНИЕ🔴\n{order.note}'''
         keyboard = json.dumps({"inline_keyboard": [[{"text": "Разместить задание", 'url': f'https://caketeam.herokuapp.com/orders/{order.id}'}]]})
         admin_staff_list = Staff.objects.filter(admin=True)
         for admin_staff in admin_staff_list:
             send_message(chat_id=int(admin_staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('quiz')
     else:
-        return render(request, 'quiz/quiz.html')
+        return render(request, 'quiz/landing.html')
 
 
 def order_for_client(request, order_url):
@@ -119,12 +137,19 @@ def orders(request):
     return render(request, 'quiz/orders.html', {'orders': orders})
 
 
+def delete_order(request, order_id):
+    order = Order.objects.filter(id=order_id)[0]
+    order.delete()
+    return redirect('orders')
+
+
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
         note = request.POST.get('note')
         max_responds = request.POST.get('max_responds')
         respond_price = request.POST.get('respond_price')
+        send_all = request.POST.get('send_all')
         order.max_responds = max_responds
         order.respond_price = int(respond_price)
         order.status = "FIND"
@@ -134,29 +159,19 @@ def order_detail(request, order_id):
         numb_of_order = order.set_numb_of_order()
         staff_list = Staff.objects.filter(active=True)
         for staff in staff_list:
-            hash_order_id = to_hash(order.id)
-            hash_telegram_id = to_hash(int(staff.telegram_id))
-            order_text = f'''Заявка {numb_of_order}\n{order.note.replace(";", "")}'''
-            keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'http://127.0.0.1:8000/n/{hash_telegram_id}/{hash_order_id}'}]]})
-            send_message(chat_id=int(staff.telegram_id), text=order_text, reply_markup=keyboard)
+            # Фильтрация по городам, если фильтра нет то рассылка по всем городам
+            if order.city in staff.cities or staff.cities == '' or send_all is '1':
+                hash_order_id = to_hash(order.id)
+                hash_telegram_id = to_hash(int(staff.telegram_id))
+                order_text = f'''Заявка {numb_of_order}\n{order.note.replace(";", "")}'''
+                keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'http://127.0.0.1:8000/n/{hash_telegram_id}/{hash_order_id}'}]]})
+                send_message(chat_id=int(staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('order_detail', order_id=order_id)
     else:
         notes = order.note
         responds = Respond.objects.filter(order=order)
         respond_price = order.respond_price
-        # Для указания бюджета
-        budget = ''
-        if respond_price == 50:
-            budget = 'До 1500 руб'
-        elif respond_price == 100:
-            budget = '1500 - 3000 руб'
-        else:
-            budget = 'Больше 3000 руб'
-        # Если заметка еще не была создана, вставляем шаблон, если была то редактируем
-        if notes == "":
-            value =f'''Имя: {order.name};\nДесерт: {order.type_of_cake};\nГород: ;\nДата и время: ;\nДоставка/Самовывоз: ;\nБюджет: {budget};\nПримечание: ;'''
-        else:
-            value = notes
+
         # Если есть отклики
         if responds is not None:
             # Если уже выбран исполнитель
@@ -164,11 +179,11 @@ def order_detail(request, order_id):
                 staff = order.staff
                 respond = Respond.objects.filter(order=order, staff=staff)[0]
                 return render(request, 'quiz/order_detail.html',
-                              {'order': order, 'notes': notes, 'value': value, 'respond_price': respond_price, 'respond': respond})
-            return render(request, 'quiz/order_detail.html', {'order': order, 'notes': notes, 'value': value, 'respond_price': respond_price, 'responds': responds})
+                              {'order': order, 'notes': notes, 'respond_price': respond_price, 'respond': respond})
+            return render(request, 'quiz/order_detail.html', {'order': order, 'notes': notes, 'respond_price': respond_price, 'responds': responds})
 
         # Если нет откликов
-        return render(request, 'quiz/order_detail.html', {'order': order, 'value': value, 'respond_price': respond_price, 'notes': notes})
+        return render(request, 'quiz/order_detail.html', {'order': order, 'respond_price': respond_price, 'notes': notes})
 
 
 # Для быстрого отклика для перехода из телеграма без логина

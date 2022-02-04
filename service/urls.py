@@ -13,6 +13,7 @@ urlpatterns = [
     path('n/<str:hash_telegram_id>/<str:hash_order_id>', quiz_views.order_respond, name="order_respond"),
     path('a/<str:telegram_id>/<int:order_id>', quiz_views.order_respond_login, name="order_respond_login"),
     path('orders', quiz_views.orders, name="orders"),
+    path('order/delete/<int:order_id>', quiz_views.delete_order, name="delete_order"),
     path('orders/<int:order_id>', quiz_views.order_detail, name="order_detail"),
     path('orders/done/<int:order_id>', quiz_views.order_done, name="order_done"),
     path('responds/<str:chat_id>', quiz_views.responds_list, name="responds_list"),
