@@ -126,6 +126,64 @@ class Respond(models.Model):
         return f'{self.staff.username} - {self.text}'
 
 
+# Изображения для отклика
+class ReferenceImage(models.Model):
+    image = models.ImageField(upload_to='orders/')
+    order = models.ForeignKey(Order, null=True, default='', on_delete=models.CASCADE, related_name='reference_images')
+
+    def __str__(self):
+        return str(self.image)
+
+    # Сохраянем изображение в соотношении 1:1, если разрешение большое то 1000на1000px, если меньше то по меньшей стороне
+    def save(self, *args, **kwargs):
+        super().save()
+        img = PillowImage.open(self.image.path)
+        # Для того чтобы картинка с телефона не поворачивалась
+        img = ImageOps.exif_transpose(img)
+        # Когда высота больше ширины
+        if img.height > img.width:
+            # обрезаем вверх и низ делая квадратной
+            left = 0
+            right = img.width
+            top = (img.height - img.width) / 2
+            bottom = (img.height + img.width) / 2
+            img = img.crop((left, top, right, bottom))
+            # Меняем разрешение на 1000х1000
+            if img.height > 1000 or img.width > 1000:
+                output_size = (1000, 1000)
+                img.thumbnail(output_size)
+                img.save(self.image.path)
+            else:
+                output_size = (img.width, img.width)
+                img.thumbnail(output_size)
+                img.save(self.image.path)
+
+        elif img.width > img.height:
+            left = (img.width - img.height) / 2
+            right = (img.width + img.height) / 2
+            top = 0
+            bottom = img.height
+            img = img.crop((left, top, right, bottom))
+            if img.height > 1000 or img.width > 1000:
+                output_size = (1000, 1000)
+                img.thumbnail(output_size)
+                img.save(self.image.path)
+            else:
+                output_size = (img.height, img.height)
+                img.thumbnail(output_size)
+                img.save(self.image.path)
+        # если изображение квадратное
+        else:
+            if img.height > 1000 and img.width > 1000:
+                output_size = (1000, 100)
+                img.thumbnail(output_size)
+                img.save(self.image.path)
+            else:
+                output_size = (img.height, img.height)
+                img.thumbnail(output_size)
+            img.save(self.image.path)
+
+
 class Image(models.Model):
     image = models.ImageField(upload_to='responds/')
     respond = models.ForeignKey(Respond, null=True, default='', on_delete=models.CASCADE, related_name='images')

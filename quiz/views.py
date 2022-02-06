@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
-from quiz.models import Order, Token, Respond, Image, Staff
+from quiz.models import Order, Token, Respond, Image, Staff, ReferenceImage
 from django.contrib.auth import login, authenticate
 from quiz.forms import RegisterForm
 from django.views.decorators.csrf import csrf_exempt
@@ -40,6 +40,7 @@ def quiz(request):
         address = request.POST.get('address')
         delivery = request.POST.get('delivery')
         date = request.POST.get('date')
+        images = request.FILES.getlist('reference_images')
         if delivery == "need":
             delivery_info = "Требуется"
         else:
@@ -49,6 +50,10 @@ def quiz(request):
         hashids = Hashids(salt=hashid_salt, alphabet=alphabet, min_length=5)
         order = Order(name=name, phone=phone, status="NEW", note=note, respond_price=int(respond_price), city=city)
         order.save()
+        # Сохраняем изображения для референсов
+        if images:
+            for image in images:
+                ReferenceImage.objects.create(image=image, order=order)
         order_url = hashids.encode(order.id)
         order.order_url = order_url
         order.save()
@@ -221,7 +226,7 @@ def order_respond(request, hash_order_id, hash_telegram_id):
                 if images:
                     for image in images:
                         Image.objects.create(image=image, respond=respond)
-            return redirect('order_respond', order_id=order.id, telegram_id=staff.telegram_id)
+            return redirect('order_respond', hash_order_id=hash_order_id, hash_telegram_id=hash_telegram_id)
         else:
             return redirect('quiz')   # Тут надо вызвать ошибку неправильного пина
     elif request.method == 'GET':
@@ -255,7 +260,7 @@ def order_respond_login(request, order_id, telegram_id):
     order = get_object_or_404(Order, id=order_id)
     staff = Staff.objects.filter(telegram_id=telegram_id)[0]
     # Проверка на то что нужно быть залогиненым и смотреть можно только свою страницу
-    if request.user.staff.telegram_id == telegram_id:
+    if request.user.staff.telegram_id == str(telegram_id):
         if request.method == 'POST':
             text = request.POST.get('message')
             price = request.POST.get('price')

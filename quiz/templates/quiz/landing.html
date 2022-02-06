@@ -194,7 +194,7 @@
   </div>
 </nav>
 <div class="container mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
-<form method="post">
+<form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <!--Первое окно-->
     <div id="first-form" class="container form-screen">
@@ -257,7 +257,7 @@
             <div class="form-group form-step">
                 <div class="row">
                     <div class="col-12">
-                       <input id="third-input" class="form-control form-control-lg" type="date" name="date"/>
+                       <input id="third-input" class="form-control form-control-lg" type="date" name="date" placeholder="Выберите дату"/>
                     </div>
                 </div>
                 <div class="container fixed-bottom mb-3">
@@ -283,7 +283,7 @@
 
                         <textarea id="fourth-input" name="message" class="form-control form-control-md" rows="6" placeholder="Опишите какой десерт, какую начинку и какое оформление предпочитаете. Укажите требуемый вес десерта или необходимое количество. Добавьте любую информацию, которая может быть полезна кондитерам."></textarea>
                         <label for="order-images" class="form-label label-text text-muted mt-2">Добавьте фото понравившихся работ:</label>
-                        <input class="form-control" type="file" id="order-images" accept=".jpg, .jpeg, .png" multiple>
+                        <input class="form-control" type="file" id="order-images" accept=".jpg, .jpeg, .png" name="reference_images" multiple>
                     </div>
                 </div>
                 <div class="container fixed-bottom mb-3">
