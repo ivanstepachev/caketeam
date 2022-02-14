@@ -529,7 +529,8 @@ def bot(request):
         if "message" in data:
             chat_id = data["message"]["chat"]["id"]
             if "text" not in data["message"]:
-                pass
+                text = '''Главное меню'''
+                send_message(chat_id=chat_id, text=text)
             else:
                 text = data["message"]["text"]
 
