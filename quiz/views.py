@@ -528,8 +528,8 @@ def bot(request):
         print(data)
         if "message" in data:
             chat_id = data["message"]["chat"]["id"]
-            if "sticker" in data["message"]:
-                text = '''Стикер'''
+            if "text" not in data["message"]:
+                text = '''/start'''
                 send_message(chat_id=chat_id, text=text)
             else:
                 text = data["message"]["text"]
