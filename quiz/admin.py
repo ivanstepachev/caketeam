@@ -1,5 +1,5 @@
 from django.contrib import admin
-from quiz.models import Order, Token, Staff, Image, Respond, OrderCounter, ReferenceImage
+from quiz.models import Order, Token, Staff, Image, Respond, OrderCounter, ReferenceImage, Review
 
 
 admin.site.register(Order)
@@ -9,6 +9,7 @@ admin.site.register(Respond)
 admin.site.register(Image)
 admin.site.register(OrderCounter)
 admin.site.register(ReferenceImage)
+admin.site.register(Review)
 
 
 

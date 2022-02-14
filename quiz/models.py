@@ -10,7 +10,6 @@ class Staff(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default='')
     name = models.CharField(max_length=15, default='')
     surname = models.CharField(max_length=15, default='')
-    city = models.CharField(max_length=15, default='')
     telegram_id = models.CharField(max_length=15)
     phone = models.CharField(max_length=15, default='')
     instagram = models.CharField(max_length=20, default='')
@@ -19,7 +18,10 @@ class Staff(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     pin = models.CharField(max_length=4, blank=True)
     balance = models.IntegerField(default=0)
-    cities = models.TextField(default='Все города', blank=True)
+    cities = models.TextField(default='', blank=True)
+    info = models.TextField(default='', blank=True)
+    # для возможности оставлять заявки безлимитно
+    unlimited = models.BooleanField(default=True)
 
     def __str__(self):
         return str(self.user)
@@ -74,6 +76,7 @@ class Order(models.Model):
         ("FIND", "find"),
         ("WORK", "work"),
         ("DONE", "done"),
+        ("UNDONE", "undone"),
     )
 
     name = models.CharField(max_length=200, default='')
@@ -121,6 +124,8 @@ class Respond(models.Model):
     # Счетчик переходов от клмента, приемка через ajax
     wa_hint = models.PositiveIntegerField(default=0)
     insta_hint = models.PositiveIntegerField(default=0)
+    # Для сохранения кода подтверждения
+    code = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.staff.username} - {self.text}'
@@ -239,6 +244,18 @@ class Image(models.Model):
                 output_size = (img.height, img.height)
                 img.thumbnail(output_size)
                 img.save(self.image.path)
+
+
+# Отзывы
+class Review(models.Model):
+    text = models.TextField(blank=True)
+    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+    staff = models.ForeignKey(Staff, on_delete=models.CASCADE, related_name='reviews')
+    rating = models.PositiveIntegerField(default=5)
+    date = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.order.note
 
 
 class Token(models.Model):

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
+{% load static %}
 {% load to_replace %}
-<html lang="en">
+<html lang="en" class="h-100">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,183 +9,32 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/css/suggestions.min.css" rel="stylesheet" />
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
     <title>Заявка {{ order.set_numb_of_order }}</title>
 </head>
-<body>
-<style>
-    .form-rounded {
-        border-radius: 0.7rem;
-    }
-    .label-text {
-        font-size: 0.8em;
-    }
-    .price-text {
-        font-size: 0.8em;
-        font-weight: 500;
-    }
-    .name-text {
-        font-weight: 500;
-    }
-    .offer-text {
-        font-size: 0.7em;
-    }
-    .add-text {
-        font-size: 0.55em;
-        line-height: 90%;
-    }
-    #win_respond {
-        background-color: #E6F1DA;
-    }
-    .responds-block {
-        border-radius: 10px;
-        width: 90%;
-        background-color: #F6FEEB;
-    }
-    .responds-img {
-        width: 100%;
-    }
-    .active-img {
-        filter: brightness(0.3);
-        width: 85%;
-
-    }
-    .first-img {
-        width: 100%;
-    }
-    .avatar {
-        width: 100%;
-    }
-
-    .staff-info {
-        line-height: 95%;
-    }
-
-    .order-info {
-        line-height: 110%;
-    }
-    .contacts {
-
-        color: black;
-        font-size: 1.1em;
-    }
-    .instagram {
-        color: #ba30b6;
-    }
-    .respond-card {
-        margin-bottom: 5em;
-    }
-
-
-    .navbar-toggler {
-        border: none !important;
-    }
-    .avatar {
-        width: 100%;
-    }
-    .link-text {
-        font-size: 0.7em;
-        text-decoration: none;
-    }
-    .big-text {
-        font-size: 1.2em;
-        font-weight: 700;
-    }
-    .label-text {
-        font-size: 0.8em;
-    }
-    #add-info {
-        display: block;
-    }
-    .instagram {
-        color: #ba30b6;
-    }
-    #cities {
-        height: 6em;
-        border-radius: 0.7rem;
-        padding: 2px;
-        overflow-x: hidden;
-        overflow-y: auto;
-        text-align:justify;
-    }
-    .city a {
-        text-decoration: none;
-    }
-    .city {
-        border: solid 1px #e2e2ee;
-        padding: 0.2em;
-        padding-left: 0.4em;
-        padding-right: 0.4em;
-        border-radius: 0.8em;
-        background-color: #e2e2ee;
-    }
-    #not-city {
-        color: red;
-        display: none;
-    }
-    #already-city {
-        color: red;
-        display: none;
-    }
-    .form-screen {
-        height: 80vh;
-    }
-    .form-title {
-        margin-top: 15vh;
-    }
-    .form-step {
-        margin-top: 5vh;
-    }
-    #first-form-step {
-        margin-top: 28vh;
-    }
-    #second-form {
-        display: none;
-    }
-    #third-form {
-        display: none;
-    }
-    #fourth-form {
-        display: none;
-    }
-    #fifth-form {
-        display: none;
-    }
-    #sixth-form {
-        display: none;
-    }
-    #delivery-need {
-        display: none;
-    }
-    ::placeholder {
-        font-size: 14px;
-    }
-    .phone-text {
-        font-size: 0.7em;
-        line-height: 0.9em;
-    }
-
-
-</style>
-<nav class="navbar navbar-expand-md border-bottom navbar-light bg-white">
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+<nav class="navbar navbar-expand-md border-bottom navbar-light bg-light">
   <div class="container">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="fs-1"><i class="bi bi-list fa-md text-dark"></i></span>
+      <span class="fs-2"><i class="bi bi-person-circle fa-md text-dark"></i></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         {% if user.is_authenticated %}
-      <ul class="navbar-nav">
+      <ul class="navbar-nav offer-text">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Мой профиль</a>
+          <a class="nav-link active" aria-current="page" href="#">Задания</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="#">Пополнить баланс <span class="offer-text"> ({{ staff.balance }} руб.)</span></a>
+            <a class="nav-link" href="#">Пополнить баланс <span class="offer-text"> ({{ request.user.staff.balance }} руб.)</span></a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Задания</a>
+          <a class="nav-link" href="#">Мой профиль</a>
         </li>
       </ul>
         {% else %}
-        <ul class="navbar-nav">
+        <ul class="navbar-nav offer-text">
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="#">Войти</a>
         </li>
@@ -359,119 +209,32 @@
 
 </form>
 </div>
-
-
-
-
-
-
 </div>
+</main>
+<footer class="footer mt-auto">
+    <div id="footer" class="container-fluid">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 text-center mt-5">
+                    <span class="text-light label-text">Caketeam ©</span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><a class="text-light" href="#">Пользовательское соглашение</a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><i class="bi bi-instagram"></i> <a class="text-light" href="#">caketeam </a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <br><span class="text-light offer-text">Тех.поддержка:</span> <span class="text-light label-text"><i class="bi bi-telegram"></i> <a class="text-light" href="https://t.me/i1nes">i1nes </a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/js/jquery.suggestions.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.js" type="text/javascript"></script>
-<script>
-
-    $(document).ready(function(){
-
-    $(".add-to-input").on("click", function(e) {
-        e.preventDefault();
-        var value = $(this).text()
-        $("#first-input").val(value);
-    });
-
-    $("#first-button").click(function(e) {
-        if ($("#first-input").val().length === 0) {
-            $("#first-input").addClass("is-invalid");
-        } else {
-            $("#first-form").css("display", "none");
-            $("#second-form").css("display", "block");
-        }
-    });
-    $("#second-back").click(function(e) {
-        $("#second-form").css("display", "none");
-        $("#first-form").css("display", "block");
-    });
-    $("#second-button").click(function(e) {
-        if ($("#second-input").val().length === 0) {
-            $("#second-input").addClass("is-invalid");
-        } else {
-            $("#second-form").css("display", "none");
-            $("#third-form").css("display", "block");
-        }
-    });
-    $("#third-back").click(function(e) {
-        $("#third-form").css("display", "none");
-        $("#second-form").css("display", "block");
-    });
-    $("#third-button").click(function(e) {
-        if ($("#third-input").val().length === 0) {
-            $("#third-input").addClass("is-invalid");
-        } else {
-            $("#third-form").css("display", "none");
-            $("#fourth-form").css("display", "block");
-        }
-    });
-    $("#fourth-back").click(function(e) {
-        $("#fourth-form").css("display", "none");
-        $("#third-form").css("display", "block");
-    });
-    $("#fourth-button").click(function(e) {
-        $("#fourth-form").css("display", "none");
-        $("#fifth-form").css("display", "block");
-    });
-    $("#fifth-back").click(function(e) {
-        $("#fifth-form").css("display", "none");
-        $("#fourth-form").css("display", "block");
-    });
-    $("#fifth-button").click(function(e) {
-        $("#fifth-form").css("display", "none");
-        $("#sixth-form").css("display", "block");
-    });
-    $("#sixth-back").click(function(e) {
-        $("#sixth-form").css("display", "none");
-        $("#fifth-form").css("display", "block");
-    });
-
-    $("#sixth-button").click(function(e) {
-        if ($("#sixth-input1").val().length === 0) {
-            e.preventDefault();
-            $("#sixth-input1").addClass("is-invalid");
-        } else {
-            $("#sixth-input1").removeClass("is-invalid");
-        }
-        if ($("#sixth-input2").val().length === 0) {
-            e.preventDefault();
-            $("#sixth-input2").addClass("is-invalid");
-        } else {
-            $("#sixth-input2").removeClass("is-invalid");
-        }
-
-    });
-
-    $("#second-input").suggestions({
-        token: "1fb228bbc969c88de6a9998d1b20bff93cd8ba94",
-        type: "ADDRESS",
-        /* Вызывается, когда пользователь выбирает одну из подсказок */
-        onSelect: function(suggestion) {
-            $('#city-input').val(suggestion.data.city_with_type);
-            $('#second-input').val(suggestion.value);
-        }
-    });
-
-    $("#check").change(function() {
-    if(this.checked) {
-        $("#delivery-need").css("display", "block");
-    } else {
-        $("#delivery-need").css("display", "none");
-    }
-    });
-
-    $("#sixth-input2").mask("7(999)999-99-99");
-
-});
-
-
-</script>
+<script type="text/javascript" src="{% static "js/landing.js" %}"></script>
 </html>

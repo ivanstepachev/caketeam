@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+{% load static %}
+{% load to_replace %}
+{% load won_respond %}
+{% load mean_rating %}
+{% load count_done_orders %}
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <title>Заказ {{ order.set_numb_of_order }}</title>
+</head>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+    <div class="container mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <h5 class="m text-center">Заказ {{ order.set_numb_of_order }}</h5>
+        <hr>
+        <div class="container">
+            {% if mistake %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <span class="label-text"><strong>Не удалось оставить отзыв!</strong>
+                Вы ввели неверный код, попробуйте еще раз или обратитесь в поддержку <a class="text-success" href="https://wa.me/79857344040"><i class="bi bi-whatsapp"></i></a></span>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+            <!--Экранирование html-->
+            {% autoescape off %}
+            <p class="label-text text-muted order-info">{{ order.note|to_replace }}</p>
+            {% endautoescape %}
+            <div class="row mb-2 justify-content-center">
+                {% for image in order.reference_images.all %}
+                <div class="col-3">
+                <img class="w-100" src="{{ image.image.url }}">
+                </div>
+                {% endfor %}
+            </div>
+            <hr>
+            <b class="name-text">Оставить отзыв кондитеру: <a class="text-primary">{{ staff.name }} {{ staff.surname }}</a></b><br>
+            <form class="mt-3" method="post">
+                {% csrf_token %}
+                <div id="review-form" class="form-group">
+                    <label for="rating" class="label-text mb-2">Поставьте оценку кондитеру:</label>
+                    <select id="rating" name="rating" class="form-select form-select-sm w-75" aria-label=".form-select-sm">
+                      <option value="1">⭐ &nbsp;Ужасно!</option>
+                      <option value="2">⭐ ⭐ &nbsp;Плохо!</option>
+                      <option value="3">⭐ ⭐ ⭐ &nbsp;Нормально!</option>
+                      <option value="4">⭐ ⭐ ⭐ ⭐ &nbsp;Хорошо!</option>
+                      <option value="5" selected>⭐ ⭐ ⭐ ⭐ ⭐ &nbsp;Отлично!</option>
+                    </select>
+                    <textarea name="text" class="form-control form-rounded mt-3" rows="6" placeholder="Расскажите подробнее о том как был выполнен заказ и остались ли вы довольны работой кондитера."></textarea>
+                    <a id="review-button" class="btn btn-success mt-3 w-100">Оставить отзыв</a>
+                </div>
+
+
+                <!--Блок верификации-->
+                <div id="confirm-form" class="row justify-content-center mb-2">
+                    <div class="p-2 text-center">
+                        <h6>Для подтверждения действия, <br> введите четыре последних числа номера телефона, от которого поступит звонок</h6>
+                        <div> <span>Звонок поступит на номер</span> <small>*******{{ order.phone|slice:"-4:" }}</small> </div>
+                            <div id="otp" class="inputs d-flex flex-row justify-content-center mt-2"> <input class="m-2 text-center form-control rounded" type="text" id="first-numb" name="first" maxlength="1" disabled /> <input class="m-2 text-center form-control rounded" type="text" id="second-numb" name="second" maxlength="1" disabled/> <input class="m-2 text-center form-control rounded" type="text" id="third-numb" name="third" maxlength="1" disabled/> <input class="m-2 text-center form-control rounded" type="text" id="fourth-numb" name="fourth" maxlength="1" disabled/>  </div>
+                            <div class="mt-4">
+                            <a id="receive-call" class="btn btn-outline-success px-4">Получить звонок</a>
+                            <button id="confirm-button" type="submit" class="w-100 confirm-button btn btn-danger px-4 validate">Подтвердить</button>
+                        </div>
+                    </div>
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</main>
+<footer class="footer mt-auto">
+    <div id="footer" class="container-fluid">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 text-center mt-5">
+                    <span class="text-light label-text">Caketeam ©</span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><a class="text-light" href="#">Пользовательское соглашение</a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><i class="bi bi-instagram"></i> <a class="text-light" href="#">caketeam </a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <br><span class="text-light offer-text">Тех.поддержка:</span> <span class="text-light label-text"><i class="bi bi-telegram"></i> <a class="text-light" href="https://t.me/i1nes">i1nes </a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+<script
+  src="https://code.jquery.com/jquery-3.6.0.js"
+  integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
+  crossorigin="anonymous"></script>
+<script>
+document.addEventListener("DOMContentLoaded", function(event) {
+
+function OTPInput() {
+const inputs = document.querySelectorAll('#otp > *[id]');
+for (let i = 0; i < inputs.length; i++) { inputs[i].addEventListener('keydown', function(event) { if (event.key==="Backspace" ) { inputs[i].value='' ; if (i !==0) inputs[i - 1].focus(); } else { if (i===inputs.length - 1 && inputs[i].value !=='' ) { return true; } else if (event.keyCode> 47 && event.keyCode < 58) { inputs[i].value=event.key; if (i !==inputs.length - 1) inputs[i + 1].focus(); event.preventDefault(); } else if (event.keyCode> 64 && event.keyCode < 91) { inputs[i].value=String.fromCharCode(event.keyCode); if (i !==inputs.length - 1) inputs[i + 1].focus(); event.preventDefault(); } } }); } } OTPInput(); });
+
+$(document).ready(function(){
+       $("#review-button").on("click", function(e) {
+            $("#review-form").css("display", "none");
+            $("#confirm-form").css("display", "block");
+      });
+
+      $("#receive-call").on("click", function(e) {
+            e.preventDefault();
+            var respondId = {{ respond.id }};
+            $(this).css("display", "none");
+            $(`#first-numb`).removeAttr('disabled');
+            $(`#second-numb`).removeAttr('disabled');
+            $(`#third-numb`).removeAttr('disabled');
+            $(`#fourth-numb`).removeAttr('disabled');
+            $(`#confirm-button`).css("display", "block");
+            $.ajax({
+                type: "POST",
+                url: "/confirm/",
+                data: {
+                    id: respondId,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function(result) {
+                    console.log('ok');
+                },
+                error: function(result) {
+                    console.log(respondId);
+                }
+            });
+      });
+
+});
+
+</script>
+</html>

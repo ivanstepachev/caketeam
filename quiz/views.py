@@ -1,17 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
-from quiz.models import Order, Token, Respond, Image, Staff, ReferenceImage
+from quiz.models import Order, Token, Respond, Image, Staff, ReferenceImage, Review
 from django.contrib.auth import login, authenticate
 from quiz.forms import RegisterForm
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, Http404
+from random import randint
+from django.db.models import Q
 
 import json
 
 import requests
 
 from quiz.handlers import handler, send_message
-from quiz.utilities import unique_view_of_order, to_hash, from_hash
+from quiz.utilities import unique_view_of_order, to_hash, from_hash, mean_rating, format_date
 
 from service.settings import admin_id, hashid_salt, alphabet
 
@@ -39,7 +41,8 @@ def quiz(request):
         city = request.POST.get('city')[2:]
         address = request.POST.get('address')
         delivery = request.POST.get('delivery')
-        date = request.POST.get('date')
+        d = request.POST.get('date')
+        date = format_date(d)
         images = request.FILES.getlist('reference_images')
         if delivery == "need":
             delivery_info = "Требуется"
@@ -62,7 +65,7 @@ def quiz(request):
         admin_staff_list = Staff.objects.filter(admin=True)
         for admin_staff in admin_staff_list:
             send_message(chat_id=int(admin_staff.telegram_id), text=order_text, reply_markup=keyboard)
-        return redirect('quiz')
+        return redirect('order_for_client', order_url=order.order_url)
     else:
         return render(request, 'quiz/landing.html')
 
@@ -72,7 +75,99 @@ def order_for_client(request, order_url):
     order = get_object_or_404(Order, order_url=order_url)
     responds = Respond.objects.filter(order=order)
     context = {'order': order, 'responds': responds}
-    return render(request, 'quiz/order_for_client.html', context)
+    if request.method == "GET":
+        return render(request, 'quiz/order_for_client.html', context)
+    else:
+        respond_id = request.POST.get("respond_id")
+        first = request.POST.get("first")
+        second = request.POST.get("second")
+        third = request.POST.get("third")
+        fourth = request.POST.get("fourth")
+        confirm_code = int(first + second + third + fourth)
+        respond = get_object_or_404(Respond, id=int(respond_id))
+        if confirm_code == respond.code:
+            order.staff = respond.staff
+            order.status = "WORK"
+            order.save()
+            # Сохраняем новый код для верификации чтобы подтверждать отзывы
+            respond.code = randint(1000, 9999)
+            respond.save()
+            return redirect('order_for_client', order.order_url)
+        else:
+            return render(request, 'quiz/order_for_client.html', {'order': order, 'responds': responds, 'mistake': True})
+
+
+# Для верификации выбора кондитера через AJAX без редиректа
+def confirm(request):
+    if request.method == "POST":
+        respond_id = request.POST.get("id")
+        respond = get_object_or_404(Respond, id=int(respond_id))
+        code = respond.code
+        order = respond.order
+        phone = order.phone
+        url = 'https://vp.voicepassword.ru/api/voice-password/send/'
+        apikey = '4e1300e2f3ca549fddcc35fef2e2dfa9'
+        data = {"security": {"apiKey": f"{apikey}"}, "number": f"{phone}", "flashcall": {"code": f"{code}"}}
+        requests.post(url, data=json.dumps(data))
+        return HttpResponse('ok', content_type='text/plain', status=200)
+
+
+# Оставление отзыва о том что задание выполнено
+def review_done(request, order_url):
+    order = Order.objects.filter(order_url=order_url)[0]
+    if order.status == "WORK":
+        staff = order.staff
+        respond = Respond.objects.filter(order=order, staff=staff)[0]
+        if request.method == "GET":
+            context = {'order': order, 'staff': staff, 'respond': respond}
+            return render(request, 'quiz/review_done.html', context=context)
+        if request.method == "POST":
+            first = request.POST.get("first")
+            second = request.POST.get("second")
+            third = request.POST.get("third")
+            fourth = request.POST.get("fourth")
+            confirm_code = int(first + second + third + fourth)
+            if respond.code == confirm_code:
+                text = request.POST.get("text")
+                rating = int(request.POST.get("rating"))
+                review = Review(text=text, rating=rating, order=order, staff=staff)
+                review.save()
+                order.status = "DONE"
+                order.save()
+                return redirect('order_for_client', order.order_url)
+            else:
+                return render(request, 'quiz/review_done.html', context={'order': order, 'staff': staff, 'respond': respond, 'mistake': True})
+    else:
+        raise Http404()
+
+
+# Оставление отзыва о том что задание не выполнено
+def review_undone(request, order_url):
+    order = Order.objects.filter(order_url=order_url)[0]
+    if order.status == "WORK":
+        staff = order.staff
+        respond = Respond.objects.filter(order=order, staff=staff)[0]
+        if request.method == "GET":
+            context = {'order': order, 'staff': staff, 'respond': respond}
+            return render(request, 'quiz/review_done.html', context=context)
+        if request.method == "POST":
+            first = request.POST.get("first")
+            second = request.POST.get("second")
+            third = request.POST.get("third")
+            fourth = request.POST.get("fourth")
+            confirm_code = int(first + second + third + fourth)
+            if respond.code == confirm_code:
+                text = request.POST.get("text")
+                rating = int(request.POST.get("rating"))
+                review = Review(text=text, rating=rating, order=order, staff=staff)
+                review.save()
+                order.status = "UNDONE"
+                order.save()
+                return redirect('order_for_client', order.order_url)
+            else:
+                return render(request, 'quiz/review_done.html', context={'order': order, 'staff': staff, 'respond': respond, 'mistake': True})
+    else:
+        raise Http404()
 
 
 def registration(request, chat_id, username):
@@ -81,7 +176,6 @@ def registration(request, chat_id, username):
         name = request.POST.get('name').capitalize()
         surname = request.POST.get('surname').capitalize()
         phone = request.POST.get('phone')
-        city = request.POST.get('city').capitalize()
         instagram = request.POST.get('instagram').lower()
         pin = chat_id[-4:]
         form = RegisterForm(request.POST)
@@ -89,7 +183,7 @@ def registration(request, chat_id, username):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             user = User.objects.create_user(username=username, email=email, password=password)
-            staff = Staff(username=username, telegram_id=chat_id, city=city, name=name, surname=surname, pin=pin, phone=phone, instagram=instagram, user=user)
+            staff = Staff(username=username, telegram_id=chat_id, cities="", name=name, surname=surname, pin=pin, phone=phone, instagram=instagram, user=user)
             staff.save()
         # Добавить клавиатуру для добавления пользователя
         send_message(chat_id=admin_id, text=f'''Новый пользователь зарегистрировался @{username.lower()}''')
@@ -101,8 +195,13 @@ def registration(request, chat_id, username):
 
 
 def staff_list(request):
-    active = Staff.objects.filter(active=True).order_by('-date')
-    inactive = Staff.objects.filter(active=False).order_by('-date')
+    if request.GET.get("search") != None:
+        search = request.GET.get("search")
+        active = Staff.objects.filter(Q(active=True) & (Q(instagram__icontains=search) | Q(username__icontains=search) | Q(name__icontains=search) | Q(surname__icontains=search) | Q(phone__icontains=search))).order_by('-date')
+        inactive = Staff.objects.filter(Q(active=False) & (Q(instagram__icontains=search) | Q(username__icontains=search) | Q(name__icontains=search) | Q(surname__icontains=search) | Q(phone__icontains=search))).order_by('-date')
+    else:
+        active = Staff.objects.filter(active=True).order_by('-date')
+        inactive = Staff.objects.filter(active=False).order_by('-date')
     return render(request, 'quiz/staff_list.html', {'active': active, 'inactive': inactive})
 
 
@@ -137,6 +236,8 @@ def orders(request):
         orders = Order.objects.filter(status="WORK").order_by('-date')
     elif request.GET.get("status") == "DONE":
         orders = Order.objects.filter(status="DONE").order_by('-date')
+    elif request.GET.get("status") == "UNDONE":
+        orders = Order.objects.filter(status="UNDONE").order_by('-date')
     else:
         orders = Order.objects.all().order_by('-date')
     return render(request, 'quiz/orders.html', {'orders': orders})
@@ -154,11 +255,15 @@ def order_detail(request, order_id):
         note = request.POST.get('note')
         max_responds = request.POST.get('max_responds')
         respond_price = request.POST.get('respond_price')
+        phone = request.POST.get('phone')
+        city = request.POST.get('city')
         send_all = request.POST.get('send_all')
         order.max_responds = max_responds
         order.respond_price = int(respond_price)
         order.status = "FIND"
         order.note = note
+        order.phone = phone
+        order.city = city
         order.save()
         # Внутренний код заявки в виде хэштега
         numb_of_order = order.set_numb_of_order()
@@ -210,13 +315,15 @@ def order_respond(request, hash_order_id, hash_telegram_id):
             # Проверка на оставленный отзыв, если его нет, значит это первичное размещение отзыва и деньги списываются, а редактирование бесплатно
             if len(Respond.objects.filter(order=order, staff=staff)) == 0:
                 # Нужно привязать к юзеру
-                respond = Respond.objects.create(text=text, order=order, staff=staff, price=price)
+                code = randint(1000, 9999)
+                respond = Respond.objects.create(text=text, order=order, staff=staff, price=price, code=code)
                 if images:
                     for image in images:
                         img = Image(image=image, respond=respond)
                         img.save()
-                staff.balance = staff.balance - order.respond_price
-                staff.save()
+                if staff.unlimited is False:
+                    staff.balance = staff.balance - order.respond_price
+                    staff.save()
             # Редактирование уже оставленный отзыв
             else:
                 respond = Respond.objects.filter(order=order, staff=staff)[0]
@@ -230,7 +337,7 @@ def order_respond(request, hash_order_id, hash_telegram_id):
         else:
             return redirect('quiz')   # Тут надо вызвать ошибку неправильного пина
     elif request.method == 'GET':
-        if order.status == "FIND" or order.status == "WORK":
+        if order.status == "FIND" or order.status == "WORK" or order.status == "DONE":
             notes = order.note.replace('-', '<br>')
             # Просмотры страницы
             if unique_view_of_order(order=order, staff=staff):
@@ -268,10 +375,11 @@ def order_respond_login(request, order_id, telegram_id):
             # Так как несколько изображений
             images = request.FILES.getlist('images')
             if str(staff.pin) == str(pin):
+                code = randint(1000, 9999)
                 # Проверка на оставленный отзыв, если его нет, значит это первичное размещение отзыва и деньги списываются, а редактирование бесплатно
                 if len(Respond.objects.filter(order=order, staff=staff)) == 0:
                     # Нужно привязать к юзеру
-                    respond = Respond.objects.create(text=text, order=order, staff=staff, price=price)
+                    respond = Respond.objects.create(text=text, order=order, staff=staff, price=price, code=code)
                     if images:
                         for image in images:
                             img = Image(image=image, respond=respond)
@@ -291,7 +399,7 @@ def order_respond_login(request, order_id, telegram_id):
             else:
                 return redirect('quiz')   # Тут надо вызвать ошибку неправильного пина
         elif request.method == 'GET':
-            if order.status == "FIND" or order.status == "WORK":
+            if order.status == "FIND" or order.status == "WORK" or order.status == "DONE":
                 notes = order.note.replace('-', '<br>')
                 # Просмотры страницы
                 if unique_view_of_order(order=order, staff=staff):
@@ -320,15 +428,47 @@ def order_respond_login(request, order_id, telegram_id):
 @login_required
 def profile_edit(request, telegram_id):
     staff = get_object_or_404(Staff, telegram_id=telegram_id)
+    rating = mean_rating(staff=staff)
+    # if request.user.staff == staff:
+    if request.method == "GET":
+        # Чтобы получить список городов из БД оформленной списком с разделителем в виде точки с запятой
+        cities = staff.cities[:-1].split(";")
+        context = {'staff': staff, 'cities': cities, 'rating': rating}
+        return render(request, 'quiz/profile_edit.html', context=context)
+    elif request.method == "POST":
+        avatar = request.FILES.get('avatar')
+        if avatar:
+            staff.avatar = avatar
+            staff.save()
+        return redirect('profile_edit', telegram_id=telegram_id)
+    # else:
+    #     raise Http404("Такой страницы нет")
+
+
+@login_required
+def profile_edit_info(request, telegram_id):
+    staff = get_object_or_404(Staff, telegram_id=telegram_id)
     if request.user.staff == staff:
-        if request.method == "GET":
-            # Чтобы получить список городов из БД оформленной списком с разделителем в виде точки с запятой
-            cities = staff.cities[:-1].split(";")
-            context = {'staff': staff, 'cities': cities}
-            return render(request, 'quiz/profile_edit.html', context=context)
+        info = request.POST.get('info')
+        staff.info = info
+        staff.save()
+        return redirect('profile_edit', telegram_id=telegram_id)
     else:
         raise Http404("Такой страницы нет")
 
+
+@login_required
+def profile_edit_contacts(request, telegram_id):
+    staff = get_object_or_404(Staff, telegram_id=telegram_id)
+    if request.user.staff == staff:
+        phone = request.POST.get('phone')
+        instagram = request.POST.get('instagram')
+        staff.phone = phone
+        staff.instagram = instagram
+        staff.save()
+        return redirect('profile_edit', telegram_id=telegram_id)
+    else:
+        raise Http404("Такой страницы нет")
 
 
 def respond_choice(request, respond_id):
@@ -341,12 +481,19 @@ def respond_choice(request, respond_id):
     return redirect('order_detail', order.id)
 
 
-def respond_delete(request, respond_id):
+def respond_cancel(request, respond_id):
     respond = get_object_or_404(Respond, id=respond_id)
     order = respond.order
     order.staff = None
     order.status = "FIND"
     order.save()
+    return redirect('order_detail', order.id)
+
+
+def respond_delete(request, respond_id):
+    respond = get_object_or_404(Respond, id=respond_id)
+    order = respond.order
+    respond.delete()
     return redirect('order_detail', order.id)
 
 
@@ -357,11 +504,21 @@ def order_done(request, order_id):
     return redirect('order_detail', order.id)
 
 
-# Список заявок каждого кондитера
-def responds_list(request, chat_id):
-    staff = Staff.objects.filter(telegram_id=chat_id)[0]
-    responds = Respond.objects.filter(staff=staff).order_by('-date')
-    return render(request, 'quiz/responds.html', {'responds': responds})
+# Список заданий для кондитера
+def staff_orders(request):
+    orders = Order.objects.exclude(status="NEW").order_by('-date')
+    staff = request.user.staff
+    filter_orders = []
+    active = False
+    if request.GET.get('f') == 'city':
+        active = True
+        for order in orders:
+            if order.city in staff.cities:
+                filter_orders.append(order)
+    else:
+        filter_orders = orders
+    context = {'orders': filter_orders, 'staff': staff, 'active': active}
+    return render(request, 'quiz/staff_orders.html', context)
 
 
 @csrf_exempt
@@ -376,7 +533,8 @@ def bot(request):
                 username = data["message"]["chat"]["username"]
                 handler(chat_id=chat_id, text=text, username=username)
             else:
-                text = '''Сначала сделайте себе ник нейм'''
+                # Если нет имени пользователя
+                text = '''Здравствуйте! Для того, чтобы начать пользоваться сервисом и зарегистрироваться на платформе, Вам требуется создать в своём профиле telegram "Имя пользователя". Для этого перейдите в настройки профиля, нажмите кнопку "Изм." в верхнем углу и в открывшемся меню напишите Имя пользователя! Пока пользуетесь нашей платформой Имя пользователя изменять нельзя! После создания Имени пользователя нажмите /start, чтобы присутпить к регистрации.'''
                 send_message(chat_id=chat_id, text=text)
     return HttpResponse('ok', content_type='text/plain', status=200)
 
@@ -421,6 +579,7 @@ def deletewebhook(request):
         return render(request, 'quiz/deletewebhook.html', {'token': token})
 
 
+# Счетчик для переходов на WA и Instagram
 def hint(request):
     if request.method == "POST":
         to = request.POST.get("to")
@@ -435,6 +594,7 @@ def hint(request):
             respond.save()
         return HttpResponse('ok', content_type='text/plain', status=200)
 
+
 def calc(request):
     if request.method == "POST":
         price = request.POST.get('price')
@@ -444,6 +604,7 @@ def calc(request):
         return render(request, 'quiz/calc.html')
 
 
+# Добавление и удаление города по которым получать задание для кондитера
 def edit_city(request):
     if request.method == "POST":
         telegram_id = request.POST.get("telegram_id")

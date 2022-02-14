@@ -1,92 +1,248 @@
 <!DOCTYPE html>
+{% load static %}
 {% load to_replace %}
-<html lang="en">
+{% load won_respond %}
+{% load mean_rating %}
+{% load count_done_orders %}
+{% load range_rating %}
+<html lang="en" class="h-100">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <title>Заявка {{ order.set_numb_of_order }}</title>
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <title>Заказ {{ order.set_numb_of_order }}</title>
 </head>
-<body>
-<style>
-    .form-rounded {
-        border-radius: 0.7rem;
-    }
-    .label-text {
-        font-size: 0.8em;
-    }
-    .price-text {
-        font-size: 0.8em;
-        font-weight: 500;
-    }
-    .name-text {
-        font-weight: 500;
-    }
-    .offer-text {
-        font-size: 0.7em;
-    }
-    .add-text {
-        font-size: 0.55em;
-        line-height: 90%;
-    }
-    #win_respond {
-        background-color: #E6F1DA;
-    }
-    .responds-block {
-        border-radius: 10px;
-        width: 90%;
-        background-color: #F6FEEB;
-    }
-    .responds-img {
-        width: 100%;
-    }
-    .active-img {
-        filter: brightness(0.3);
-        width: 85%;
-
-    }
-    .first-img {
-        width: 100%;
-    }
-    .avatar {
-        width: 100%;
-    }
-
-    .staff-info {
-        line-height: 95%;
-    }
-
-    .order-info {
-        line-height: 110%;
-    }
-    .contacts {
-
-        color: black;
-        font-size: 1.1em;
-    }
-    .instagram {
-        color: #ba30b6;
-    }
-    .respond-card {
-        margin-bottom: 5em;
-    }
-</style>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
     <div class="container mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
-        <h5 class="text-center">Заявка {{ order.set_numb_of_order }}</h5>
+        <h5 class="m text-center">Заказ {{ order.set_numb_of_order }}</h5>
         <hr>
         <div class="container">
+            {% if mistake %}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <span class="label-text"><strong>Не удалось выбрать кондитера!</strong>
+                Вы ввели неверный код, попробуйте еще раз или обратитесь в поддержку <a class="text-success" href="https://wa.me/79857344040"><i class="bi bi-whatsapp"></i></a></span>
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endif %}
+
             <!--Экранирование html-->
             {% autoescape off %}
             <p class="label-text text-muted order-info">{{ order.note|to_replace }}</p>
             {% endautoescape %}
+            <div class="row mb-2 justify-content-center">
+                {% for image in order.reference_images.all %}
+                <div class="col-3">
+                <img class="w-100" src="{{ image.image.url }}">
+                </div>
+                {% endfor %}
+            </div>
             <b class="name-text">Откликов на задание от кондитеров: {{ responds.all.count }}</b><br>
             <span class="add-text">Просмотров: {{ order.views }}</span><br>
             <hr>
         </div>
     </div>
+
+    {% if order.staff != None and order.status == "WORK" %}
+    <!--  Если задание выполняется  -->
+    {% with respond=order|won_respond:order.staff %}
+
+    <div class="container respond-card mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <div class="row mb-3">
+            <div class="col-6">
+                <a href="{% url 'review_done' order_url=order.order_url %}" class="w-100 btn btn-success">Заказ выполнен</a>
+            </div>
+            <div class="col-6">
+                <a href="{% url 'review_undone' order_url=order.order_url %}" class="w-100 btn btn-danger">Заказ не выполнен</a>
+            </div>
+            <p class="offer-text text-muted text-center mt-2">Пожалуйста, укажите статус заказа после того, как он будет выполнен или не выполнен. После этого вы сможете оставить отзыв о кондитере.</p>
+        </div>
+
+
+
+        <b class="name-text text-center">Ваш заказ выполняет:</b>
+        <div class="row mt-3 mb-2">
+                <div class="col-3 mt-2">
+                    <img src="{{ respond.staff.avatar.url }}" class="responds-block avatar">
+                </div>
+                <div class="col-9">
+                    <p class="staff-info mt-1">
+                    <span class="name-text text-primary">{{ respond.staff.name }} {{ respond.staff.surname|slice:":1" }}.</span><br>
+                    {% if respond.staff.reviews.all.count > 0 %}
+                    <span class="offer-text text-warning"><i class="bi bi-star-fill"></i> <span class="text-muted">{{ respond|mean_rating }} отзывов: {{ respond.staff.reviews.all.count }}</span></span><br>
+                    {% else %}
+                    <span class="offer-text text-warning"><i class="bi bi-star"></i> <span class="text-muted"> Нет отзывов</span></span><br>
+                    {% endif %}
+                    <span class="offer-text text-muted">Выполнено заказов: {{ respond.staff.orders.all|count_done_orders }}</span></p>
+                    <p class="staff-info mt-1"> <span class="mt-2 offer-text">Моё портфолио и контакты:<br>
+                    <a data-id="{{ respond.id }}" class="contacts insta-hint" href="https://instagram.com/{{ respond.staff.instagram }}"><i class="bi bi-instagram instagram"></i>  instagram.com/{{ respond.staff.instagram }}</a><br>
+                    <a data-id="{{ respond.id }}" class="contacts wa-hint" href="https://wa.me/{{ respond.staff.phone }}"><i class="bi bi-whatsapp text-success"></i>  +{{ respond.staff.phone }}</a></span>
+                    </p>
+                </div>
+            </div>
+
+
+            <div id="win_respond" class="container responds-block py-3">
+                <div class="container">
+                    <p class="price-text">Стоимость: <b>{{ respond.price }} ₽</b></br>
+                    <span class="add-text text-muted">Свяжитесь с кондитером, чтобы определить точную цену.</span></p>
+                    <hr>
+                    <p class="label-text">{{ respond.text|linebreaksbr }}</p>
+                </div>
+
+                    <!--        Если одно фото без галереи            -->
+                    {% if respond.images.all.count == 1 %}
+                    <div class="row">
+                        {% with respond.images.all|first as img %}
+                        <div class="col-12 my-2 text-center">
+                            <img src="{{ img.image.url }}" class="image-fluid rounded first-img">
+                        </div>
+                        {% endwith %}
+                    </div>
+
+                    <!--        Если есть галерея с выбором            -->
+                    {% elif respond.images.all.count > 1 %}
+                    <div class="row">
+                        {% with respond.images.all|first as img %}
+                        <div class="col-12 my-2 text-center">
+                            <img id="main-foto{{ img.id }}" src="{{ img.image.url }}" class="image-fluid rounded first-img">
+                        </div>
+                    </div>
+                    <div id="gallery-row" class="row align-items-center">
+                        {% for image in respond.images.all %}
+                        <div class="col-4 mb-3 text-center gallery-col">
+                            {% if forloop.counter == 1 %}
+                            <a class="gallery-foto" data-id="{{ img.id }}"><img src="{{ image.image.url }}" class="responds-img active-img rounded"></a>
+                            {% else %}
+                            <a class="gallery-foto" data-id="{{ img.id }}"><img src="{{ image.image.url }}" class="responds-img rounded"></a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                        {% endwith %}
+                    {% endif %}
+
+                    <div class="row mt-2 my-3">
+                        <div class="col-12">
+                        <a href="https://wa.me/{{ respond.staff.phone }}" data-id="{{ respond.id }}" class="btn btn-outline-dark btn-md form-rounded w-100">Написать в WA <i class="bi bi-whatsapp text-dark"></i></a>
+                        </div>
+                    </div>
+            </div>
+            <p class="add-text mt-2 text-muted text-end me-4">{{ respond.date }}</p>
+        </div>
+    </div>
+    {% endwith %}
+
+    {% elif order.staff != None and order.status == "DONE" or order.status == "UNDONE" %}
+    <!--  Если задание ВЫПОЛНЕНО или НЕ ВЫПОЛНЕНО  -->
+    {% with respond=order|won_respond:order.staff %}
+
+    <div class="container respond-card mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+        <div class="row mb-3 justify-content-center">
+            <div class="col-12 text-center">
+                {% if order.status == "DONE" %}
+                <span class="name-text text-success text-center">Заказ выполнен</span>
+                {% elif order.status == "UNDONE" %}
+                <span class="name-text text-danger text-center">Заказ не выполнен</span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="container">
+        {% with review=order.review %}
+        <div class="row justify-content-center mt-3 mb-4">
+            <div class="col-10 review pt-2 rounded">
+                <p class=" label-text fw-bolder">{{ order.name }}<br>
+                    <span class="offer-text text-muted">Оценка: {% for i in review.rating|range_rating %}<i class="bi bi-star-fill text-warning"></i>{% endfor %}</span></p>
+                <p class="label-text">{{ review.text|linebreaksbr }}</p>
+                <p class="add-text mt-2 text-muted text-end me-4">{{ review.date }}</p>
+            </div>
+        </div>
+        {% endwith %}
+        </div>
+        <hr>
+
+        <div class="row mt-3 mb-2">
+                <div class="col-3 mt-2">
+                    <img src="{{ respond.staff.avatar.url }}" class="responds-block avatar">
+                </div>
+                <div class="col-9">
+                    <p class="staff-info mt-1">
+                    <span class="name-text text-primary">{{ respond.staff.name }} {{ respond.staff.surname|slice:":1" }}.</span><br>
+                    {% if respond.staff.reviews.all.count > 0 %}
+                    <span class="offer-text text-warning"><i class="bi bi-star-fill"></i> <span class="text-muted">{{ respond|mean_rating }} отзывов: {{ respond.staff.reviews.all.count }}</span></span><br>
+                    {% else %}
+                    <span class="offer-text text-warning"><i class="bi bi-star"></i> <span class="text-muted"> Нет отзывов</span></span><br>
+                    {% endif %}
+                    <span class="offer-text text-muted">Выполнено заказов: {{ respond.staff.orders.all|count_done_orders }}</span></p>
+                    <p class="staff-info mt-1"> <span class="mt-2 offer-text">Моё портфолио и контакты:<br>
+                    <a data-id="{{ respond.id }}" class="contacts insta-hint" href="https://instagram.com/{{ respond.staff.instagram }}"><i class="bi bi-instagram instagram"></i>  instagram.com/{{ respond.staff.instagram }}</a><br>
+                    <a data-id="{{ respond.id }}" class="contacts wa-hint" href="https://wa.me/{{ respond.staff.phone }}"><i class="bi bi-whatsapp text-success"></i>  +{{ respond.staff.phone }}</a></span>
+                    </p>
+                </div>
+            </div>
+
+
+            <div id="done_respond" class="container responds-block py-3">
+                <div class="container">
+                    <p class="price-text">Стоимость: <b>{{ respond.price }} ₽</b></br>
+                    <span class="add-text text-muted">Свяжитесь с кондитером, чтобы определить точную цену.</span></p>
+                    <hr>
+                    <p class="label-text">{{ respond.text|linebreaksbr }}</p>
+                </div>
+
+                    <!--        Если одно фото без галереи            -->
+                    {% if respond.images.all.count == 1 %}
+                    <div class="row">
+                        {% with respond.images.all|first as img %}
+                        <div class="col-12 my-2 text-center">
+                            <img src="{{ img.image.url }}" class="image-fluid rounded first-img">
+                        </div>
+                        {% endwith %}
+                    </div>
+
+                    <!--        Если есть галерея с выбором            -->
+                    {% elif respond.images.all.count > 1 %}
+                    <div class="row">
+                        {% with respond.images.all|first as img %}
+                        <div class="col-12 my-2 text-center">
+                            <img id="main-foto{{ img.id }}" src="{{ img.image.url }}" class="image-fluid rounded first-img">
+                        </div>
+                    </div>
+                    <div id="gallery-row" class="row align-items-center">
+                        {% for image in respond.images.all %}
+                        <div class="col-4 mb-3 text-center gallery-col">
+                            {% if forloop.counter == 1 %}
+                            <a class="gallery-foto" data-id="{{ img.id }}"><img src="{{ image.image.url }}" class="responds-img active-img rounded"></a>
+                            {% else %}
+                            <a class="gallery-foto" data-id="{{ img.id }}"><img src="{{ image.image.url }}" class="responds-img rounded"></a>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                        {% endwith %}
+                    {% endif %}
+
+                    <div class="row mt-2 my-3">
+                        <div class="col-12">
+                        <a href="https://wa.me/{{ respond.staff.phone }}" data-id="{{ respond.id }}" class="btn btn-outline-dark btn-md form-rounded w-100">Написать в WA <i class="bi bi-whatsapp text-dark"></i></a>
+                        </div>
+                    </div>
+            </div>
+            <p class="add-text mt-2 text-muted text-end me-4">{{ respond.date }}</p>
+        </div>
+    </div>
+    {% endwith %}
+
+
+    {% else %}
+
     <!--  Отклики  -->
+    {% if responds %}
     {% for respond in responds %}
     <div class="container respond-card mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
         <div class="row mt-3 mb-2">
@@ -95,11 +251,16 @@
             </div>
             <div class="col-9">
                 <p class="staff-info mt-1">
-                <span class="name-text text-primary">{{ respond.staff.name }} S.</span><br>
-                <span class="offer-text text-warning"><i class="bi bi-star-fill"></i> <span class="text-muted">4.9 359 отзывов</span></span><br>
-                <span class="offer-text">Моё портфолио и контакты:<br>
-                <a data-id="{{ respond.id }}" class="contacts insta-hint" href="https://instagram.com/{{ respond.staff.instagram }}"><i class="bi bi-instagram instagram"></i>  instagram.com/{{ respond.staff.instagram }}</a><br>
-                <a data-id="{{ respond.id }}" class="contacts wa-hint" href="https://wa.me/{{ respond.staff.phone }}"><i class="bi bi-whatsapp text-success"></i>  +{{ respond.staff.phone }}</a></span>
+                    <span class="name-text text-primary">{{ respond.staff.name }} {{ respond.staff.surname|slice:":1" }}.</span><br>
+                    {% if respond.staff.reviews.all.count > 0 %}
+                    <span class="offer-text text-warning"><i class="bi bi-star-fill"></i> <span class="text-muted">{{ respond|mean_rating }} отзывов: {{ respond.staff.reviews.all.count }}</span></span><br>
+                    {% else %}
+                    <span class="offer-text text-warning"><i class="bi bi-star"></i> <span class="text-muted"> Нет отзывов</span></span><br>
+                    {% endif %}
+                    <span class="offer-text text-muted">Выполнено заказов: {{ respond.staff.orders.all|count_done_orders }}</span></p>
+                    <p class="staff-info mt-1"> <span class="mt-2 offer-text">Моё портфолио и контакты:<br>
+                    <a data-id="{{ respond.id }}" class="contacts insta-hint" href="https://instagram.com/{{ respond.staff.instagram }}"><i class="bi bi-instagram instagram"></i>  instagram.com/{{ respond.staff.instagram }}</a><br>
+                    <a data-id="{{ respond.id }}" class="contacts wa-hint" href="https://wa.me/{{ respond.staff.phone }}"><i class="bi bi-whatsapp text-success"></i>  +{{ respond.staff.phone }}</a></span>
                 </p>
             </div>
         </div>
@@ -150,70 +311,117 @@
                     <a href="https://wa.me/{{ respond.staff.phone }}" data-id="{{ respond.id }}" class="btn btn-outline-dark btn-md form-rounded w-100 wa-hint">Написать в WA <i class="bi bi-whatsapp text-dark"></i></a>
                     </div>
                     <div class="col-5">
-                        <button class="btn btn-success btn-md form-rounded w-100">Выбрать</button>
+                        <a class="btn btn-success btn-md form-rounded w-100" data-bs-toggle="modal" data-bs-target="#select{{ respond.id }}">Выбрать</a>
                     </div>
                 </div>
         </div>
         <p class="add-text mt-2 text-muted text-end me-4">{{ respond.date }}</p>
     </div>
+
+    <!--Модальное окно-->
+    <div class="modal fade" id="select{{ respond.id }}" tabindex="-1" aria-labelledby="M{{ respond.id }}" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="M{{ respond.id }}2">{{ respond.staff.name }} {{ respond.staff.surname }} будет выполнять ваш заказ?</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+
+                <div class="row justify-content-center mb-2">
+                    <div class="p-2 text-center">
+                    <h6>Для подтверждения действия, <br> введите четыре последних числа номера телефона, от которого поступит звонок</h6>
+                    <div> <span>Звонок поступит на номер</span> <small>*******{{ order.phone|slice:"-4:" }}</small> </div>
+                    <form method="post">
+                        {% csrf_token %}
+                        <div id="otp" class="inputs d-flex flex-row justify-content-center mt-2"> <input class="m-2 text-center form-control rounded" type="text" id="first{{ respond.id }}" name="first" maxlength="1" disabled /> <input class="m-2 text-center form-control rounded" type="text" id="second{{ respond.id }}" name="second" maxlength="1" disabled/> <input class="m-2 text-center form-control rounded" type="text" id="third{{ respond.id }}" name="third" maxlength="1" disabled/> <input class="m-2 text-center form-control rounded" type="text" id="fourth{{ respond.id }}" name="fourth" maxlength="1" disabled/>  </div>
+                        <input type="hidden" name="respond_id" value="{{ respond.id }}">
+                        <div class="mt-4">
+                            <a data-id="{{ respond.id }}" class="receive-call btn btn-outline-success px-4">Получить звонок</a>
+                            <button id="confirm-button{{ respond.id }}" type="submit" class="w-100 confirm-button btn btn-danger px-4 validate">Подтвердить</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
     {% endfor %}
 
+    {% else %}
+    <div class="container">
+        <p class="text-center text-success"><i class="bi bi-hourglass-split fs-1"></i></p>
+        <p class="label-text text-center">Скоро здесь появится информация от кондитеров, готовых выполнить ваш заказ.</p>
+    </div>
+    {% endif %}
+
+{% endif %}
+</main>
+<footer class="footer mt-auto">
+    <div id="footer" class="container-fluid">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 text-center mt-5">
+                    <span class="text-light label-text">Caketeam ©</span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><a class="text-light" href="#">Пользовательское соглашение</a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><i class="bi bi-instagram"></i> <a class="text-light" href="#">caketeam </a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <br><span class="text-light offer-text">Тех.поддержка:</span> <span class="text-light label-text"><i class="bi bi-telegram"></i> <a class="text-light" href="https://t.me/i1nes">i1nes </a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
 </body>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script
   src="https://code.jquery.com/jquery-3.6.0.js"
   integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk="
   crossorigin="anonymous"></script>
+<script type="text/javascript" src="{% static "js/order_for_client.js" %}"></script>
 <script>
+    document.addEventListener("DOMContentLoaded", function(event) {
 
+function OTPInput() {
+const inputs = document.querySelectorAll('#otp > *[id]');
+for (let i = 0; i < inputs.length; i++) { inputs[i].addEventListener('keydown', function(event) { if (event.key==="Backspace" ) { inputs[i].value='' ; if (i !==0) inputs[i - 1].focus(); } else { if (i===inputs.length - 1 && inputs[i].value !=='' ) { return true; } else if (event.keyCode> 47 && event.keyCode < 58) { inputs[i].value=event.key; if (i !==inputs.length - 1) inputs[i + 1].focus(); event.preventDefault(); } else if (event.keyCode> 64 && event.keyCode < 91) { inputs[i].value=String.fromCharCode(event.keyCode); if (i !==inputs.length - 1) inputs[i + 1].focus(); event.preventDefault(); } } }); } } OTPInput(); });
 
 $(document).ready(function(){
-    $(".gallery-foto").on("click", function(e) {
-        e.preventDefault();
-        var imageUrl = $(this).children().attr("src");
-        var imageId = $(this).attr("data-id");
-        $("#main-foto" + `${imageId}`).attr("src", imageUrl);
-        $(`a[data-id="${imageId}"]`).children().removeClass("active-img");
-        $(this).children().addClass("active-img");
-    });
-
-        $(".wa-hint").on("click", function(e) {
+      $(".receive-call").on("click", function(e) {
+            e.preventDefault();
             var respondId = $(this).attr("data-id");
+            $(this).css("display", "none");
+            $(`#first${respondId}`).removeAttr('disabled');
+            $(`#second${respondId}`).removeAttr('disabled');
+            $(`#third${respondId}`).removeAttr('disabled');
+            $(`#fourth${respondId}`).removeAttr('disabled');
+            $(`#confirm-button${respondId}`).css("display", "block");
             $.ajax({
                 type: "POST",
-                url: "/hint",
+                url: "/confirm/",
                 data: {
-                    to: "wa",
                     id: respondId,
                     csrfmiddlewaretoken: '{{ csrf_token }}'
                 },
                 success: function(result) {
-                    console.log('Hint send');
+                    console.log('ok');
                 },
                 error: function(result) {
-                    console.log('error');
+                    console.log(respondId);
                 }
-                });
-        });
-
-        $(".insta-hint").on("click", function(e) {
-            var respondId = $(this).attr("data-id");
-            $.ajax({
-                type: "POST",
-                url: "/hint",
-                data: {
-                    to: "insta",
-                    id: respondId,
-                    csrfmiddlewaretoken: '{{ csrf_token }}'
-                },
-                success: function(result) {
-                    console.log('Hint send');
-                },
-                error: function(result) {
-                    console.log('error');
-                }
-                });
-        });
+            });
+      });
 });
+
 </script>
 </html>

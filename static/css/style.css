@@ -1,0 +1,179 @@
+.form-rounded {
+    border-radius: 0.7rem;
+}
+.label-text {
+    font-size: 0.8em;
+}
+.price-text {
+    font-size: 0.8em;
+    font-weight: 500;
+}
+.name-text {
+    font-weight: 500;
+}
+.offer-text {
+    font-size: 0.7em;
+}
+.add-text {
+    font-size: 0.55em;
+    line-height: 90%;
+}
+#win_respond {
+    background-color: #FAF9D6;
+}
+#done_respond {
+    background-color: #f5f5f5;
+}
+.responds-block {
+    border-radius: 10px;
+    width: 90%;
+    background-color: #F6FEEB;
+}
+.responds-img {
+    width: 100%;
+}
+.active-img {
+    filter: brightness(0.3);
+    width: 85%;
+}
+.first-img {
+    width: 100%;
+}
+.staff-info {
+    line-height: 95%;
+}
+.order-info {
+    line-height: 110%;
+}
+.contacts {
+    color: black;
+    font-size: 1.1em;
+}
+.instagram {
+    color: #ba30b6;
+}
+.respond-card {
+    margin-bottom: 5em;
+}
+.navbar-toggler {
+    border: none !important;
+}
+.avatar {
+    width: 100%;
+}
+.link-text {
+    font-size: 0.7em;
+    text-decoration: none;
+}
+.big-text {
+    font-size: 1.2em;
+    font-weight: 700;
+}
+#cities {
+    height: 6em;
+    border-radius: 0.7rem;
+    padding: 2px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    text-align:justify;
+}
+.city a {
+    text-decoration: none;
+}
+.city {
+    border: solid 1px #e2e2ee;
+    padding: 0.2em;
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+    border-radius: 0.8em;
+    background-color: #e2e2ee;
+}
+#not-city {
+    color: red;
+    display: none;
+}
+#already-city {
+    color: red;
+    display: none;
+}
+.form-screen {
+    height: 80vh;
+}
+.form-title {
+    margin-top: 15vh;
+}
+.form-step {
+    margin-top: 5vh;
+}
+#first-form-step {
+    margin-top: 28vh;
+}
+#second-form {
+    display: none;
+}
+#third-form {
+    display: none;
+}
+#fourth-form {
+    display: none;
+}
+#fifth-form {
+    display: none;
+}
+#sixth-form {
+    display: none;
+}
+#delivery-need {
+    display: none;
+}
+::placeholder {
+    font-size: 14px;
+}
+.phone-text {
+    font-size: 0.7em;
+    line-height: 0.9em;
+}
+.form-img {
+    width: 3em;
+    height: 3em;
+}
+.remove-foto {
+    text-decoration: none;
+    font-size: 0.8em;
+}
+.refresh-icon {
+    text-decoration: none;
+    font-size: 1em;
+    display: none;
+}
+#nav-icon {
+   text-size: 2em !important;
+}
+.linkcontacts-text {
+    text-decoration: none;
+}
+#add-info {
+    display: none;
+}
+#add-contacts {
+    display: none;
+}
+#add-cities {
+    display: none;
+}
+#saveCities {
+    display: none;
+}
+.review {
+    background-color: #FFFAF0;
+}
+.confirm-button {
+    display: none;
+}
+#confirm-form {
+    display: none;
+}
+#footer {
+    height: 13em;
+    background: #2a2a2a;
+}

@@ -1,98 +1,21 @@
 <!DOCTYPE html>
 {% load to_replace %}
-<html lang="en">
+{% load static %}
+{% load mean_rating %}
+{% load count_done_orders %}
+<html lang="en" class="h-100">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
-    <title>Document</title>
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <title>Оставить отклик</title>
 </head>
-<body>
-<style>
-    .form-img {
-        width: 3em;
-        height: 3em;
-    }
-    .remove-foto {
-        text-decoration: none;
-        font-size: 0.8em;
-    }
-    .refresh-icon {
-        text-decoration: none;
-        font-size: 1em;
-        display: none;
-    }
-    .form-rounded {
-        border-radius: 0.7rem;
-    }
-    .label-text {
-        font-size: 0.8em;
-    }
-    .price-text {
-        font-size: 0.8em;
-        font-weight: 500;
-    }
-    .name-text {
-        font-weight: 500;
-    }
-    .offer-text {
-        font-size: 0.7em;
-    }
-    .add-text {
-        font-size: 0.55em;
-        line-height: 90%;
-    }
-    #win_respond {
-        background-color: #E6F1DA;
-    }
-    .responds-block {
-        border-radius: 10px;
-        width: 90%;
-        background-color: #F6FEEB;
-    }
-    .responds-img {
-        width: 100%;
-    }
-    .active-img {
-        filter: brightness(0.3);
-        width: 85%;
-
-    }
-    .first-img {
-        width: 100%;
-    }
-    .avatar {
-        width: 100%;
-    }
-
-    .staff-info {
-        line-height: 95%;
-    }
-
-    .order-info {
-        line-height: 110%;
-    }
-    .contacts {
-
-        color: black;
-        font-size: 1.1em;
-    }
-    .instagram {
-        color: #ba30b6;
-    }
-    .respond-card {
-        margin-bottom: 5em;
-    }
-    .navbar-toggler {
-        border: none !important;
-    }
-    #nav-icon {
-       text-size: 2em !important;
-    }
-</style>
-
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
 <nav class="navbar navbar-expand-md border-bottom navbar-light bg-light">
   <div class="container">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -100,19 +23,21 @@
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         {% if user.is_authenticated %}
-      <ul class="navbar-nav">
+      <ul class="navbar-nav offer-text">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Мой профиль</a>
+          <a class="nav-link" aria-current="page" href="{% url 'staff_orders' %}">Задания</a>
         </li>
+        {% if user.staff.unlimited == False %}
         <li class="nav-item">
             <a class="nav-link" href="#">Пополнить баланс <span class="offer-text"> ({{ staff.balance }} руб.)</span></a>
         </li>
+        {% endif %}
         <li class="nav-item">
-          <a class="nav-link" href="#">Задания</a>
+          <a class="nav-link" href="{% url 'profile_edit' telegram_id=staff.telegram_id %}">Мой профиль</a>
         </li>
       </ul>
         {% else %}
-        <ul class="navbar-nav">
+        <ul class="navbar-nav offer-text">
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="#">Войти</a>
         </li>
@@ -125,6 +50,7 @@
 
     <div class="container mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
         <h5 class="text-center">Отклик к заданию {{ order.set_numb_of_order }}</h5>
+        <a href="{% url 'staff_orders' %}" class="link-text"><i class="bi bi-arrow-left"></i>Другие задания</a>
         <hr>
         <!--Экранирование html-->
         {% autoescape off %}
@@ -156,70 +82,93 @@
 
 
 
-        <p class="mt-3"><span class="label-text text-muted">Количество откликов:</span><span class="price-text"> {{ amount_responds }} из {{ order.max_responds }}</span><br>
-        <span class="label-text text-muted">Стоимость отклика:</span><span class="price-text"> {{ order.respond_price }} руб.</span><br>
-        <span class="label-text text-muted">Ваш баланс:</span><span class="price-text"> {{ staff.balance }} руб.</span> <a href="#"><small class="offer-text">пополнить</small></a></p>
+
+        <p class="mt-3"><span class="label-text text-muted">Количество откликов:</span><span class="price-text"> {{ amount_responds }} из {{ order.max_responds }}</span>
+        {% if staff.unlimited == False %}
+        <br><span class="label-text text-muted">Стоимость отклика:</span><span class="price-text"> {{ order.respond_price }} руб.</span>
+        <br><span class="label-text text-muted">Ваш баланс:</span><span class="price-text"> {{ staff.balance }} руб.</span> <a href="#"><small class="offer-text">пополнить</small></a>
+        {% endif %}
+        </p>
         <hr>
 
-        <!-- Проверка что у него нет отклика  -->
-        <a data-bs-toggle="modal" data-bs-target="#editRespond" class="btn btn-success">Откликнуться на задание</a>
-        {% if amount_responds < order.max_responds and respond == None %}
 
-        <form id="first-form" method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            <div class="form-group">
-                <label class="text-muted label-text" for="message">Текст отклика:</label>
-                <textarea class="form-control form-control-sm form-rounded" id="message" name="message" rows="6"></textarea>
-            </div>
-            <div class="form-group my-2">
-                <div class="row">
-                    <div class="col-6">
-                        <label class="text-muted label-text" for="instagram">Мой Instagram:</label>
-                        <input type="text" class="form-control form-control-sm" id="instagram" name="instagram" value="@{{ staff.instagram }}" disabled>
+
+        <!-- Проверка что у него нет отклика  -->
+        {% if amount_responds < order.max_responds and respond == None %}
+        <div class="row row justify-content-center">
+            <a data-bs-toggle="modal" data-bs-target="#addRespond" class="col-10 btn btn-success">Откликнуться на задание</a>
+        </div>
+        <!--МОДАЛЬНОЕ ОКНО ДЛЯ ПЕРВИЧНОЙ ОТПРАВКИ ОТКЛИКА-->
+        <div class="modal fade" id="addRespond" tabindex="-1" aria-labelledby="ModalLabel3" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="ModalLabel4">Добавить отклик</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                <form id="addrespond-form" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="text-muted label-text" for="message">Текст отклика:</label>
+                        <textarea class="form-control form-control-sm form-rounded" id="message" name="message" rows="6"></textarea>
                     </div>
-                    <div class="col-6">
-                        <label class="text-muted label-text" for="whatsapp">Мой Whatsapp:</label>
-                        <input type="text" class="form-control form-control-sm" id="whatsapp" name="whatsapp" value="+{{ staff.phone }}" disabled>
+                    <div class="form-group my-2">
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="text-muted label-text" for="instagram">Мой Instagram:</label>
+                                <input type="text" class="form-control form-control-sm" id="instagram" name="instagram" value="@{{ staff.instagram }}" disabled>
+                            </div>
+                            <div class="col-6">
+                                <label class="text-muted label-text" for="whatsapp">Мой Whatsapp:</label>
+                                <input type="text" class="form-control form-control-sm" id="whatsapp" name="whatsapp" value="+{{ staff.phone }}" disabled>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="form-group my-2">
-                <label class="text-muted label-text" for="images">Фото работ</label>
-                <input type="file" accept=".jpg, .jpeg, .png" class="form-control form-control-sm" id="images" name="images" multiple>
-                <div id="foto-error" class="invalid-feedback">
-                    <p class="offer-text">Суммарно не более 6 фотографий.</p>
-                </div>
-            </div>
-            <div class="form-group my-2">
-                <div class="row">
-                    <div class="col-6">
-                        <label class="text-muted label-text" for="price">Цена:</label>
-                        <input type="text" class="form-control form-control-sm" id="price" name="price">
+                    <div class="form-group my-2">
+                        <label class="text-muted label-text" for="images">Фото работ</label>
+                        <input type="file" accept=".jpg, .jpeg, .png" class="form-control form-control-sm" id="images" name="images" multiple>
+                        <div id="foto-error" class="invalid-feedback">
+                            <p class="offer-text">Суммарно не более 6 фотографий.</p>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        {% if user.is_authenticated %}
-                         <label class="text-muted label-text" for="pin1">pin</label>
-                         <input type="text" class="form-control form-control-sm" id="pin1" name="pin" value="{{ staff.pin }}">
+                    <div class="form-group my-2">
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="text-muted label-text" for="price">Цена:</label>
+                                <input type="text" class="form-control form-control-sm" id="price" name="price">
+                            </div>
+                            <div class="col-6">
+                                {% if user.is_authenticated %}
+                                 <label class="text-muted label-text" for="pin1">pin</label>
+                                 <input type="text" class="form-control form-control-sm" id="pin1" name="pin" value="{{ staff.pin }}">
+                                {% else %}
+                                 <label class="text-muted label-text" for="pin2">pin</label>
+                                 <input type="text" class="form-control form-control-sm" id="pin2" name="pin">
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% if has_balance or staff.unlimited == True %}
+                    <div class="d-grid gap-2 mt-2">
+                        {% if staff.unlimited == True %}
+                        <small class="offer-text text-muted">Нажимая кнопку "Откликнуться" отклик с вашими контактными данными будет отправлен заказчику. Закачик свяжется с вами, если ваш отклик его заинтересует.</small>
                         {% else %}
-                         <label class="text-muted label-text" for="pin2">pin</label>
-                         <input type="text" class="form-control form-control-sm" id="pin2" name="pin">
+                        <small class="offer-text text-muted">Нажимая кнопку "Откликнуться" с баланса будут списаны {{ order.respond_price }} руб. и отклик с вашими контактными данными будет отправлен заказчику. Закачик свяжется с вами, если ваш отклик его заинтересует.</small>
                         {% endif %}
+                        <input id="first-submit" class="btn btn-success btn-md form-rounded" type="submit" value="Откликнуться">
                     </div>
-                </div>
+                    {% else %}
+                    <div class="d-grid gap-2 mt-2">
+                        <small class="offer-text text-muted">Для того, чтобы отправить свой отклик клиенту с вашими контактными данными требуется пополнить баланс. Для отклика требуется {{ order.respond_price }} руб., а ваш баланс равен {{ staff.balance }} руб..</small>
+                        <button class="btn btn-danger btn-md form-rounded" disabled>Пополните баланс</button>
+                    </div>
+                    {% endif %}
+                </form>
+              </div>
             </div>
-            {% if has_balance %}
-            <div class="d-grid gap-2 mt-2">
-                <small class="offer-text text-muted">Нажимая кнопку "Откликнуться" с баланса будут списаны {{ order.respond_price }} руб. и отклик с вашими контактными данными будет отправлен заказчику. Закачик свяжется с вами, если ваш отклик его заинтересует.</small>
-                <input id="first-submit" class="btn btn-success btn-md form-rounded" type="submit" value="Откликнуться">
-            </div>
-            {% else %}
-            <div class="d-grid gap-2 mt-2">
-                <small class="offer-text text-muted">Для того, чтобы отправить свой отклик клиенту с вашими контактными данными требуется пополнить баланс. Для отклика требуется {{ order.respond_price }} руб., а ваш баланс равен {{ staff.balance }} руб..</small>
-                <button class="btn btn-danger btn-md form-rounded" disabled>Пополните баланс</button>
-            </div>
-            {% endif %}
-        </form>
-    </div>
+          </div>
+        </div>
 
     {% elif respond %}
 
@@ -231,11 +180,16 @@
             </div>
             <div class="col-9">
                 <p class="staff-info mt-1">
-                <span class="name-text text-primary">{{ respond.staff.name }} S.</span><br>
-                <span class="offer-text text-warning"><i class="bi bi-star-fill"></i> <span class="text-muted">4.9 359 отзывов</span></span><br>
-                <span class="offer-text">Моё портфолио и контакты:<br>
-                <a data-id="{{ respond.id }}" class="contacts insta-hint" href="https://instagram.com/{{ respond.staff.instagram }}"><i class="bi bi-instagram instagram"></i>  instagram.com/{{ respond.staff.instagram }}</a><br>
-                <a data-id="{{ respond.id }}" class="contacts wa-hint" href="https://wa.me/{{ respond.staff.phone }}"><i class="bi bi-whatsapp text-success"></i>  +{{ respond.staff.phone }}</a></span>
+                    <span class="name-text text-primary">{{ respond.staff.name }} {{ respond.staff.surname|slice:":1" }}.</span><br>
+                    {% if respond.staff.reviews.all.count > 0 %}
+                    <span class="offer-text text-warning"><i class="bi bi-star-fill"></i> <span class="text-muted">{{ respond|mean_rating }} отзывов: {{ respond.staff.reviews.all.count }}</span></span><br>
+                    {% else %}
+                    <span class="offer-text text-warning"><i class="bi bi-star"></i> <span class="text-muted"> Нет отзывов</span></span><br>
+                    {% endif %}
+                    <span class="offer-text text-muted">Выполнено заказов: {{ respond.staff.orders.all|count_done_orders }}</span></p>
+                    <p class="staff-info mt-1"> <span class="mt-2 offer-text">Моё портфолио и контакты:<br>
+                    <a data-id="{{ respond.id }}" class="contacts insta-hint" href="https://instagram.com/{{ respond.staff.instagram }}"><i class="bi bi-instagram instagram"></i>  instagram.com/{{ respond.staff.instagram }}</a><br>
+                    <a data-id="{{ respond.id }}" class="contacts wa-hint" href="https://wa.me/{{ respond.staff.phone }}"><i class="bi bi-whatsapp text-success"></i>  +{{ respond.staff.phone }}</a></span>
                 </p>
             </div>
         </div>
@@ -289,7 +243,9 @@
                         <button class="btn btn-success btn-md form-rounded w-100" disabled>Выбрать</button>
                     </div>
                     <div class="text-center mt-3">
+                        {% if order.status == "FIND" %}
                         <small><a class="offer-text" data-bs-toggle="modal" data-bs-target="#editRespond">Редактировать отклик</a></small>
+                        {% endif %}
                     </div>
                 </div>
         </div>
@@ -304,7 +260,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                  <form id="second-form" method="post" enctype="multipart/form-data">
+                  <form id="editrespond-form" method="post" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="form-group">
                         <label class="text-muted label-text" for="message2">Текст отклика:</label>
@@ -317,7 +273,7 @@
                             <a data-id="{{ image.id }}" class="remove-foto text-danger" href="#"><img src="{{ image.image.url }}" class="image-fluid rounded form-img border border-2 border-danger" alt="..."></a>
                         </div>
                         {% endfor %}
-                        <a class="refresh-icon text-success" href="#"><i class="bi bi-x-square"></i><span class="offer-text align-middle"> отменить</span></a>
+                        <a class="refresh-icon text-success"><i class="bi bi-x-square"></i><span class="offer-text align-middle"> отменить</span></a>
 
                       </div>
 
@@ -359,8 +315,31 @@
         <p>Если потребуются дополнительные отклики, вам придет уведомление.</p>
 
         {% endif %}
-
     </div>
+    </div>
+
+</main>
+<footer class="footer mt-auto">
+    <div id="footer" class="container-fluid">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 text-center mt-5">
+                    <span class="text-light label-text">Caketeam ©</span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><a class="text-light" href="#">Пользовательское соглашение</a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><i class="bi bi-instagram"></i> <a class="text-light" href="#">caketeam </a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <br><span class="text-light offer-text">Тех.поддержка:</span> <span class="text-light label-text"><i class="bi bi-telegram"></i> <a class="text-light" href="https://t.me/i1nes">i1nes </a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 <script
@@ -394,7 +373,7 @@ $(document).ready(function(){
                     imagesAmount1 = 1;
                 }
                 if ((imagesAmount1 + imagesAmount2 - images) > 6) {
-                    $("#second-form #images2").addClass("is-invalid");
+                    $("#editrespond-form #images2").addClass("is-invalid");
                     e.preventDefault();
                 } else {
                     $.ajax({
@@ -427,11 +406,16 @@ $(document).ready(function(){
             $('#first-submit').click(function(e){
                 var amountImages = $('#images').get(0).files.length;
                 if (amountImages > 6) {
-                $("#first-form #images").addClass("is-invalid");
+                $("#addrespond-form #images").addClass("is-invalid");
                 e.preventDefault();
-                } else {
-                console.log("ok");
                 }
+            });
+
+            $("form").submit(function() {
+                $(this).submit(function() {
+                    return false;
+                });
+                return true;
             });
 });
 

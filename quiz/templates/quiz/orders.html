@@ -1,17 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+{% load static %}
+<html lang="en" class="h-100">
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    <title>Заявки</title>
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <title>Заказы</title>
 </head>
-<body>
-    <h4 class="text-center mt-3">Заявки:</h4>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+    <h4 class="text-center mt-3">Заказы:</h4>
     <div class="container">
     <form class="row" method="get">
-<!--            {% csrf_token %}-->
         <div class="col-8 ">
             <div class="form-group form-control-sm">
                 <select class="form-control mb-2" id="status" name="status">
@@ -20,6 +23,7 @@
                     <option value="FIND">Обрабатывается</option>
                     <option value="WORK">Выполняется</option>
                     <option value="DONE">Сделан</option>
+                    <option value="UNDONE">Не сделан</option>
                 </select>
             </div>
         </div>
@@ -36,7 +40,7 @@
             <div class="col-12">
                 <p class="fw-bold lh-sm"><a href="{% url 'order_detail' order_id=a.id %}">Заявка {{ a.set_numb_of_order }}</a>
                     <br> <small class="text-muted fw-normal">Дата: <b class="text-dark">{{ a.date|date:'d/m/Y H:i' }}-{{ a.id }}</b></small>
-                    <a class="text-danger" href="{% url 'delete_order' order_id=a.id %}">Удалить</a>
+                    <br> <small class="text-muted fw-normal"><a href="{% url 'order_for_client' a.order_url %}" class="text-dark">/{{ a.order_url }}</a></small>
                     {% if a.status == 'NEW' %}
                     <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-warning text-dark">Новая</span></small>
                     {% elif a.status == 'FIND' %}
@@ -47,17 +51,44 @@
                     <!--  Ссылка с якорем на исполнителя                    -->
                     <br> <small class="text-muted fw-normal">Исполнитель: <b class="text-dark"><a href="{% url 'staff_list' %}#{{ a.id }}">{{ a.staff.name }} {{ a.staff.surname }}</a></b></small>
                     {% elif a.status == 'DONE' %}
-                    <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-secondary">Сделан</span></small>
+                    <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-secondary">Выполнен</span></small>
+                    <br> <small class="text-muted fw-normal">Исполнитель: <b class="text-dark"><a href="{% url 'staff_list' %}#{{ a.id }}">{{ a.staff.name }} {{ a.staff.surname }}</a></b></small>
+                    {% elif a.status == 'UNDONE' %}
+                    <br> <small class="text-muted fw-normal">Статус: <span class="badge bg-danger">Не выполнен</span></small>
                     <br> <small class="text-muted fw-normal">Исполнитель: <b class="text-dark"><a href="{% url 'staff_list' %}#{{ a.id }}">{{ a.staff.name }} {{ a.staff.surname }}</a></b></small>
                     {% endif %}
                     <br> <small class="text-muted fw-normal">Имя: <b class="text-dark">{{ a.name }}</b></small>
+                    <br> <small class="text-muted fw-normal">Город: <b class="text-dark">{{ a.city }}</b></small>
                     <br> <small class="text-muted fw-normal">Номер: <b class="text-dark">{{ a.phone }}</b></small>
-                    <br> <small class="text-muted fw-normal">Примечание: <b class="text-dark">{{ a.message }}</b></small>
+                    <br> <small class="text-muted fw-normal">Просмотры: {{ a.views }}</small>
+                    <br> <small class="offer-text"><a class="text-danger" href="{% url 'delete_order' order_id=a.id %}">Удалить</a></small>
                 </p>
             </div>
         </div>
     </div>
     {% endfor %}
+</main>
+<footer class="footer mt-auto">
+    <div id="footer" class="container-fluid">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 text-center mt-5">
+                    <span class="text-light label-text">Caketeam ©</span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><a class="text-light" href="#">Пользовательское соглашение</a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><i class="bi bi-instagram"></i> <a class="text-light" href="#">caketeam </a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <br><span class="text-light offer-text">Тех.поддержка:</span> <span class="text-light label-text"><i class="bi bi-telegram"></i> <a class="text-light" href="https://t.me/i1nes">i1nes </a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
 </body>
 </html>
 

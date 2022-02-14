@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!--Мой тег для замены символов в строке, чтобы заменить тире в примечние к заказу на разрыв строки <br>-->
+{% load to_replace %}
+{% load is_viewed %}
+{% load is_responded %}
+{% load static %}
+<html lang="en" class="h-100">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+    <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+    <title>Задания</title>
+</head>
+<body class="d-flex flex-column h-100">
+<main class="flex-shrink-0">
+<nav class="navbar navbar-expand-md border-bottom navbar-light bg-light">
+  <div class="container">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="fs-2"><i class="bi bi-person-circle fa-md text-dark"></i></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        {% if user.is_authenticated %}
+      <ul class="navbar-nav offer-text">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="{% url 'staff_orders' %}">Задания</a>
+        </li>
+        {% if user.staff.unlimited == False %}
+        <li class="nav-item">
+            <a class="nav-link" href="#">Пополнить баланс <span class="offer-text"> ({{ staff.balance }} руб.)</span></a>
+        </li>
+        {% endif %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'profile_edit' telegram_id=staff.telegram_id %}">Мой профиль</a>
+        </li>
+      </ul>
+        {% else %}
+        <ul class="navbar-nav offer-text">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="#">Войти</a>
+        </li>
+      </ul>
+        {% endif %}
+    </div>
+  </div>
+</nav>
+    <h4 class="text-center my-3">Задания:</h4>
+    <div class="container mb-2">
+        {% if active %}
+        <span class="text-muted offer-text"><a class="text-muted" href="{% url 'staff_orders' %}">Все города</a> / <a class="text-dark fw-bolder" href="{% url 'staff_orders' %}?f=city">Мои города</a></span>
+        {% else %}
+        <span class="text-muted offer-text"><a class="text-dark fw-bolder" href="{% url 'staff_orders' %}">Все города</a> / <a class="text-muted" href="{% url 'staff_orders' %}?f=city">Мои города</a></span>
+        {% endif %}
+    </div>
+
+    {% for order in orders|slice:":100" %}
+    <div class="container-fluid border-top border-top pt-2">
+        <div class="row">
+            <div class="col-12">
+                {% if order.staff != staff and order.staff != None or order.status == "DONE" or order.status == "UNDONE" %}
+                <p class="fw-normal lh-sm text-dark">{{ order.set_numb_of_order }}
+                {% else %}
+                    {% if order|is_viewed:staff %}
+                    <p class="fw-normal lh-sm"><a class="text-dark" href="{% url 'order_respond_login' order_id=order.id telegram_id=staff.telegram_id %}">{{ order.set_numb_of_order }}</a>
+                    {% else %}
+                    <p class="fw-bold lh-sm"><a class="text-dark" href="{% url 'order_respond_login' order_id=order.id telegram_id=staff.telegram_id %}">{{ order.set_numb_of_order }}</a>
+                    {% endif %}
+                {% endif %}
+                        <small class="text-muted fw-normal">от {{ order.date|date:'d.m.Y H:i' }}</small><br>
+                        {% if order.staff == staff %}
+                        <span class="badge bg-success offer-text">Вы исполнитель</span>{% if order.status == "DONE" %}<span class="text-success offer-text"> ЗАКАЗ ВЫПОЛНЕН</span>{% elif order.status == "UNDONE" %}<span class="text-danger offer-text"> ЗАКАЗ НЕ ВЫПОЛНЕН</span>{% endif %}
+                        {% elif order.staff != staff and order.staff != None %}
+                        <span class="badge bg-danger offer-text">Выбран другой кондитер</span>
+                        {% elif order|is_responded:staff %}
+                        <span class="badge bg-primary offer-text">Вы оставили отклик</span>
+                        {% endif %}
+                        <!--Экранирование html-->
+                        {% autoescape off %}
+                        <br><small class="text-dark fw-normal">{{ order.note|to_replace }}</small>
+                        {% endautoescape %}
+                </span>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</main>
+<footer class="footer mt-auto">
+    <div id="footer" class="container-fluid">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 text-center mt-5">
+                    <span class="text-light label-text">Caketeam ©</span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><a class="text-light" href="#">Пользовательское соглашение</a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <span class="text-light offer-text"><i class="bi bi-instagram"></i> <a class="text-light" href="#">caketeam </a></span>
+                </div>
+                <div class="col-12 text-center mt-2">
+                    <br><span class="text-light offer-text">Тех.поддержка:</span> <span class="text-light label-text"><i class="bi bi-telegram"></i> <a class="text-light" href="https://t.me/i1nes">i1nes </a></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</html>
