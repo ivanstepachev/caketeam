@@ -20,12 +20,16 @@ def handler(chat_id, text, username):
             send_message(chat_id=chat_id, text=answer, reply_markup=keyboard)
         else:
             answer = '''Главное меню'''
-            keyboard = json.dumps({'keyboard': [["Заказы"], ["Разместить свободную коробку"], ["Мой pin-код"]], 'one_time_keyboard': True, 'resize_keyboard': True})
+            keyboard = json.dumps({'keyboard': [["Заказы"], ["Разместить свободную коробку"], ["Мой pin-код"]], 'one_time_keyboard': False, 'resize_keyboard': True})
             send_message(chat_id=chat_id, text=answer, reply_markup=keyboard)
 
 
     else:
-        send_message(chat_id=chat_id, text=text)
+        answer = '''Главное меню'''
+        keyboard = json.dumps(
+            {'keyboard': [["Заказы"], ["Разместить свободную коробку"], ["Мой pin-код"]], 'one_time_keyboard': False,
+             'resize_keyboard': True})
+        send_message(chat_id=chat_id, text=answer, reply_markup=keyboard)
 
 
 

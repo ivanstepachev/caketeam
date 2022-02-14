@@ -533,6 +533,7 @@ def bot(request):
                 send_message(chat_id=chat_id, text=text)
             else:
                 text = data["message"]["text"]
+
             if 'username' in data["message"]["chat"]:
                 username = data["message"]["chat"]["username"]
                 handler(chat_id=chat_id, text=text, username=username)
