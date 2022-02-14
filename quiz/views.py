@@ -529,8 +529,7 @@ def bot(request):
         if "message" in data:
             chat_id = data["message"]["chat"]["id"]
             if "text" not in data["message"]:
-                text = '''/start'''
-                send_message(chat_id=chat_id, text=text)
+                pass
             else:
                 text = data["message"]["text"]
 
