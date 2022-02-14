@@ -13,6 +13,7 @@ def send_message(chat_id, text, reply_markup=None, **kwargs):
 
 
 def handler(chat_id, text, username):
+    # Обработка /start в зависимости есть ли кондитер в БД
     if text.lower() == '/start':
         if len(Staff.objects.filter(telegram_id=chat_id)) == 0:
             answer = '''Добро пожаловать на платформу. Здесь ты можешь получать кондитерские задание. Для начала нужно пройти регистрацию'''
@@ -25,11 +26,15 @@ def handler(chat_id, text, username):
 
 
     else:
-        answer = '''Главное меню'''
-        keyboard = json.dumps(
-            {'keyboard': [["Заказы"], ["Разместить свободную коробку"], ["Мой pin-код"]], 'one_time_keyboard': False,
-             'resize_keyboard': True})
-        send_message(chat_id=chat_id, text=answer, reply_markup=keyboard)
+        if len(Staff.objects.filter(telegram_id=chat_id)) > 0:
+            answer = '''Главное меню'''
+            keyboard = json.dumps(
+                {'keyboard': [["Заказы"], ["Разместить свободную коробку"], ["Мой pin-код"]], 'one_time_keyboard': False,
+                 'resize_keyboard': True})
+            send_message(chat_id=chat_id, text=answer, reply_markup=keyboard)
+        else:
+            answer = '''Вы не зарегистрированы. Нажмите /start'''
+            send_message(chat_id=chat_id, text=answer)
 
 
 
