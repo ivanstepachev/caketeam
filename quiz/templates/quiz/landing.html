@@ -11,205 +11,110 @@
     <link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/css/suggestions.min.css" rel="stylesheet" />
     <link href="{% static 'css/style.css' %}" rel="stylesheet" />
     <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
-    <title>Заявка {{ order.set_numb_of_order }}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gideon+Roman&display=swap" rel="stylesheet">
+    <title>Cake Team</title>
 </head>
 <body class="d-flex flex-column h-100">
+<style>
+    .brand-text {
+        font-family: 'Gideon Roman', cursive !important;
+        font-weight: 900;
+    }
+    .blue-btn {
+        background-color: #18bedb;
+          border: none;
+          color: white;
+          padding: 15px 32px;
+          text-align: center;
+          text-decoration: none;
+          display: inline-block;
+          font-size: 1em;
+            font-weight: 500;
+          border-radius: 25px;
+    }
+    .input-title {
+    box-shadow:0 0 7px #11859d;
+}
+#second-screen {
+background-color: #18bedb;
+}
+</style>
 <main class="flex-shrink-0">
-<nav class="navbar navbar-expand-md border-bottom navbar-light bg-light">
+<nav class="navbar navbar-expand-lg border-bottom navbar-light bg-light">
   <div class="container">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="fs-2"><i class="bi bi-person-circle fa-md text-dark"></i></span>
+      <span class="fs-2"><i class="bi bi-person fa-md text-muted"></i></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         {% if user.is_authenticated %}
       <ul class="navbar-nav offer-text">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Задания</a>
+          <a class="nav-link active" aria-current="page" href="{% url 'staff_orders' %}">Задания</a>
         </li>
+        {% if user.staff.unlimited == False %}
         <li class="nav-item">
-            <a class="nav-link" href="#">Пополнить баланс <span class="offer-text"> ({{ request.user.staff.balance }} руб.)</span></a>
+            <a class="nav-link" href="#">Пополнить баланс <span class="offer-text"> ({{ user.staff.balance }} руб.)</span></a>
         </li>
+        {% endif %}
         <li class="nav-item">
-          <a class="nav-link" href="#">Мой профиль</a>
+          <a class="nav-link" href="{% url 'profile_edit' telegram_id=user.staff.telegram_id %}">Мой профиль</a>
         </li>
       </ul>
         {% else %}
         <ul class="navbar-nav offer-text">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Войти</a>
+          <a class="nav-link active" aria-current="page" href="{% url 'login' %}">Вход для кондитеров</a>
         </li>
       </ul>
         {% endif %}
     </div>
   </div>
 </nav>
-<div class="container mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <!--Первое окно-->
-    <div id="first-form" class="container form-screen">
-            <div id="first-form-step" class="form-group form-step">
+
+<div class="container-fluid mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
+    <div id="first-form" class="container h-100">
+        <form action="{% url 'quiz' %}" method="get">
+            <div class="form-group">
+                <div class="row justify-content-center">
+                    <div class="col-5 col-md-3 col-lg-3">
+                        <img src="{% static 'images/sticker1.png' %}" class="w-100">
+                    </div>
+                </div>
+                 <div class="row mb-2">
+                    <div class="col-12">
+                        <h2 class="brand-text text-center">CAKETEAM</h2>
+                        <h6 class="text-center">Найди за пару минут кондитера, который выполнит любой твой заказ.</h6>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-12">
-                        <input id="first-input" class="form-control form-control-lg" type="text" placeholder="Что хотите заказть?" name="title">
+                        <input id="first-input" class="input-title form-control form-control-lg" type="text" placeholder="Что хотите заказть?" name="title">
                     </div>
                 </div>
                 <div class="row mt-2">
                     <div class="col-12">
-                        <p class="offer-text text-muted">Например: <a class="add-to-input" href="#">торт на день рождения</a>, <a class="add-to-input" href="#">макаронс сегодня</a></p>
+                        <p class="offer-text text-muted">Например: <a class="add-to-input text-dark" href="#">торт на день рождения</a>, <a class="add-to-input text-dark" href="#">макаронс сегодня</a></p>
                     </div>
                     <div class="col-12">
                         <div class="d-grid gap-2">
-                        <a id="first-button" class="btn btn-md btn-outline-success">Начать</a>
+                        <input type="submit" class="blue-btn" value="Найти кондитера!">
                         </div>
                     </div>
 
                 </div>
             </div>
+        </form>
     </div>
-    <!--Второе окно-->
-    <div id="second-form" class="container form-screen">
-    <div class="progress">
-        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 20%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-    </div>
-        <p class="form-title text-center fs-2 fa-bold align-center">Из какого вы города?</p>
-            <div class="form-group form-step">
-                <div class="row">
-                    <div class="col-12">
-                        <input id="second-input" class="form-control form-control-lg" type="text" name="address" placeholder="Город / улица / метро">
-                        <input id="city-input" class="form-control" type="hidden" name="city">
-                    </div>
-                    <div class="col-12 mt-2">
-                      <input class="form-check-input" type="checkbox" name="delivery" value="need" id="check">
-                      <label class="label-text form-check-label" for="check">
-                        Мне понадобится доставка
-                      </label><br>
-                        <span id="delivery-need" class="mt-2 offer-text text-muted">В этом случае можете указать более подробный адрес</span>
-                    </div>
-                </div>
-                <div class="container fixed-bottom mb-3">
-                    <div class="col-12">
-                        <a id="second-back" class="btn btn-lg btn-outline-dark w-100">Назад</a>
-                    </div>
-                    <div class="col-12 mt-2">
-                        <a id="second-button" class="btn btn-lg btn-success w-100">Дальше</a>
-                    </div>
-                </div>
-            </div>
-    </div>
-
-    <!--Третье окно-->
-    <div id="third-form" class="container form-screen">
-    <div class="progress">
-        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 40%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-    </div>
-        <p class="form-title text-center fs-2 fa-bold align-center">К какой дате?</p>
-            <div class="form-group form-step">
-                <div class="row">
-                    <div class="col-12">
-                       <input id="third-input" class="form-control form-control-lg" type="date" name="date" placeholder="Выберите дату"/>
-                    </div>
-                </div>
-                <div class="container fixed-bottom mb-3">
-                    <div class="col-12">
-                        <a id="third-back" class="btn btn-lg btn-outline-dark w-100">Назад</a>
-                    </div>
-                    <div class="col-12 mt-2">
-                        <a id="third-button" class="btn btn-lg btn-success w-100">Дальше</a>
-                    </div>
-                </div>
-            </div>
-    </div>
-
-    <!--Четвертое окно-->
-    <div id="fourth-form" class="container form-screen">
-    <div class="progress">
-        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 60%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-    </div>
-        <p class="form-title text-center fs-2 fa-bold align-center">Расскажите подробнее?</p>
-            <div class="form-group form-step">
-                <div class="row">
-                    <div class="col-12">
-
-                        <textarea id="fourth-input" name="message" class="form-control form-control-md" rows="6" placeholder="Опишите какой десерт, какую начинку и какое оформление предпочитаете. Укажите требуемый вес десерта или необходимое количество. Добавьте любую информацию, которая может быть полезна кондитерам."></textarea>
-                        <label for="order-images" class="form-label label-text text-muted mt-2">Добавьте фото понравившихся работ:</label>
-                        <input class="form-control" type="file" id="order-images" accept=".jpg, .jpeg, .png" name="reference_images" multiple>
-                    </div>
-                </div>
-                <div class="container fixed-bottom mb-3">
-                    <div class="col-12">
-                        <a id="fourth-back" class="btn btn-lg btn-outline-dark w-100">Назад</a>
-                    </div>
-                    <div class="col-12 mt-2">
-                        <a id="fourth-button" class="btn btn-lg btn-success w-100">Дальше</a>
-                    </div>
-                </div>
-            </div>
-    </div>
-
-    <!--Пятое окно-->
-    <div id="fifth-form" class="container form-screen">
-    <div class="progress">
-        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 80%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-    </div>
-        <p class="form-title text-center fs-2 fa-bold align-center">Какой бюджет?</p>
-            <div class="form-group form-step">
-                <div class="row">
-                    <div class="col-12">
-                        <select class="form-select form-select-lg" name="respond_price">
-                            <option value="30" selected>до 1500 руб.</option>
-                            <option value="50">до 2500 руб.</option>
-                            <option value="75">до 3500 руб.</option>
-                            <option value="100">до 5000 руб.</option>
-                            <option value="150">от 5000 руб.</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="container fixed-bottom mb-3">
-                    <div class="col-12">
-                        <a id="fifth-back" class="btn btn-lg btn-outline-dark w-100">Назад</a>
-                    </div>
-                    <div class="col-12 mt-2">
-                        <a id="fifth-button" class="btn btn-lg btn-success w-100">Дальше</a>
-                    </div>
-                </div>
-            </div>
-    </div>
-
-    <!--Шестое окно-->
-    <div id="sixth-form" class="container form-screen">
-    <div class="progress">
-        <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100"></div>
-    </div>
-        <p class="form-title text-center fs-2 fa-bold align-center">Укажите контактные данные</p>
-            <div class="form-group form-step">
-                <div class="row">
-                    <div class="col-12">
-                        <label for="sixth-input1" class="form-label label-text text-muted mt-2">Ваше имя</label>
-                        <input type="text" id="sixth-input1" class="form-control form-control-lg" name="name">
-                        <label for="sixth-input2" class="form-label label-text text-muted mt-2">Ваш контактный телефон:</label>
-                        <div class="input-group">
-                            <span class="input-group-text label-text" id="basic-addon1">+</span>
-                            <input type="tel" id="sixth-input2" class="form-control form-control-lg" name="phone" value="7(___)___-__-__" pattern="\7\s?[\(]{0,1}9[0-9]{2}[\)]{0,1}\s?\d{3}[-]{0,1}\d{2}[-]{0,1}\d{2}">
-                        </div>
-                        <p class="phone-text text-muted mt-2">* Мы не сообщаем ваши контактные данные кондитерам и другим третьим лицам, они необходимы для комфортного использования сервиса. Нажимая кнопку "Опубликовать", вы принимаете наше <a href="#">Пользовательское соглашение</a></p>
-                    </div>
-                </div>
-                <div class="container fixed-bottom mb-3">
-                    <div class="col-12">
-                        <a id="sixth-back" class="btn btn-lg btn-outline-dark w-100">Назад</a>
-                    </div>
-                    <div class="col-12 mt-2">
-                        <input type="submit" id="sixth-button" class="btn btn-lg btn-success w-100" value="Опубликовать">
-                    </div>
-                </div>
-            </div>
-    </div>
-
-
-</form>
 </div>
+<!--Второй экран-->
+<div id="second-screen" class="mt-5 container-fluid bg-dark h-75">
+
 </div>
+
+
+
 </main>
 <footer class="footer mt-auto">
     <div id="footer" class="container-fluid">

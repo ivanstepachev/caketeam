@@ -16,10 +16,10 @@
 </head>
 <body class="d-flex flex-column h-100">
 <main class="flex-shrink-0">
-<nav class="navbar navbar-expand-md border-bottom navbar-light bg-light">
+<nav class="navbar navbar-expand-lg border-bottom navbar-light bg-light">
   <div class="container">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="fs-2"><i class="bi bi-person-circle fa-md text-dark"></i></span>
+      <span class="fs-2"><i class="bi bi-person fa-md text-muted"></i></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         {% if user.is_authenticated %}
@@ -29,17 +29,17 @@
         </li>
         {% if user.staff.unlimited == False %}
         <li class="nav-item">
-            <a class="nav-link" href="#">Пополнить баланс <span class="offer-text"> ({{ staff.balance }} руб.)</span></a>
+            <a class="nav-link" href="#">Пополнить баланс <span class="offer-text"> ({{ user.staff.balance }} руб.)</span></a>
         </li>
         {% endif %}
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'profile_edit' telegram_id=staff.telegram_id %}">Мой профиль</a>
+          <a class="nav-link" href="{% url 'profile_edit' telegram_id=user.staff.telegram_id %}">Мой профиль</a>
         </li>
       </ul>
         {% else %}
         <ul class="navbar-nav offer-text">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Войти</a>
+          <a class="nav-link active" aria-current="page" href="{% url 'login' %}">Вход для кондитеров</a>
         </li>
       </ul>
         {% endif %}
@@ -333,7 +333,7 @@
                     <span class="text-light offer-text"><i class="bi bi-instagram"></i> <a class="text-light" href="#">caketeam </a></span>
                 </div>
                 <div class="col-12 text-center mt-2">
-                    <br><span class="text-light offer-text">Тех.поддержка:</span> <span class="text-light label-text"><i class="bi bi-telegram"></i> <a class="text-light" href="https://t.me/i1nes">i1nes </a></span>
+                    <br><span class="text-light offer-text">Тех.поддержка:</span> <span class="text-light label-text"><i class="bi bi-telegram"></i> <a class="text-light" href="https://t.me/i1ness">@i1ness </a></span>
                 </div>
             </div>
         </div>

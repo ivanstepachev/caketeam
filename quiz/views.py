@@ -1,8 +1,10 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
 from quiz.models import Order, Token, Respond, Image, Staff, ReferenceImage, Review
+
+from django.template import RequestContext
 from django.contrib.auth import login, authenticate
-from quiz.forms import RegisterForm
+from quiz.forms import RegisterForm, LoginForm
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, Http404
 from random import randint
@@ -20,6 +22,7 @@ from service.settings import admin_id, hashid_salt, alphabet
 from hashids import Hashids
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 
 
 budget = {
@@ -29,6 +32,58 @@ budget = {
     '100': 'до 5000 руб',
     '150': 'от 5000 руб'
 }
+
+
+def handler404(request, exception):
+    return render(request, 'quiz/404.html', status=404)
+
+
+def handler500(request):
+    return render(request, 'quiz/500.html', status=500)
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user = authenticate(username=cd['username'], password=cd['password'])
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return redirect('staff_orders')
+                else:
+                    return render(request, 'quiz/login.html', {'form': form, 'not_exist': True})
+            else:
+                return render(request, 'quiz/login.html', {'form': form, 'not_correct': True})
+    else:
+        form = LoginForm()
+    return render(request, 'quiz/login.html', {'form': form})
+
+
+# Если изначально была ссылка для редиректа после логина
+def login_view_redirect(request):
+    nxt = request.GET.get("next", None)
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user = authenticate(username=cd['username'], password=cd['password'])
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    return redirect(nxt)
+                else:
+                    return render(request, 'quiz/login.html', {'form': form, 'not_exist': True})
+            else:
+                return render(request, 'quiz/login.html', {'form': form, 'not_correct': True})
+    else:
+        form = LoginForm()
+    return render(request, 'quiz/login.html', {'form': form})
+
+
+def landing(request):
+    return render(request, 'quiz/landing.html')
 
 
 def quiz(request):
@@ -67,7 +122,11 @@ def quiz(request):
             send_message(chat_id=int(admin_staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('order_for_client', order_url=order.order_url)
     else:
-        return render(request, 'quiz/landing.html')
+        title = request.GET.get('title')
+        if title:
+            return render(request, 'quiz/quiz.html', {'title': title})
+        else:
+            return render(request, 'quiz/quiz.html', {'title': ''})
 
 
 def order_for_client(request, order_url):
@@ -185,19 +244,25 @@ def registration(request, chat_id, username):
             user = User.objects.create_user(username=username, email=email, password=password)
             staff = Staff(username=username, telegram_id=chat_id, cities="", name=name, surname=surname, pin=pin, phone=phone, instagram=instagram, user=user)
             staff.save()
+            login(request, user)
         # Добавить клавиатуру для добавления пользователя
         send_message(chat_id=admin_id, text=f'''Новый пользователь зарегистрировался @{username.lower()}''')
         text = '''🙌 Поздравляю, вы успешно зарегистрировались на платформе!\n\nНемного информации по нашему проекту:\n\n🔊 Основная функция этого бота - сообщать Вам о новых заказах, поэтому обязательно включите уведомления о новых сообщениях.\n\nМеханизм проекта простой:\n\n🍰 Клиенты, заинтересованные в приготовлении десертов, оставляют заявки на заказы десертов на нашем сайте, эти заявки попадают к вам. И если заказ Вам подходит вы можете оставить на него отклик, проявив желание выполнить заказ. На один заказ могут оставить отклики до 5 кондитеров. Заказчик может связаться с вами, так как в отклике содержится контактная информация (WA и Instagram).\n\n👩‍🍳 Обязательно заполните свой профиль на нашей платформе, укажите как можно больше полезной информации, которая сможет заинтересовать потенциальных закачиков, там же Вы сможете установить фильтры, чтобы заказы приходили только по определенным городам.\n\n⭐ После выполнения задания, кондитер получает оценку и отзыв от заказчика, на основании этого на проекте строится рейтинговая система.\n\nЖелаем много заказов!'''
         keyboard = json.dumps({'keyboard': [["Заказы"], ["Мой профиль"], ["Мой pin-код"], ["Тех поддержка"]],
                                'one_time_keyboard': True, 'resize_keyboard': True})
         send_message(chat_id=chat_id, text=text, reply_markup=keyboard)
-        return redirect('quiz')
+        return redirect('profile_edit', telegram_id=chat_id)
     if request.method == 'GET':
-        user_form = RegisterForm()
-        pin = chat_id[-4:]
-        return render(request, 'quiz/registration.html', {'pin': pin, 'username': username.lower(), 'form': user_form})
+        if len(Staff.objects.filter(username=username)) == 0 and len(Staff.objects.filter(telegram_id=chat_id)) == 0:
+            user_form = RegisterForm()
+            pin = chat_id[-4:]
+            return render(request, 'quiz/registration.html', {'pin': pin, 'username': username.lower(), 'form': user_form})
+        else:
+            send_message(chat_id=chat_id, text=f'''Вы уже зарегистрированы, нажмите: \n/start''')
+            raise Http404()
 
 
+@staff_member_required
 def staff_list(request):
     if request.GET.get("search") != None:
         search = request.GET.get("search")
@@ -209,6 +274,7 @@ def staff_list(request):
     return render(request, 'quiz/staff_list.html', {'active': active, 'inactive': inactive})
 
 
+@staff_member_required
 def staff_activate(request, chat_id):
     staff = Staff.objects.filter(telegram_id=chat_id)[0]
     staff.active = True
@@ -216,6 +282,7 @@ def staff_activate(request, chat_id):
     return redirect('staff_list')
 
 
+@staff_member_required
 def staff_deactivate(request, chat_id):
     staff = Staff.objects.filter(telegram_id=chat_id)[0]
     staff.active = False
@@ -223,12 +290,16 @@ def staff_deactivate(request, chat_id):
     return redirect('staff_list')
 
 
+@staff_member_required
 def staff_delete(request, chat_id):
     staff = Staff.objects.filter(telegram_id=chat_id)[0]
+    user = staff.user
     staff.delete()
+    user.delete()
     return redirect('staff_list')
 
 
+@staff_member_required
 def orders(request):
     if request.GET.get("status") == "ALL":
         orders = Order.objects.all().order_by('-date')
@@ -247,12 +318,14 @@ def orders(request):
     return render(request, 'quiz/orders.html', {'orders': orders})
 
 
+@staff_member_required
 def delete_order(request, order_id):
     order = Order.objects.filter(id=order_id)[0]
     order.delete()
     return redirect('orders')
 
 
+@staff_member_required
 def order_detail(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     if request.method == 'POST':
@@ -277,7 +350,7 @@ def order_detail(request, order_id):
             if order.city in staff.cities or staff.cities == '' or send_all is '1':
                 hash_order_id = to_hash(order.id)
                 hash_telegram_id = to_hash(int(staff.telegram_id))
-                order_text = f'''Заявка {numb_of_order}\n{order.note.replace(";", "")}'''
+                order_text = f'''⚠️ Заказ {numb_of_order}\n{order.note.replace(";", "")}'''
                 keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'http://127.0.0.1:8000/n/{hash_telegram_id}/{hash_order_id}'}]]})
                 send_message(chat_id=int(staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('order_detail', order_id=order_id)
@@ -433,20 +506,28 @@ def order_respond_login(request, order_id, telegram_id):
 def profile_edit(request, telegram_id):
     staff = get_object_or_404(Staff, telegram_id=telegram_id)
     rating = mean_rating(staff=staff)
-    # if request.user.staff == staff:
-    if request.method == "GET":
-        # Чтобы получить список городов из БД оформленной списком с разделителем в виде точки с запятой
-        cities = staff.cities[:-1].split(";")
-        context = {'staff': staff, 'cities': cities, 'rating': rating}
-        return render(request, 'quiz/profile_edit.html', context=context)
-    elif request.method == "POST":
-        avatar = request.FILES.get('avatar')
-        if avatar:
-            staff.avatar = avatar
-            staff.save()
-        return redirect('profile_edit', telegram_id=telegram_id)
-    # else:
-    #     raise Http404("Такой страницы нет")
+    if request.user.staff == staff or request.user.is_superuser:
+        if request.method == "GET":
+            # Чтобы получить список городов из БД оформленной списком с разделителем в виде точки с запятой
+            cities = staff.cities[:-1].split(";")
+            context = {'staff': staff, 'cities': cities, 'rating': rating}
+            return render(request, 'quiz/profile_edit.html', context=context)
+        elif request.method == "POST":
+            avatar = request.FILES.get('avatar')
+            if avatar:
+                staff.avatar = avatar
+                staff.save()
+            return redirect('profile_edit', telegram_id=telegram_id)
+    else:
+        raise Http404("Такой страницы нет")
+
+
+def profile(request, telegram_id):
+    staff = get_object_or_404(Staff, telegram_id=telegram_id)
+    rating = mean_rating(staff=staff)
+    cities = staff.cities[:-1].split(";")
+    context = {'staff': staff, 'cities': cities, 'rating': rating}
+    return render(request, 'quiz/profile.html', context=context)
 
 
 @login_required
@@ -475,6 +556,7 @@ def profile_edit_contacts(request, telegram_id):
         raise Http404("Такой страницы нет")
 
 
+@staff_member_required
 def respond_choice(request, respond_id):
     respond = get_object_or_404(Respond, id=respond_id)
     staff = respond.staff
@@ -485,6 +567,7 @@ def respond_choice(request, respond_id):
     return redirect('order_detail', order.id)
 
 
+@staff_member_required
 def respond_cancel(request, respond_id):
     respond = get_object_or_404(Respond, id=respond_id)
     order = respond.order
@@ -494,6 +577,7 @@ def respond_cancel(request, respond_id):
     return redirect('order_detail', order.id)
 
 
+@staff_member_required
 def respond_delete(request, respond_id):
     respond = get_object_or_404(Respond, id=respond_id)
     order = respond.order
@@ -509,6 +593,7 @@ def order_done(request, order_id):
 
 
 # Список заданий для кондитера
+@login_required
 def staff_orders(request):
     orders = Order.objects.exclude(status="NEW").order_by('-date')
     staff = request.user.staff
@@ -558,7 +643,7 @@ def delete_foto(request):
             image.delete()
         return HttpResponse('ok', content_type='text/plain', status=200)
 
-
+@staff_member_required
 def setwebhook(request):
     if request.method == "POST":
         token = request.POST.get('token')
@@ -578,6 +663,7 @@ def setwebhook(request):
         return render(request, 'quiz/setwebhook.html', {'url': url})
 
 
+@staff_member_required()
 def deletewebhook(request):
     if request.method == "POST":
         token = request.POST.get('token')

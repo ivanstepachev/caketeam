@@ -106,11 +106,9 @@
     margin-top: 5vh;
 }
 #first-form-step {
-    margin-top: 28vh;
+    margin-top: 15vh;
 }
-#second-form {
-    display: none;
-}
+
 #third-form {
     display: none;
 }

@@ -3,11 +3,22 @@ from django.urls import path
 from quiz import views as quiz_views
 from django.conf.urls.static import static
 from service import settings
+from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', quiz_views.quiz, name="quiz"),
+    path('accounts/login/', quiz_views.login_view_redirect, name='login_redirect'),
+    path('login', quiz_views.login_view, name='login'),
+    path('login/', quiz_views.login_view, name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout', auth_views.LogoutView.as_view(), name='logout'),
+    path('password_change/', auth_views.PasswordChangeView.as_view(template_name='quiz/change_password.html'), name='password_change'),
+    path('password_change/done', auth_views.PasswordChangeDoneView.as_view(template_name='quiz/change_password_done.html'), name='password_change_done'),
+
+    path('', quiz_views.landing, name="landing"),
+    path('quiz', quiz_views.quiz, name="quiz"),
+    path('profile/<str:telegram_id>', quiz_views.profile, name="profile"),
     path('a/profile/<str:telegram_id>', quiz_views.profile_edit, name="profile_edit"),
     path('a/profile/<str:telegram_id>/info', quiz_views.profile_edit_info, name="profile_edit_info"),
     path('a/profile/<str:telegram_id>/contacts', quiz_views.profile_edit_contacts, name="profile_edit_contacts"),
@@ -45,3 +56,5 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+handler404 = 'quiz.views.handler404'
+handler500 = 'quiz.views.handler500'

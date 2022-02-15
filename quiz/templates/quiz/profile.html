@@ -12,7 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/css/suggestions.min.css" rel="stylesheet" />
     <link href="{% static 'css/style.css' %}" rel="stylesheet" />
     <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
-    <title>Мой профиль</title>
+    <title>Кондитер {{ staff.name }} {{ staff.surname }}</title>
 </head>
 <body class="d-flex flex-column h-100">
 <main class="flex-shrink-0">
@@ -33,7 +33,7 @@
         </li>
         {% endif %}
         <li class="nav-item">
-          <a class="nav-link active" href="{% url 'profile_edit' telegram_id=user.staff.telegram_id %}">Мой профиль</a>
+          <a class="nav-link" href="{% url 'profile_edit' telegram_id=user.staff.telegram_id %}">Мой профиль</a>
         </li>
       </ul>
         {% else %}
@@ -48,14 +48,13 @@
 </nav>
 
 <div class="container mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
-    <a class="offer-text" href="{% url 'profile' staff.telegram_id %}">См.профиль</a>
+    {% if request.user == staff.user %}
+    <a class="offer-text" href="{% url 'profile_edit' staff.telegram_id %}">Редактировать</a>
+    {% endif %}
     <h3 class="mb-4 mt-2 fw-bolder">{{ staff.name}} {{ staff.surname }}</h3>
     <div class="row">
         <div class="col-6">
             <img src="{{ staff.avatar.url }}" class="avatar">
-            <div class="d-grid gap-2 mt-2">
-                <a data-bs-toggle="modal" data-bs-target="#changeAvatar" class="btn btn-light btn-sm"><i class="bi bi-camera-fill"></i> Изменить фото</a>
-            </div>
         </div>
 
         <div class="col-6">
@@ -71,72 +70,23 @@
 
     </div>
     <hr>
-    <p class="mt-4"><span class="big-text ">Расскажите о себе:        </span><a id="editInfo" class="text-muted link-text"><i class="bi bi-pencil"></i> Редактировать</a></p>
+    <p class="mt-4"><span class="big-text ">Обо мне:</span></p>
     <div id="info">
-    {% if staff.info == "" %}
-    <div>
-        <p class="label-text text-danger">Укажите информацию о себе, чтобы с большей вероятностью заинтересовать заказчика</p>
-    </div>
-    {% else %}
-    <div>
         <p class="label-text">{{ staff.info|linebreaksbr }}</p>
     </div>
-    {% endif %}
-    </div>
 
-    <div id="add-info">
-        <form action="{% url 'profile_edit_info' telegram_id=staff.telegram_id %}" method="post">
-            {% csrf_token %}
-            <div class="form-group">
-                <textarea class="form-control form-control-sm form-rounded" name="info" rows="6" placeholder="Расскажите о вашем опыте, на каких десертах специализируетесь и другую информацию, которая может быть полезна потенциальному заказчику">{{ staff.info }}</textarea>
-            </div>
-            <div class="row">
-                <div class="col-7">
-                    <input type="submit" class="btn btn-sm btn-success mt-3 form-control-sm w-100" value="Сохранить">
-                </div>
-                <div class="col-5">
-                    <a id="info-back" class="btn btn-sm btn-outline-dark mt-3 w-100">Отменить</a>
-                </div>
-            </div>
-        </form>
-    </div>
 
     <hr>
 
-    <p class="mt-4"><span class="big-text ">Контактные данные:        </span><a id="editContacts" class="text-muted link-text"><i class="bi bi-pencil"></i> Редактировать</a></p>
+    <p class="mt-4"><span class="big-text ">Контактные данные:</span></p>
     <div id="contacts" class="container fs-3 fw-normal">
         <a class="text-dark linkcontacts-text" href="https://wa.me/{{ staff.phone }}"><i class="bi bi-whatsapp text-success"></i> <span class="fs-6 fw-bolder align-middle">+{{ staff.phone }}</span></a><br>
-        <a class="text-dark linkcontacts-text" href="https://instagram.com/{{ staff.instagram }}"><i class="bi bi-instagram instagram"></i> <span class="fs-6 fw-bolder align-middle">instagram.com/{{ staff.instagram }}</span></a><br>
+        <a class="text-dark linkcontacts-text" href="https://instagram.com/{{ staff.instagram }}"><i class="bi bi-instagram instagram"></i> <span class="fs-6 fw-bolder align-middle">instagram.com/{{ staff.instagram }}</span></a>
     </div>
 
-
-    <div id="add-contacts">
-        <form action="{% url 'profile_edit_contacts' telegram_id=staff.telegram_id %}" method="post">
-        {% csrf_token %}
-            <div class="form-group">
-                <label class="text-muted label-text" for="wa">Телефон (только цифры, без пробелов и символов):</label>
-                <input type="text" class="form-control form-control-sm form-rounded" id="wa" name="phone" value="{{ staff.phone }}">
-
-                <label class="text-muted label-text" for="instagram">Instagram (ник-нейм без @):</label>
-                <input type="text" class="form-control form-control-sm form-rounded" id="instagram" name="instagram" value="{{ staff.instagram }}">
-            </div>
-            <div class="row">
-                <div class="col-7">
-                    <input type="submit" class="btn btn-sm btn-success mt-3 form-control-sm w-100" value="Сохранить">
-                </div>
-                <div class="col-5">
-                    <a id="contacts-back" class="btn btn-sm btn-outline-dark mt-3 w-100">Отменить</a>
-                </div>
-            </div>
-            <div>
-                <p class="offer-text mt-2">Для изменения контактных данных по Telegram для получения уведомлений по заданиям, обращайтесь в поддержку</p>
-            </div>
-        </form>
-        <a class="text-muted link-text" href="{% url 'password_change' %}">Сменить пароль</a>
-    </div>
     <hr>
 
-    <p class="mt-4"><span class="big-text ">Города по которым получать заказы:</span><a id="editCities" class="text-muted link-text"><i class="bi bi-pencil"></i> Редактировать</a><a id="saveCities" class="text-danger link-text"><i class="bi bi-box-arrow-down"></i> Сохранить</a></p></p></p>
+    <p class="mt-4"><span class="big-text ">Работаю по городам:</span></p>
 
     <div id="cities-list" class="container">
         <div class="row justify-content-center">
@@ -152,36 +102,6 @@
         </div>
     </div>
 
-    <div id="add-cities" class="container">
-        <div class="row justify-content-center">
-            <div id="cities" class="col-12 border">
-                {% if cities|first|length == 0 %}
-                    <span class="offer-text city text-dark">Все города</span>
-                {% else %}
-                    {% for city in cities %}
-                    <span class="offer-text city"><a data-id="{{ city }}" class="text-dark delete-city">{{ city }}&nbsp;X</a></span>
-                    {% endfor %}
-                {% endif %}
-            </div>
-        </div>
-            <div class="mt-3">
-                <div class="row">
-                    <div class="col-12">
-                        <label for="add-city-input" class="label-text">Добавить город</label>
-                    </div>
-                    <div class="col-9">
-                        <input type="text" class="form-control form-control-sm" id="add-city-input" name="add-city">
-                        <div>
-                            <p id="not-city" class="offer-text">Добавить можно только город.</p>
-                            <p id="already-city" class="offer-text">Этот город у вас уже добавлен.</p>
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <button id="add-city" class="btn btn-sm btn-outline-dark dark" disabled>Добавить</button>
-                    </div>
-                </div>
-            </div>
-        </div>
 
     <hr>
     <p class="mt-4"><span class="big-text ">Отзывы:</span></p>
@@ -200,40 +120,9 @@
         {% else %}
         <p class="label-text">Отзывов пока что нет</p>
         {% endif %}
-
     </div>
+
 </div>
-
-<!--Модальное окно смены аватара-->
-<div class="modal fade" id="changeAvatar" tabindex="-1" aria-labelledby="ModalLabel11" aria-hidden="true">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="ModalLabel11">Изменить фото</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <div class="row">
-                    <div class="col-12">
-                        <img src="{{ staff.avatar.url }}" class="avatar">
-                    </div>
-                  </div>
-                  <form id="change-avatar" method="post" enctype="multipart/form-data">
-                    {% csrf_token %}
-
-                    <div class="form-group my-2">
-                        <label class="text-muted label-text" for="images">Загрузить новое фото</label>
-                        <input type="file" accept=".jpg, .jpeg, .png" class="form-control form-control-sm" id="images" name="avatar">
-                    </div>
-                    <div class="d-grid gap-2 mt-4">
-                        <input class="btn btn-success btn-md form-rounded" type="submit" value="Сохранить">
-                    </div>
-
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
 
 
 </main>
