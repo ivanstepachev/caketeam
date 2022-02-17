@@ -11,41 +11,65 @@
     <link href="https://cdn.jsdelivr.net/npm/suggestions-jquery@21.12.0/dist/css/suggestions.min.css" rel="stylesheet" />
     <link href="{% static 'css/style.css' %}" rel="stylesheet" />
     <link rel="shortcut icon" href="{% static 'images/favicon.ico' %}" type="image/x-icon">
+
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Gideon+Roman&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville&family=Playfair+Display&display=swap" rel="stylesheet">
     <title>Cake Team</title>
 </head>
 <body class="d-flex flex-column h-100">
 <style>
     .brand-text {
-        font-family: 'Gideon Roman', cursive !important;
+        font-family: 'Libre Baskerville', serif !important;
         font-weight: 900;
     }
     .blue-btn {
-        background-color: #18bedb;
+        background-color: #32edec;
           border: none;
-          color: white;
+          color: black;
           padding: 15px 32px;
           text-align: center;
           text-decoration: none;
           display: inline-block;
-          font-size: 1em;
+          font-size: 0.7em;
             font-weight: 500;
-          border-radius: 25px;
+            letter-spacing: 2px;
+          border-radius: 12px;
     }
     .input-title {
-    box-shadow:0 0 7px #11859d;
+    box-shadow:0 0 7px #5ec4c4;
+    border: none !important;
 }
 #second-screen {
-background-color: #18bedb;
+background-color: #f3f8ef;
+}
+
+#nav-color {
+ background-color: #404040 !important;
+}
+
+.action-text {
+    font-size: 1.1em;
+    line-height: 95%;
+    font-weight: 400;
+}
+.title-text {
+    font-family: 'Playfair Display', serif !important;
+}
+.row-fix {
+    height: 7em;
+}
+
+#ccc {
+    color: #608529;
 }
 </style>
 <main class="flex-shrink-0">
-<nav class="navbar navbar-expand-lg border-bottom navbar-light bg-light">
+<nav id="nav-color" class="navbar navbar-expand-lg border-bottom navbar-dark">
   <div class="container">
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="fs-2"><i class="bi bi-person fa-md text-muted"></i></span>
+      <span class="fs-2"><i class="bi bi-person fa-md text-light"></i></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
         {% if user.is_authenticated %}
@@ -74,7 +98,7 @@ background-color: #18bedb;
 </nav>
 
 <div class="container-fluid mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
-    <div id="first-form" class="container h-100">
+    <div id="first-form" class="container my-5 h-100">
         <form action="{% url 'quiz' %}" method="get">
             <div class="form-group">
                 <div class="row justify-content-center">
@@ -84,8 +108,8 @@ background-color: #18bedb;
                 </div>
                  <div class="row mb-2">
                     <div class="col-12">
-                        <h2 class="brand-text text-center">CAKETEAM</h2>
-                        <h6 class="text-center">Найди за пару минут кондитера, который выполнит любой твой заказ.</h6>
+                        <h2 class="brand-text text-center">CAKE TEAM</h2>
+                        <p class="text-center action-text">Найди за пару минут кондитера, который выполнит любой твой заказ.</p>
                     </div>
                 </div>
                 <div class="row">
@@ -93,14 +117,14 @@ background-color: #18bedb;
                         <input id="first-input" class="input-title form-control form-control-lg" type="text" placeholder="Что хотите заказть?" name="title">
                     </div>
                 </div>
-                <div class="row mt-2">
+                <div class="row mt-2 justify-content-center">
                     <div class="col-12">
                         <p class="offer-text text-muted">Например: <a class="add-to-input text-dark" href="#">торт на день рождения</a>, <a class="add-to-input text-dark" href="#">макаронс сегодня</a></p>
                     </div>
-                    <div class="col-12">
-                        <div class="d-grid gap-2">
-                        <input type="submit" class="blue-btn" value="Найти кондитера!">
-                        </div>
+                    <div class="col-8 text-center">
+
+                        <input type="submit" class="blue-btn text-center mb-5 w-100" value="НАЙТИ КОНДИТЕРА">
+
                     </div>
 
                 </div>
@@ -109,9 +133,46 @@ background-color: #18bedb;
     </div>
 </div>
 <!--Второй экран-->
-<div id="second-screen" class="mt-5 container-fluid bg-dark h-75">
+<div id="second-screen" class="container-fluid pt-2 pb-5">
+    <div class="container">
+        <div class="row">
+            <h3 class="title-text text-center my-5">Как это работает?</h3>
+        </div>
 
+        <div class="row row-fix justify-content-center mt-2">
+            <div class="col-2 col-md-1 col-lg-1">
+                <img src="{% static 'images/ready.png' %}" class="w-100 text-center">
+            </div>
+            <div class="col-9">
+                <p class="label-text text-left">Простота в использовании платформы: с вас ответы на несколько. С нас — подбор кондитеров, которые готовы выполнить заказ</p>
+            </div>
+        </div>
+
+
+        <div class="row row-fix justify-content-center mt-2">
+            <div class="col-2 col-md-1 col-lg-1">
+                <img src="{% static 'images/chef.png' %}" class="w-100 text-center">
+            </div>
+            <div class="col-9">
+                <p class="label-text text-left">Возможность найти «своего» мастера без листания Инстаграм по несколько часов и переписок в стиле «подскажите, сможете ли вы выполнить заказ к пятнице?»</p>
+            </div>
+        </div>
+
+        <div class="row row-fix justify-content-center mt-2">
+            <div class="col-2 col-md-1 col-lg-1">
+                <img src="{% static 'images/rating.png' %}" class="w-100 text-center">
+            </div>
+            <div class="col-9">
+                <p class="label-text text-left">Прозрачная система: вы получаете ссылки на работы, отзывы других покупателей и рейтинг самого кондитера</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+
+
+
 
 
 
@@ -130,7 +191,7 @@ background-color: #18bedb;
                     <span class="text-light offer-text"><i class="bi bi-instagram"></i> <a class="text-light" href="#">caketeam </a></span>
                 </div>
                 <div class="col-12 text-center mt-2">
-                    <br><span class="text-light offer-text">Тех.поддержка:</span> <span class="text-light label-text"><i class="bi bi-telegram"></i> <a class="text-light" href="https://t.me/i1nes">i1nes </a></span>
+                    <br><span class="text-light offer-text">Тех.поддержка:</span> <span class="text-light label-text"><i class="bi bi-telegram"></i> <a class="text-light" href="https://t.me/i1ness">@i1ness </a></span>
                 </div>
             </div>
         </div>
