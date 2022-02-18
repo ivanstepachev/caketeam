@@ -165,7 +165,7 @@ def confirm(request):
         order = respond.order
         phone = order.phone
         url = 'https://vp.voicepassword.ru/api/voice-password/send/'
-        apikey = '4e1300e2f3ca549fddcc35fef2e2dfa9'
+        apikey = APIKEY
         data = {"security": {"apiKey": f"{apikey}"}, "number": f"{phone}", "flashcall": {"code": f"{code}"}}
         requests.post(url, data=json.dumps(data))
         return HttpResponse('ok', content_type='text/plain', status=200)
