@@ -55,13 +55,10 @@ MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
 ]
 
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 CSRF_COOKIE_SECURE = True
 CSRF_TRUSTED_ORIGINS = ['https://caketeam.store']
-SECURE_HSTS_SECONDS = 60
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+
 
 ROOT_URLCONF = 'service.urls'
 
