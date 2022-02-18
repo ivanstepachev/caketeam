@@ -158,3 +158,5 @@ alphabet='abcdefghijklmnopqrstuvwxyz0123456789'
 
 db_from_env = dj_database_url.config()
 
+APIKEY = os.getenv('APIKEY')
+

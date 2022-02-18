@@ -17,7 +17,7 @@ import requests
 from quiz.handlers import handler, send_message
 from quiz.utilities import unique_view_of_order, to_hash, from_hash, mean_rating, format_date
 
-from service.settings import admin_id, hashid_salt, alphabet
+from service.settings import admin_id, hashid_salt, alphabet, APIKEY
 
 from hashids import Hashids
 
@@ -116,7 +116,7 @@ def quiz(request):
         order.order_url = order_url
         order.save()
         order_text = f'''🔴НОВОЕ ЗАДАНИЕ🔴\n{order.note}'''
-        keyboard = json.dumps({"inline_keyboard": [[{"text": "Разместить задание", 'url': f'https://caketeam.herokuapp.com/orders/{order.id}'}]]})
+        keyboard = json.dumps({"inline_keyboard": [[{"text": "Разместить задание", 'url': f'https://caketeam.store/orders/{order.id}'}]]})
         admin_staff_list = Staff.objects.filter(admin=True)
         for admin_staff in admin_staff_list:
             send_message(chat_id=int(admin_staff.telegram_id), text=order_text, reply_markup=keyboard)
@@ -165,7 +165,7 @@ def confirm(request):
         order = respond.order
         phone = order.phone
         url = 'https://vp.voicepassword.ru/api/voice-password/send/'
-        apikey = '4e1300e2f3ca549fddcc35fef2e2dfa9'
+        apikey = APIKEY
         data = {"security": {"apiKey": f"{apikey}"}, "number": f"{phone}", "flashcall": {"code": f"{code}"}}
         requests.post(url, data=json.dumps(data))
         return HttpResponse('ok', content_type='text/plain', status=200)
@@ -351,7 +351,7 @@ def order_detail(request, order_id):
                 hash_order_id = to_hash(order.id)
                 hash_telegram_id = to_hash(int(staff.telegram_id))
                 order_text = f'''⚠️ Заказ {numb_of_order}\n{order.note.replace(";", "")}'''
-                keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'http://127.0.0.1:8000/n/{hash_telegram_id}/{hash_order_id}'}]]})
+                keyboard = json.dumps({"inline_keyboard": [[{"text": "Оставить заявку", 'url': f'https://caketeam.store/n/{hash_telegram_id}/{hash_order_id}'}]]})
                 send_message(chat_id=int(staff.telegram_id), text=order_text, reply_markup=keyboard)
         return redirect('order_detail', order_id=order_id)
     else:
@@ -721,17 +721,3 @@ def edit_city(request):
             staff.cities = staff.cities.replace(f'{city};', '')
             staff.save()
         return HttpResponse('ok', content_type='text/plain', status=200)
-
-
-
-# {'update_id': 541049445, 'message':
-#     {'message_id': 60, 'from':
-#         {'id': 896205315, 'is_bot': False, 'first_name': 'Ivan', 'username': 'ivan40', 'language_code': 'ru'},
-#      'chat': {'id': 896205315, 'first_name': 'Ivan', 'username': 'ivan40', 'type': 'private'},
-#      'date': 1641148166, 'text': 'Hdbcnf'}}
-
-# {'update_id': 541049484, 'my_chat_member':
-#     {'chat': {'id': 1715664500, 'first_name': 'Alina', 'type': 'private'},
-#      'from': {'id': 1715664500, 'is_bot': False, 'first_name': 'Alina', 'language_code': 'ru'},
-#      'date': 1642118668, 'old_chat_member': {'user': {'id': 5043578506, 'is_bot': True, 'first_name': 'FirstBot', 'username': 'i1nes_bot'},
-#             'status': 'member'}, 'new_chat_member': {'user': {'id': 5043578506, 'is_bot': True, 'first_name': 'FirstBot', 'username': 'i1nes_bot'}, 'status': 'kicked', 'until_date': 0}}}

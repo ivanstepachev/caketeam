@@ -17,7 +17,7 @@ def handler(chat_id, text, username):
     if text.lower() == '/start':
         if len(Staff.objects.filter(telegram_id=chat_id)) == 0:
             answer = '''👋 Добро пожаловать на платформу. Здесь вы можете получать кондитерские задание. Для начала нужно пройти регистрацию, внимательно заполнив все данные.'''
-            keyboard = json.dumps({"inline_keyboard": [[{"text": "Регистрация", 'url': f'https://caketeam.herokuapp.com/reg/{chat_id}/{username.lower()}'}]]})
+            keyboard = json.dumps({"inline_keyboard": [[{"text": "Регистрация", 'url': f'https://caketeam.store/reg/{chat_id}/{username.lower()}'}]]})
             send_message(chat_id=chat_id, text=answer, reply_markup=keyboard)
         else:
             answer = '''Главное меню'''
@@ -28,7 +28,7 @@ def handler(chat_id, text, username):
         if len(Staff.objects.filter(telegram_id=chat_id)) > 0:
             answer = '''💼 Перейдите по ссылке, чтобы посмотреть все последние заказы на десерты\n\nВозврат в главное меню: /menu'''
             keyboard = json.dumps({"inline_keyboard": [
-                [{"text": "Все заказы", 'url': f'https://caketeam.herokuapp.com/a/orders'}]]})
+                [{"text": "Все заказы", 'url': f'https://caketeam.store/a/orders'}]]})
             send_message(chat_id=chat_id, text=answer, reply_markup=keyboard)
         else:
             answer = '''Вы не зарегистрированы. Нажмите /start'''
@@ -38,7 +38,7 @@ def handler(chat_id, text, username):
         if len(Staff.objects.filter(telegram_id=chat_id)) > 0:
             answer = '''👩‍🍳 Перейдите по ссылке, чтобы внести изменения в свой профиль.\n\nЗдесь вы можете добавить себе аватар, написать про свои навыки и поставить фильтр по городам, по которым будут приходить уведомления о новых заказах.\n\nВозврат в главное меню: /menu'''
             keyboard = json.dumps({"inline_keyboard": [
-                [{"text": "Редактировать мой профиль", 'url': f'https://caketeam.herokuapp.com/a/profile/{chat_id}'}]]})
+                [{"text": "Редактировать мой профиль", 'url': f'https://caketeam.store/a/profile/{chat_id}'}]]})
             send_message(chat_id=chat_id, text=answer, reply_markup=keyboard)
         else:
             answer = '''Вы не зарегистрированы. Нажмите /start'''
