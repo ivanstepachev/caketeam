@@ -142,8 +142,12 @@ def order_for_client(request, order_url):
         second = request.POST.get("second")
         third = request.POST.get("third")
         fourth = request.POST.get("fourth")
-        confirm_code = int(first + second + third + fourth)
-        respond = get_object_or_404(Respond, id=int(respond_id))
+        if first is not None and second is not None and third is not None and fourth is not None:
+            confirm_code = int(first + second + third + fourth)
+            respond = get_object_or_404(Respond, id=int(respond_id))
+        else:
+            return render(request, 'quiz/order_for_client.html',
+                          {'order': order, 'responds': responds, 'mistake': True})
         if confirm_code == respond.code:
             order.staff = respond.staff
             order.status = "WORK"
