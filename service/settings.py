@@ -85,7 +85,8 @@ WSGI_APPLICATION = 'service.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
-DB_PASSWORD = os.environ['DB_PASSWORD']
+DB_PASSWORD = os.getenv('DB_PASSWORD')
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',

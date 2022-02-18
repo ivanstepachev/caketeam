@@ -478,10 +478,11 @@ def order_respond_login(request, order_id, telegram_id):
                             Image.objects.create(image=image, respond=respond)
                 return redirect('order_respond_login', order_id=order.id, telegram_id=staff.telegram_id)
             else:
+                # Если неверный пин код
                 keyboard = json.dumps({'keyboard': [["Заказы"], ["Мой профиль"], ["Мой pin-код"], ["Тех поддержка"]],
                                        'one_time_keyboard': True, 'resize_keyboard': True})
                 send_message(chat_id=int(staff.telegram_id), text="Вы ввели неверный pin-код", reply_markup=keyboard)
-                return redirect('order_respond', hash_order_id=hash_order_id, hash_telegram_id=hash_telegram_id)
+                return redirect('order_respond_login', order_id=order_id, telegram_id=telegram_id)
         elif request.method == 'GET':
             if order.status == "FIND" or order.status == "WORK" or order.status == "DONE":
                 notes = order.note.replace('-', '<br>')
