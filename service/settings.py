@@ -146,8 +146,8 @@ STATICFILES_DIRS = (
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 MEDIA_URL = 'media/'
-MEDIA_ROOT = 'media'
-# MEDIA_ROOT = os.environ.get('EDGE_URL', '') + '/media/'
+
+MEDIA_ROOT = os.environ.get('EDGE_URL', '') + '/media/'
 
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL = '/a/orders'
