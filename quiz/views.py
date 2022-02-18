@@ -142,7 +142,7 @@ def order_for_client(request, order_url):
         second = request.POST.get("second")
         third = request.POST.get("third")
         fourth = request.POST.get("fourth")
-        if first is not None and second is not None and third is not None and fourth is not None:
+        if first != '' and second != '' and third != '' and fourth != '':
             confirm_code = int(first + second + third + fourth)
             respond = get_object_or_404(Respond, id=int(respond_id))
         else:
