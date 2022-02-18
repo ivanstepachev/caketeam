@@ -189,7 +189,8 @@ def review_done(request, order_url):
             second = request.POST.get("second")
             third = request.POST.get("third")
             fourth = request.POST.get("fourth")
-            confirm_code = int(first + second + third + fourth)
+            if first != '' and second != '' and third != '' and fourth != '':
+                confirm_code = int(first + second + third + fourth)
             if respond.code == confirm_code:
                 text = request.POST.get("text")
                 rating = int(request.POST.get("rating"))
