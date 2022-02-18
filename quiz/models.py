@@ -262,4 +262,4 @@ class Token(models.Model):
     token = models.CharField(max_length=60)
 
     def __str__(self):
-        return 'token'
+        return str(self.id)
