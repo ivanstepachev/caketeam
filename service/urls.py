@@ -51,7 +51,10 @@ urlpatterns = [
     path('delete/foto', quiz_views.delete_foto, name="delete_foto"),
     path('calc', quiz_views.calc, name="calc"),
     path('<str:order_url>', quiz_views.order_for_client, name="order_for_client")
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 handler404 = 'quiz.views.handler404'
 handler500 = 'quiz.views.handler500'
