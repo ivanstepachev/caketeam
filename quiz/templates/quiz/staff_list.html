@@ -37,7 +37,7 @@
 <div id="{{ i.id }}" class="container-fluid border-bottom border-top pt-2">
         <div class="row">
             <div class="col-6">
-                <p class="fw-bold lh-sm">{{ i.name}} {{ i.surname }}
+                <p class="fw-bold lh-sm"><a href="{% url 'profile' i.telegram_id %}">{{ i.name}} {{ i.surname }}</a>
                     <br> <small class="text-muted offer-text fa-6">Статус: <span class="badge bg-danger">Неактивен</span></small>
                     <br> <small class="text-muted offer-text">Регистрация: <b class="text-dark">{{ i.date|date:'d.m.Y H:i' }}</b></small>
                     <br> <small class="text-muted offer-text">Города: {{ i.cities }}</small>
@@ -67,7 +67,7 @@
 <div id="{{ a.id }}" class="container-fluid border-bottom border-top pt-2">
         <div class="row">
             <div class="col-6">
-                <p class="fw-bold lh-sm">{{ a.name}} {{ a.surname }}
+                <p class="fw-bold lh-sm"><a href="{% url 'profile' a.telegram_id %}">{{ a.name}} {{ a.surname }}</a>
                     <br> <small class="text-muted offer-text">Статус: <span class="badge bg-success">Активен</span></small>
                     <br> <small class="text-muted offer-text">Регистрация: <b class="text-dark">{{ a.date|date:'d.m.Y H:i' }}</b></small>
                     <br> <small class="text-muted offer-text">Города: {{ a.cities }}</small>
