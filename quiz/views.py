@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
-from quiz.models import Order, Token, Respond, Image, Staff, ReferenceImage, Review
+from quiz.models import Order, Token, Respond, Image, Staff, ReferenceImage, Review, Avatar
 
 from django.template import RequestContext
 from django.contrib.auth import login, authenticate
@@ -529,8 +529,8 @@ def profile_edit(request, telegram_id):
         elif request.method == "POST":
             avatar = request.FILES.get('avatar')
             if avatar:
-                staff.avatar = avatar
-                staff.save()
+                avatar = Avatar(avatar=avatar, staff=staff)
+                avatar.save()
             return redirect('profile_edit', telegram_id=telegram_id)
     else:
         raise Http404("Такой страницы нет")

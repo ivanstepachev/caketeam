@@ -52,7 +52,11 @@
     <h3 class="mb-4 mt-2 fw-bolder">{{ staff.name}} {{ staff.surname }}</h3>
     <div class="row">
         <div class="col-6">
+            {% if staff.avatar.url == '' %}
+            <img src="https://caketeam.store/media/avatars/ava_F68lBxi_xbswx2G.jpeg" class="avatar">
+            {% else %}
             <img src="{{ staff.avatar.url }}" class="avatar">
+            {% endif %}
             <div class="d-grid gap-2 mt-2">
                 <a data-bs-toggle="modal" data-bs-target="#changeAvatar" class="btn btn-light btn-sm"><i class="bi bi-camera-fill"></i> Изменить фото</a>
             </div>
@@ -215,7 +219,11 @@
               <div class="modal-body">
                   <div class="row">
                     <div class="col-12">
+                        {% if staff.avatar.url == '' %}
+                        <img src="https://caketeam.store/media/avatars/ava_F68lBxi_xbswx2G.jpeg" class="avatar">
+                        {% else %}
                         <img src="{{ staff.avatar.url }}" class="avatar">
+                        {% endif %}
                     </div>
                   </div>
                   <form id="change-avatar" method="post" enctype="multipart/form-data">
