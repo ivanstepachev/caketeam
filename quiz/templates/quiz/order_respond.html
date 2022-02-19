@@ -180,7 +180,7 @@
         <div class="row mt-3 mb-2">
             <div class="col-3 mt-2">
                 {% if respond.staff.avatar == '' %}
-                <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava.jpeg" class="responds-block avatar">
+                <img src="{% static 'images/ava.jpg' %}" class="avatar">
                 {% else %}
                 <img src="{{ respond.staff.avatar.avatar.url }}" class="responds-block avatar">
                 {% endif %}

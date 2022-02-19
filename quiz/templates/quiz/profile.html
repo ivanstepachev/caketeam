@@ -55,7 +55,7 @@
     <div class="row">
         <div class="col-6">
             {% if staff.avatar == '' %}
-            <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava.jpeg" class="avatar">
+            <img src="{% static 'images/ava.jpg' %}" class="avatar">
             {% else %}
             <img src="{{ staff.avatar.avatar.url }}" class="avatar">
             {% endif %}
