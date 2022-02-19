@@ -179,7 +179,7 @@
     <p class="label-text">Вы уже оставили отклик. Так его видит заказчик:</p>
         <div class="row mt-3 mb-2">
             <div class="col-3 mt-2">
-                {% if respond.staff.avatar.avatar.url == '' %}
+                {% if respond.staff.avatar is None %}
                 <p>b{{ respond.staff.avatar.avatar.url }}</p>
                 <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava_F68lBxi_xbswx2G.jpeg" class="responds-block avatar">
                 {% else %}

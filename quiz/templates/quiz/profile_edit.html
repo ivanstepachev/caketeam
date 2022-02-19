@@ -219,7 +219,7 @@
               <div class="modal-body">
                   <div class="row">
                     <div class="col-12">
-                        {% if staff.avatar.url == '' %}
+                        {% if staff.avatar is None %}
                         <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava_F68lBxi_xbswx2G.jpeg" class="avatar">
                         {% else %}
                         <img src="{{ staff.avatar.avatar.url }}" class="avatar">
