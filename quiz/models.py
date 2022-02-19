@@ -30,6 +30,9 @@ class Avatar(models.Model):
     avatar = models.ImageField(upload_to='avatars/')
     staff = models.OneToOneField(Staff, on_delete=models.CASCADE, related_name='avatar')
 
+    def __str__(self):
+        return str(self.staff.username)
+
     def save(self, *args, **kwargs):
         super().save()
         img = PillowImage.open(self.avatar.path)
