@@ -53,10 +53,10 @@
     <div class="row">
         <div class="col-6">
             {% if staff.avatar.url == '' %}
-            <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava_F68lBxi_xbswx2G.jpeg class="avatar">
+            <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava_F68lBxi_xbswx2G.jpeg" class="avatar">
             {% else %}
             <img src="{{ staff.avatar.avatar.url }}" class="avatar">
-            <p>{{ staff.avatar.avatar.url }}</p>
+            <p>{{ MEDIA_URL }}{{ staff.avatar.avatar.url }}</p>
             {% endif %}
             <div class="d-grid gap-2 mt-2">
                 <a data-bs-toggle="modal" data-bs-target="#changeAvatar" class="btn btn-light btn-sm"><i class="bi bi-camera-fill"></i> Изменить фото</a>
