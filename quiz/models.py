@@ -28,7 +28,7 @@ class Staff(models.Model):
 
 class Avatar(models.Model):
     avatar = models.ImageField(upload_to='avatars/')
-    staff = models.OneToOneField(Staff, on_delete=models.CASCADE)
+    staff = models.OneToOneField(Staff, on_delete=models.CASCADE, related_name='avatar')
 
     def save(self, *args, **kwargs):
         super().save()

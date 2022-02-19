@@ -529,8 +529,13 @@ def profile_edit(request, telegram_id):
         elif request.method == "POST":
             avatar = request.FILES.get('avatar')
             if avatar:
-                avatar = Avatar(avatar=avatar, staff=staff)
-                avatar.save()
+                if len(Avatar.objects.filter(staff=staff)) > 0:
+                    ava = Avatar.objects.filter(staff=staff)[0]
+                    ava.avatar = avatar
+                    ava.save()
+                else:
+                    ava = Avatar(avatar=avatar, staff=staff)
+                    ava.save()
             return redirect('profile_edit', telegram_id=telegram_id)
     else:
         raise Http404("Такой страницы нет")
