@@ -5,7 +5,7 @@ from PIL import ImageOps, Image as PillowImage
 
 
 class Staff(models.Model):
-    avatar = models.ImageField(upload_to='avatars/', default='static/images/ava.jpg')
+    avatar = models.ImageField(upload_to='avatars/')
     username = models.CharField(max_length=25, default='')
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, default='')
     name = models.CharField(max_length=15, default='')

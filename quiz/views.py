@@ -9,6 +9,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse, Http404
 from random import randint
 from django.db.models import Q
+from django.templatetags.static import static
 
 import json
 
@@ -247,7 +248,7 @@ def registration(request, chat_id, username):
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
             user = User.objects.create_user(username=username, email=email, password=password)
-            staff = Staff(username=username, telegram_id=chat_id, cities="", name=name, surname=surname, pin=pin, phone=phone, instagram=instagram, user=user)
+            staff = Staff(username=username, telegram_id=chat_id, cities="", name=name, surname=surname, pin=pin, phone=phone, instagram=instagram, user=user, avatar=static('images/ava.jpg'))
             staff.save()
             login(request, user)
         # Добавить клавиатуру для добавления пользователя
