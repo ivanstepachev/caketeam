@@ -67,8 +67,8 @@
         <b class="name-text text-center">Ваш заказ выполняет:</b>
         <div class="row mt-3 mb-2">
                 <div class="col-3 mt-2">
-                    {% if staff.avatar.url == '' %}
-                    <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava_F68lBxi_xbswx2G.jpeg" class="responds-block avatar">
+                    {% if respond.staff.avatar == '' %}
+                    <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava.jpeg" class="responds-block avatar">
                     {% else %}
                     <img src="{{ respond.staff.avatar.avatar.url }}" class="responds-block avatar">
                     {% endif %}
@@ -174,8 +174,8 @@
 
         <div class="row mt-3 mb-2">
                 <div class="col-3 mt-2">
-                    {% if staff.avatar.url == '' %}
-                    <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava_F68lBxi_xbswx2G.jpeg" class="responds-block avatar">
+                    {% if respond.staff.avatar == '' %}
+                    <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava.jpeg" class="responds-block avatar">
                     {% else %}
                     <img src="{{ respond.staff.avatar.avatar.url }}" class="responds-block avatar">
                     {% endif %}
@@ -257,8 +257,8 @@
     <div class="container respond-card mt-3 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
         <div class="row mt-3 mb-2">
             <div class="col-3 mt-2">
-                {% if staff.avatar.url == '' %}
-                <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava_F68lBxi_xbswx2G.jpeg" class="responds-block avatar">
+                {% if respond.staff.avatar == '' %}
+                <img src="https://d1rscgf2gt4l52.cloudfront.net/media/avatars/ava.jpeg" class="responds-block avatar">
                 {% else %}
                 <img src="{{ respond.staff.avatar.avatar.url }}" class="responds-block avatar">
                 {% endif %}
