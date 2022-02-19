@@ -1,9 +1,10 @@
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, re_path
 from quiz import views as quiz_views
 from django.conf.urls.static import static
 from service import settings
 from django.contrib.auth import views as auth_views
+from django.views.static import serve
 
 
 urlpatterns = [
@@ -50,10 +51,11 @@ urlpatterns = [
     path('reg/<str:chat_id>/<str:username>', quiz_views.registration, name="registration"),
     path('delete/foto', quiz_views.delete_foto, name="delete_foto"),
     path('calc', quiz_views.calc, name="calc"),
-    path('<str:order_url>', quiz_views.order_for_client, name="order_for_client")
+    path('<str:order_url>', quiz_views.order_for_client, name="order_for_client"),
+    re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}),
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+# urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 handler404 = 'quiz.views.handler404'
