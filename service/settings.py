@@ -80,26 +80,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'service.wsgi.application'
 
-
-# Database
-# https://docs.djangoproject.com/en/4.0/ref/settings/#databases
-#
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'd5ucbshikjqf2p',
-        'USER': 'ujykedqzrssrtx',
+        'NAME': '',
+        'USER': '',
         'PASSWORD': DB_PASSWORD,
-        'HOST': 'ec2-34-249-247-7.eu-west-1.compute.amazonaws.com',
-        'PORT': '5432',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
@@ -194,7 +184,7 @@ LOGIN_REDIRECT_URL = '/a/orders'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-admin_id = 896205315
+admin_id = os.getenv('admin_id')
 
 hashid_salt = "the best of the best"
 alphabet='abcdefghijklmnopqrstuvwxyz0123456789'
